@@ -17,14 +17,32 @@
     "commands": [
       {
         "command": "rename-angular-component.renameComponent",
-        "title": "Rename Component"
+        "title": "Rename Angular Component"
+      },
+      {
+        "command": "rename-angular-component.renameDirective",
+        "title": "Rename Angular Directive"
+      },
+      {
+        "command": "rename-angular-component.renameService",
+        "title": "Rename Angular Service"
       }
     ],
     "menus": {
       "explorer/context": [
         {
-          "when": "resourceFilename =~ /^.+\\.(component|directive|service)\\.(spec.ts|scss|html|ts)$/",
+          "when": "resourceFilename =~ /^.+\\.component\\.(spec.ts|scss|html|ts)$/",
           "command": "rename-angular-component.renameComponent",
+          "group": "navigation"
+        },
+        {
+          "when": "resourceFilename =~ /^.+\\.directive\\.(spec.ts|scss|html|ts)$/",
+          "command": "rename-angular-component.renameDirective",
+          "group": "navigation"
+        },
+        {
+          "when": "resourceFilename =~ /^.+\\.service\\.(spec.ts|ts)$/",
+          "command": "rename-angular-component.renameService",
           "group": "navigation"
         }
       ]

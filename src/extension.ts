@@ -3,6 +3,7 @@
 import { FileHandle } from 'fs/promises';
 import { FileInfoResult } from 'prettier';
 import * as vscode from 'vscode';
+import { rename } from './rename-helpers';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -18,51 +19,19 @@ export function activate(context: vscode.ExtensionContext) {
   // The commandId parameter must match the command field in package.json
   let renameComponent = vscode.commands.registerCommand(
     'rename-angular-component.renameComponent',
-    (e) => {
-      const filePath: string = e.path;
-      const lastSlash = filePath.lastIndexOf('/');
-      const path = filePath.substr(0, lastSlash);
-      const file = filePath.substr(
-        lastSlash + 1,
-        filePath.length - lastSlash - 1
-      );
-      console.log(path, file);
-
-      vscode.window.showInputBox({
-        title: 'Rename file stub',
-        prompt:
-          'Type the new filename stub you want to rename to. Use kebab case.',
-        value: file,
-      });
-      // Display a message box to the user
-      vscode.window.showInformationMessage(
-        'Hello World from Rename Angular Component!'
-      );
-    }
+    (e) => rename('component', e.path)
   );
   context.subscriptions.push(renameComponent);
 
   let renameDirective = vscode.commands.registerCommand(
     'rename-angular-component.renameDirective',
-    () => {
-      // The code you place here will be executed every time your command is executed
-      // Display a message box to the user
-      vscode.window.showInformationMessage(
-        'Hello World from Rename Angular Directive!'
-      );
-    }
+    (e) => rename('directive', e.path)
   );
   context.subscriptions.push(renameDirective);
 
   let renameService = vscode.commands.registerCommand(
     'rename-angular-component.renameService',
-    () => {
-      // The code you place here will be executed every time your command is executed
-      // Display a message box to the user
-      vscode.window.showInformationMessage(
-        'Hello World from Rename Angular Service!'
-      );
-    }
+    (e) => rename('service', e.path)
   );
   context.subscriptions.push(renameService);
 }

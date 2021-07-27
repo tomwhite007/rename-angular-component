@@ -3,6 +3,7 @@
   "displayName": "Rename Angular Component",
   "description": "Rename Angular Components, Directives and Services",
   "version": "0.0.1",
+  "license": "MIT",
   "engines": {
     "vscode": "^1.58.0"
   },
@@ -74,5 +75,8 @@
     "ts-loader": "^9.2.2",
     "webpack": "^5.38.1",
     "webpack-cli": "^4.7.0"
+  },
+  "dependencies": {
+    "change-case": "^4.1.2"
   }
 }

@@ -37,7 +37,7 @@
           "group": "navigation"
         },
         {
-          "when": "resourceFilename =~ /^.+\\.directive\\.(spec.ts|scss|html|ts)$/",
+          "when": "resourceFilename =~ /^.+\\.directive\\.(spec.ts|ts)$/",
           "command": "rename-angular-component.renameDirective",
           "group": "navigation"
         },

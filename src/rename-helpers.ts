@@ -67,7 +67,7 @@ function renameToNewStub(
 
   const fs = require('fs');
   fs.readdirSync(fileDetails.path).forEach((file: string) => {
-    if (likeFilesRegex.test(file)) {
+    if (likeFilesRegex.test(file) && file.startsWith(fileDetails.stub)) {
       console.log(file);
     }
   });

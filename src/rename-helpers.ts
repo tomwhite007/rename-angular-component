@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { camelCase } from 'camel-case';
 import { pascalCase } from 'pascal-case';
 import { paramCase } from 'param-case';
+import * as fs from 'fs';
 
 export type AngularConstruct = 'component' | 'directive' | 'service' | 'module';
 export interface OriginalFileDetails {
@@ -12,6 +13,11 @@ export interface OriginalFileDetails {
 const componentRegex = /^.+\.component\.(spec.ts|scss|html|ts)$/;
 const directiveRegex = /^.+\.directive\.(spec.ts|ts)$/;
 const serviceRegex = /^.+\.service\.(spec.ts|ts)$/;
+const likeFilesRegexLookup: { [key: string]: RegExp } = {
+  component: componentRegex,
+  directive: directiveRegex,
+  service: serviceRegex,
+};
 
 export function rename(construct: AngularConstruct, filePath: string) {
   const fileDetails = originalFileDetails(filePath);
@@ -43,7 +49,7 @@ function originalFileDetails(filePath: string): OriginalFileDetails {
 function renameToNewStub(
   construct: AngularConstruct,
   newStub: string | undefined,
-  fileDetails: OriginalFileDetails
+  selectedFileDetails: OriginalFileDetails
 ) {
   // component = 4 files, directive|service = 2 files to rename
 
@@ -58,19 +64,30 @@ function renameToNewStub(
   newStub = paramCase(newStub);
 
   // select the right regex
-  const likeFilesRegexLookup: { [key: string]: RegExp } = {
-    component: componentRegex,
-    directive: directiveRegex,
-    service: serviceRegex,
-  };
   const likeFilesRegex = likeFilesRegexLookup[construct];
 
-  const fs = require('fs');
-  fs.readdirSync(fileDetails.path).forEach((file: string) => {
-    if (likeFilesRegex.test(file) && file.startsWith(fileDetails.stub)) {
-      console.log(file);
-    }
+  const foundFilesToRename: string[] = fs
+    .readdirSync(selectedFileDetails.path)
+    .filter(
+      (file: string) =>
+        likeFilesRegex.test(file) && file.startsWith(selectedFileDetails.stub)
+    );
+
+  foundFilesToRename.forEach((foundFile) => {
+    const newFilename = foundFile.replace(
+      RegExp(`^${selectedFileDetails.stub}`),
+      <string>newStub
+    );
+    fs.renameSync(
+      `${selectedFileDetails.path}/${foundFile}`,
+      `${selectedFileDetails.path}/${newFilename}`
+    );
   });
+
+  vscode.window.showInformationMessage(
+    `Successfully renamed!
+    How about that?`
+  );
 
   // console.log('camelCase', camelCase(stub));
   // console.log('pascalCase', pascalCase(stub));

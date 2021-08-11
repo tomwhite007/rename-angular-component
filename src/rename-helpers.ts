@@ -62,14 +62,17 @@ function renameToNewStub(
   // make sure it's kebab
   newStub = paramCase(newStub);
 
-  // TODO: Only do if Component
-  // rename folder
-  const { newPath, renameFolderErrorMsgs } = renameFolder(
-    selectedFileDetails.stub,
-    newStub,
-    selectedFileDetails.path
-  );
-  selectedFileDetails.path = newPath;
+  let renameFolderErrorMsgs: string[] = [];
+  if (construct === 'component') {
+    // rename folder if component
+    let newPath: string;
+    ({ newPath, renameFolderErrorMsgs } = renameFolder(
+      selectedFileDetails.stub,
+      newStub,
+      selectedFileDetails.path
+    ));
+    selectedFileDetails.path = newPath;
+  }
 
   // TODO: fix rename for service
   // find files to rename

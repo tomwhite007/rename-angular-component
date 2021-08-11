@@ -11,7 +11,9 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:rename-angular-component.renameComponent"
+    "onCommand:rename-angular-component.renameComponent",
+    "onCommand:rename-angular-component.renameDirective",
+    "onCommand:rename-angular-component.renameService"
   ],
   "main": "./dist/extension.js",
   "contributes": {

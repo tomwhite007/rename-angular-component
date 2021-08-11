@@ -25,14 +25,12 @@ export function rename(construct: AngularConstruct, filePath: string) {
 
   vscode.window
     .showInputBox({
-      title: 'Rename file stub',
+      title: `Rename Angular ${pascalCase(construct)}`,
       prompt:
         'Type the new filename stub you want to rename to (use kebab / dashed case).',
       value: fileDetails.stub,
     })
     .then((newStub) => renameToNewStub(construct, newStub, fileDetails));
-
-  // TODO: need to validate stub for illegal chars and let user know slashes not allowed
 }
 
 function originalFileDetails(filePath: string): OriginalFileDetails {
@@ -57,11 +55,14 @@ function renameToNewStub(
   }
   if (newStub === selectedFileDetails.stub) {
     return logInfo('. No files changed.', construct);
-    return;
+  }
+  if (newStub.match(/^([a-z]+)+(\-[a-z]+)*$/)) {
+    return logInfo('. Text entered is not kebab case.', construct);
   }
   // make sure it's kebab
   newStub = paramCase(newStub);
 
+  // TODO: Only do if Component
   // rename folder
   const { newPath, renameFolderErrorMsgs } = renameFolder(
     selectedFileDetails.stub,
@@ -70,6 +71,7 @@ function renameToNewStub(
   );
   selectedFileDetails.path = newPath;
 
+  // TODO: fix rename for service
   // find files to rename
   const { foundFilesToRename, findFileErrorMsgs } = findFilesToRename(
     selectedFileDetails.path,

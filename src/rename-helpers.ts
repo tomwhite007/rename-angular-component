@@ -56,9 +56,10 @@ function renameToNewStub(
   if (newStub === selectedFileDetails.stub) {
     return logInfo('. No files changed.', construct);
   }
-  if (newStub.match(/^([a-z]+)+(\-[a-z]+)*$/)) {
+  if (!newStub.match(/^([a-z0-9]+)+(\-[a-z0-9]+)*$/)) {
     return logInfo('. Text entered is not kebab case.', construct);
   }
+  // TODO: check if cli allows any special characters when creating services!!!
   // make sure it's kebab
   newStub = paramCase(newStub);
 
@@ -74,7 +75,6 @@ function renameToNewStub(
     selectedFileDetails.path = newPath;
   }
 
-  // TODO: fix rename for service
   // find files to rename
   const { foundFilesToRename, findFileErrorMsgs } = findFilesToRename(
     selectedFileDetails.path,

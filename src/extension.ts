@@ -3,7 +3,7 @@
 import { FileHandle } from 'fs/promises';
 import { FileInfoResult } from 'prettier';
 import * as vscode from 'vscode';
-import { rename } from './rename-helpers';
+import { rename } from './helpers/rename.function';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed

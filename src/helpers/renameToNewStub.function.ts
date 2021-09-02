@@ -3,10 +3,10 @@ import {
   OriginalFileDetails,
 } from './definitions/file.interfaces';
 import { paramCase } from 'param-case';
-import { logInfo } from './logInfo.function';
-import { findFilesToRename } from './findFilesToRename.function';
-import { getComponentClassFileDetails } from './getComponentClassFileDetails.function';
-import { logErrors } from './logErrors.function';
+import { findFilesToRename } from './fileManipulation/findFilesToRename.function';
+import { getComponentClassFileDetails } from './classFileDetails/getComponentClassFileDetails.function';
+import { logErrors } from './logging/logErrors.function';
+import { logInfo } from './logging/logInfo.function';
 
 export function renameToNewStub(
   construct: AngularConstruct,
@@ -71,17 +71,45 @@ export function renameToNewStub(
   // TODO: rename filename and folder import paths
   // TODO: fix sub folder imports afterwards
 
-  // TODO: rename Class name
+  // get Class name and selector details
   const componentClassFileDetails = getComponentClassFileDetails(
     foundFilesToRename.map(
       (file: string) => selectedFileDetails.path + '/' + file
     ),
     selectedFileDetails.path + '/' + selectedFileDetails.stub
   );
+
+  // TODO: rename Class name
+  // Rename Class
+
   // TODO: rename Class imports
 
   // TODO: rename Selector
   // TODO: rename Selector where used in templates
+
+  // TODO: may need allowance for special chars in file path / name...
+  // Inside Class File:
+
+  // imports:
+  // import[\s\{\}A-Za-z,]*["']+[@\/\.A-Za-z\-]*["']+;?
+
+  // component meta
+  // @Component\(\{[\v\sa-zA-Z:'"\-,\.\/\[\]]*\}\)
+
+  // TODO: check if selectors can be more than kebab
+  // selector:\s?('|")[a-z\-]+('|"),?
+
+  // class line
+  // export class [A-Za-z\s]+\{
+  // note: remember class name can repeat in file
+
+  // Other Files:
+
+  // imports:
+  // import[\s\{\}A-Za-z,]*["']+[@\/\.A-Za-z\-]*["']+;?
+  // then replace class name wherever in the file
+
+  // exports (barrel files)
 
   // console.log('camelCase', camelCase(stub));
   // console.log('pascalCase', pascalCase(stub));

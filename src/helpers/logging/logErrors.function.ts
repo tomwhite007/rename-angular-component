@@ -1,4 +1,4 @@
-import { AngularConstruct } from './definitions/file.interfaces';
+import { AngularConstruct } from '../definitions/file.interfaces';
 import { logInfo } from './logInfo.function';
 
 export function logErrors(construct: AngularConstruct, textLines?: string[]) {

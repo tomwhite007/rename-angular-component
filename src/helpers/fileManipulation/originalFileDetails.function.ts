@@ -1,4 +1,4 @@
-import { OriginalFileDetails } from './definitions/file.interfaces';
+import { OriginalFileDetails } from '../definitions/file.interfaces';
 
 export function originalFileDetails(filePath: string): OriginalFileDetails {
   const lastSlash = filePath.lastIndexOf('/');

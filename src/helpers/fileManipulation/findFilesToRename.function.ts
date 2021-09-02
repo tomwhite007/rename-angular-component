@@ -1,5 +1,5 @@
-import { AngularConstruct } from './definitions/file.interfaces';
-import { likeFilesRegexPartialLookup } from './definitions/file-regex.constants';
+import { AngularConstruct } from '../definitions/file.interfaces';
+import { likeFilesRegexPartialLookup } from '../definitions/file-regex.constants';
 import * as fs from 'fs';
 
 export function findFilesToRename(

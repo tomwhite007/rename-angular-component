@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import { pascalCase } from 'pascal-case';
 import { AngularConstruct } from './definitions/file.interfaces';
-import { originalFileDetails } from './originalFileDetails.function';
 import { renameToNewStub } from './renameToNewStub.function';
+import { originalFileDetails } from './fileManipulation/originalFileDetails.function';
 
 export function rename(construct: AngularConstruct, filePath: string) {
   const fileDetails = originalFileDetails(filePath);

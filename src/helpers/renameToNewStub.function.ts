@@ -3,10 +3,12 @@ import {
   OriginalFileDetails,
 } from './definitions/file.interfaces';
 import { paramCase } from 'param-case';
+import { pascalCase } from 'pascal-case';
 import { findFilesToRename } from './fileManipulation/findFilesToRename.function';
 import { getComponentClassFileDetails } from './classFileDetails/getComponentClassFileDetails.function';
 import { logErrors } from './logging/logErrors.function';
 import { logInfo } from './logging/logInfo.function';
+import { renameClass } from './inFileEdits/renameClass.function';
 
 export function renameToNewStub(
   construct: AngularConstruct,
@@ -72,15 +74,22 @@ export function renameToNewStub(
   // TODO: fix sub folder imports afterwards
 
   // get Class name and selector details
-  const componentClassFileDetails = getComponentClassFileDetails(
+  const {
+    classFileDetails,
+    getComponentClassFileDetailsErrorMsgs,
+  } = getComponentClassFileDetails(
     foundFilesToRename.map(
       (file: string) => selectedFileDetails.path + '/' + file
     ),
     selectedFileDetails.path + '/' + selectedFileDetails.stub
   );
 
-  // TODO: rename Class name
   // Rename Class
+  const newClassName = `${pascalCase(newStub)}${pascalCase(construct)}`;
+  const { renameClasssuccessMsg, renameClassErrorMsgs } = renameClass(
+    classFileDetails.className,
+    newClassName
+  );
 
   // TODO: rename Class imports
 

@@ -90,6 +90,9 @@ export function renameToNewStub(
     classFileDetails.className,
     newClassName
   );
+  if (renameClassErrorMsgs.length) {
+    return logErrors(construct, renameClassErrorMsgs);
+  }
 
   // TODO: rename Class imports
 

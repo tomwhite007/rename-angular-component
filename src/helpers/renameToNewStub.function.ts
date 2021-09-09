@@ -9,6 +9,7 @@ import { getComponentClassFileDetails } from './classFileDetails/getComponentCla
 import { logErrors } from './logging/logErrors.function';
 import { logInfo } from './logging/logInfo.function';
 import { renameClass } from './inFileEdits/renameClass.function';
+import { renameSelector } from './inFileEdits/renameSelector.function';
 
 export function renameToNewStub(
   construct: AngularConstruct,
@@ -84,20 +85,32 @@ export function renameToNewStub(
     selectedFileDetails.path + '/' + selectedFileDetails.stub
   );
 
-  // Rename Class
+  // Rename Class and Imports
   const newClassName = `${pascalCase(newStub)}${pascalCase(construct)}`;
+  const oldFileName = `${selectedFileDetails.stub}.${construct}`;
+  const newFileName = `${newStub}.${construct}`;
   const { renameClasssuccessMsg, renameClassErrorMsgs } = renameClass(
     classFileDetails.className,
-    newClassName
+    newClassName,
+    oldFileName,
+    newFileName
   );
   if (renameClassErrorMsgs.length) {
     return logErrors(construct, renameClassErrorMsgs);
   }
 
-  // TODO: rename Class imports
+  // rename Selector
+  const { renameSelectorSuccessMsg, renameSelectorErrorMsgs } = renameSelector(
+    classFileDetails.selector,
+    classFileDetails.selector.replace(selectedFileDetails.stub, newStub)
+  );
+  if (renameSelectorErrorMsgs.length) {
+    return logErrors(construct, renameSelectorErrorMsgs);
+  }
 
-  // TODO: rename Selector
-  // TODO: rename Selector where used in templates
+  // TODO: rename Selector in Class file!!!
+
+  // TODO: how to limit scope? I have two apps with same named components
 
   // TODO: may need allowance for special chars in file path / name...
   // Inside Class File:
@@ -129,5 +142,9 @@ export function renameToNewStub(
 
   // console.log(vscode.workspace.getWorkspaceFolder({j}))
 
-  logInfo(' success', construct, renameFolderErrorMsgs);
+  logInfo(' success', construct, [
+    ...renameFolderErrorMsgs,
+    ...renameClasssuccessMsg,
+    ...renameSelectorSuccessMsg,
+  ]);
 }

@@ -80,6 +80,7 @@
   },
   "dependencies": {
     "change-case": "^4.1.2",
+    "escape-string-regexp": "^5.0.0",
     "replace-in-file": "^6.2.0"
   }
 }

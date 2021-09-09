@@ -1,6 +1,6 @@
-import { AngularConstruct } from './definitions/file.interfaces';
 import * as vscode from 'vscode';
 import { pascalCase } from 'pascal-case';
+import { AngularConstruct } from '../definitions/file.interfaces';
 
 export function logInfo(
   additionalInfoMessage: string,

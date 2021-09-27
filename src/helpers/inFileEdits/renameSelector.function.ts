@@ -14,7 +14,7 @@ export function renameSelector(originalSelector: string, newSelector: string) {
   };
 
   let renameSelectorSuccessMsg = '';
-  let renameSelectorErrorMsgs = [''];
+  let renameSelectorErrorMsgs: string[] = [];
 
   try {
     const results = replace.sync(options);

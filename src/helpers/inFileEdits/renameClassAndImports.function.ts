@@ -2,7 +2,7 @@ import { getProjectRoot } from '../definitions/getProjectRootFilePath.function';
 import * as replace from 'replace-in-file';
 import escapeStringRegexp from 'escape-string-regexp';
 
-export function renameClass(
+export function renameClassAndImports(
   originalClassName: string,
   newClassName: string,
   oldFilePath: string,
@@ -29,7 +29,7 @@ export function renameClass(
   };
 
   let renameClasssuccessMsg = '';
-  let renameClassErrorMsgs = [''];
+  let renameClassErrorMsgs: string[] = [];
 
   try {
     const results = replace.sync(options);

@@ -8,8 +8,11 @@ import { findFilesToRename } from './fileManipulation/findFilesToRename.function
 import { getComponentClassFileDetails } from './classFileDetails/getComponentClassFileDetails.function';
 import { logErrors } from './logging/logErrors.function';
 import { logInfo } from './logging/logInfo.function';
-import { renameClass } from './inFileEdits/renameClass.function';
+import { renameClassAndImports } from './inFileEdits/renameClassAndImports.function';
 import { renameSelector } from './inFileEdits/renameSelector.function';
+import { applyInClassFileChanges } from './inFileEdits/applyInClassFileChanges.function';
+import { renameFolder } from './fileManipulation/renameFolder.function';
+import { renameEachFile } from './fileManipulation/renameEachFile.function';
 
 export function renameToNewStub(
   construct: AngularConstruct,
@@ -33,16 +36,16 @@ export function renameToNewStub(
 
   // rename folder if is component
   let renameFolderErrorMsgs: string[] = [];
-  // if (construct === 'component') {
-  //   // rename folder if component
-  //   let newPath: string;
-  //   ({ newPath, renameFolderErrorMsgs } = renameFolder(
-  //     selectedFileDetails.stub,
-  //     newStub,
-  //     selectedFileDetails.path
-  //   ));
-  //   selectedFileDetails.path = newPath;
-  // }
+  if (construct === 'component') {
+    // rename folder if component
+    let newPath: string;
+    ({ newPath, renameFolderErrorMsgs } = renameFolder(
+      selectedFileDetails.stub,
+      newStub,
+      selectedFileDetails.path
+    ));
+    selectedFileDetails.path = newPath;
+  }
 
   // find files to rename
   const { foundFilesToRename, findFileErrorMsgs } = findFilesToRename(
@@ -58,38 +61,60 @@ export function renameToNewStub(
   }
 
   // rename each file
-  // const { renamedFiles, renameFilesErrorMsgs } = renameEachFile(
-  //   foundFilesToRename,
-  //   selectedFileDetails.stub,
-  //   newStub,
-  //   selectedFileDetails.path
-  // );
-  // if (renameFilesErrorMsgs.length) {
-  //   return logErrors(construct, [
-  //     ...renameFolderErrorMsgs,
-  //     ...renameFilesErrorMsgs,
-  //   ]);
-  // }
+  const { renamedFiles, renameFilesErrorMsgs } = renameEachFile(
+    foundFilesToRename,
+    selectedFileDetails.stub,
+    newStub,
+    selectedFileDetails.path
+  );
+  if (renameFilesErrorMsgs.length) {
+    return logErrors(construct, [
+      ...renameFolderErrorMsgs,
+      ...renameFilesErrorMsgs,
+    ]);
+  }
 
-  // TODO: rename filename and folder import paths
-  // TODO: fix sub folder imports afterwards
+  // *** External file manipulations completed ***
 
   // get Class name and selector details
   const {
     classFileDetails,
     getComponentClassFileDetailsErrorMsgs,
   } = getComponentClassFileDetails(
-    foundFilesToRename.map(
-      (file: string) => selectedFileDetails.path + '/' + file
-    ),
-    selectedFileDetails.path + '/' + selectedFileDetails.stub
+    renamedFiles,
+    selectedFileDetails.path + '/' + newStub
   );
+  if (getComponentClassFileDetailsErrorMsgs.length) {
+    return logErrors(construct, getComponentClassFileDetailsErrorMsgs);
+  }
 
-  // Rename Class and Imports
+  const classFilePath = `${selectedFileDetails.path}/${newStub}.${construct}.ts`;
   const newClassName = `${pascalCase(newStub)}${pascalCase(construct)}`;
   const oldFileName = `${selectedFileDetails.stub}.${construct}`;
   const newFileName = `${newStub}.${construct}`;
-  const { renameClasssuccessMsg, renameClassErrorMsgs } = renameClass(
+  const newSelector = classFileDetails.selector.replace(
+    selectedFileDetails.stub,
+    newStub
+  );
+  console.log('classFilePath', classFilePath);
+
+  // rename Class and Selector inside Class File
+  const {
+    applyInClassFileChangeSuccessMsg,
+    applyInClassFileChangesErrorMsgs,
+  } = applyInClassFileChanges(
+    classFilePath,
+    classFileDetails.className,
+    newClassName,
+    classFileDetails.selector,
+    newSelector
+  );
+  if (applyInClassFileChangesErrorMsgs.length) {
+    return logErrors(construct, applyInClassFileChangesErrorMsgs);
+  }
+
+  // Rename Class and Imports
+  const { renameClasssuccessMsg, renameClassErrorMsgs } = renameClassAndImports(
     classFileDetails.className,
     newClassName,
     oldFileName,
@@ -102,13 +127,11 @@ export function renameToNewStub(
   // rename Selector
   const { renameSelectorSuccessMsg, renameSelectorErrorMsgs } = renameSelector(
     classFileDetails.selector,
-    classFileDetails.selector.replace(selectedFileDetails.stub, newStub)
+    newSelector
   );
   if (renameSelectorErrorMsgs.length) {
     return logErrors(construct, renameSelectorErrorMsgs);
   }
-
-  // TODO: rename Selector in Class file!!!
 
   // TODO: how to limit scope? I have two apps with same named components
 
@@ -144,7 +167,8 @@ export function renameToNewStub(
 
   logInfo(' success', construct, [
     ...renameFolderErrorMsgs,
-    ...renameClasssuccessMsg,
-    ...renameSelectorSuccessMsg,
+    applyInClassFileChangeSuccessMsg,
+    renameClasssuccessMsg,
+    renameSelectorSuccessMsg,
   ]);
 }

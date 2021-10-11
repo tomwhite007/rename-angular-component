@@ -5,10 +5,11 @@ export function applyInClassFileChanges(
   originalClassName: string,
   newClassName: string,
   originalSelector: string,
-  newSelector: string
+  newSelector: string,
+  oldStub: string,
+  newStub: string,
+  construct: string
 ) {
-  console.log('applyInClassFileChanges filePath', filePath);
-
   const oriClassRegex = new RegExp(
     `(?<![A-Za-z]+)${originalClassName}(?![A-Za-z]+)`,
     'g'
@@ -17,11 +18,15 @@ export function applyInClassFileChanges(
     `(?<=['"]{1})${originalSelector}(?=['"]{1})`,
     'g'
   );
+  const templateAndStylePathRegex = new RegExp(
+    `(?<=['"]{1}\\.\\/)${oldStub}\\.${construct}(?=\\.(scss|html)['"]{1})`,
+    'g'
+  );
 
   const options = {
     files: filePath,
-    from: [oriClassRegex, oriSelectorRegex],
-    to: [newClassName, newSelector],
+    from: [oriClassRegex, oriSelectorRegex, templateAndStylePathRegex],
+    to: [newClassName, newSelector, `${newStub}.${construct}`],
   };
 
   let applyInClassFileChangeSuccessMsg = '';

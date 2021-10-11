@@ -5,8 +5,8 @@ import escapeStringRegexp from 'escape-string-regexp';
 export function renameClassAndImports(
   originalClassName: string,
   newClassName: string,
-  oldFilePath: string,
-  newFilePath: string
+  oldLocalFilePath: string,
+  newLocalFilePath: string
 ) {
   const oriClassRegex = new RegExp(
     `(?<![A-Za-z]+)${originalClassName}(?![A-Za-z]+)`,
@@ -14,7 +14,7 @@ export function renameClassAndImports(
   );
   const oriImportRegex = new RegExp(
     `import[\\s\\n]+\\{[\\s\\n]+[a-z,\\s]+[\\s\\n]+\\}[\\s\\n]+from[\\s\\n]+['"]{1}[^'"\\n]+${escapeStringRegexp(
-      oldFilePath
+      oldLocalFilePath
     )}['"]{1}`,
     'gi'
   );
@@ -24,7 +24,7 @@ export function renameClassAndImports(
     from: [oriClassRegex, oriImportRegex],
     to: [
       newClassName,
-      (match: string) => match.replace(oldFilePath, newFilePath),
+      (match: string) => match.replace(oldLocalFilePath, newLocalFilePath),
     ],
   };
 

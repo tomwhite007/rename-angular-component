@@ -44,6 +44,12 @@ export function renameToNewStub(
       newStub,
       selectedFileDetails.path
     ));
+    console.log(
+      'renamed folder from ',
+      selectedFileDetails.path,
+      ' to ',
+      newPath
+    );
     selectedFileDetails.path = newPath;
   }
 
@@ -88,10 +94,11 @@ export function renameToNewStub(
     return logErrors(construct, getComponentClassFileDetailsErrorMsgs);
   }
 
+  // TODO: add replace for folder if required
   const classFilePath = `${selectedFileDetails.path}/${newStub}.${construct}.ts`;
   const newClassName = `${pascalCase(newStub)}${pascalCase(construct)}`;
-  const oldFileName = `${selectedFileDetails.stub}.${construct}`;
-  const newFileName = `${newStub}.${construct}`;
+  const oldLocalFilePath = `${selectedFileDetails.stub}/${selectedFileDetails.stub}.${construct}`;
+  const newLocalFilePath = `${newStub}/${newStub}.${construct}`;
   const newSelector = classFileDetails.selector.replace(
     selectedFileDetails.stub,
     newStub
@@ -107,7 +114,10 @@ export function renameToNewStub(
     classFileDetails.className,
     newClassName,
     classFileDetails.selector,
-    newSelector
+    newSelector,
+    selectedFileDetails.stub,
+    newStub,
+    construct
   );
   if (applyInClassFileChangesErrorMsgs.length) {
     return logErrors(construct, applyInClassFileChangesErrorMsgs);
@@ -117,8 +127,8 @@ export function renameToNewStub(
   const { renameClasssuccessMsg, renameClassErrorMsgs } = renameClassAndImports(
     classFileDetails.className,
     newClassName,
-    oldFileName,
-    newFileName
+    oldLocalFilePath,
+    newLocalFilePath
   );
   if (renameClassErrorMsgs.length) {
     return logErrors(construct, renameClassErrorMsgs);

@@ -13,6 +13,7 @@ import { renameSelector } from './inFileEdits/renameSelector.function';
 import { applyInClassFileChanges } from './inFileEdits/applyInClassFileChanges.function';
 import { renameFolder } from './fileManipulation/renameFolder.function';
 import { renameEachFile } from './fileManipulation/renameEachFile.function';
+import { checkCanRenameFolder } from './fileManipulation/checkCanRenameFolder.function';
 
 export function renameToNewStub(
   construct: AngularConstruct,
@@ -36,21 +37,34 @@ export function renameToNewStub(
 
   // rename folder if is component
   let renameFolderErrorMsgs: string[] = [];
+  let folderRenamed = false;
+
   if (construct === 'component') {
-    // rename folder if component
-    let newPath: string;
-    ({ newPath, renameFolderErrorMsgs } = renameFolder(
-      selectedFileDetails.stub,
-      newStub,
-      selectedFileDetails.path
-    ));
-    console.log(
-      'renamed folder from ',
+    const {
+      canRenameFolder,
+      findFilesToNotRenameErrorMsgs,
+    } = checkCanRenameFolder(
       selectedFileDetails.path,
-      ' to ',
-      newPath
+      selectedFileDetails.stub,
+      construct
     );
-    selectedFileDetails.path = newPath;
+    if (findFilesToNotRenameErrorMsgs.length) {
+      return logErrors(construct, [...findFilesToNotRenameErrorMsgs]);
+    }
+
+    if (canRenameFolder) {
+      let newPath: string;
+      ({ newPath, renameFolderErrorMsgs, folderRenamed } = renameFolder(
+        selectedFileDetails.stub,
+        newStub,
+        selectedFileDetails.path
+      ));
+      if (folderRenamed) {
+        selectedFileDetails.path = newPath;
+      }
+    } else {
+      renameFolderErrorMsgs = ["Can't rename folder with extra files in it."];
+    }
   }
 
   // find files to rename
@@ -97,8 +111,12 @@ export function renameToNewStub(
   // TODO: add replace for folder if required
   const classFilePath = `${selectedFileDetails.path}/${newStub}.${construct}.ts`;
   const newClassName = `${pascalCase(newStub)}${pascalCase(construct)}`;
-  const oldLocalFilePath = `${selectedFileDetails.stub}/${selectedFileDetails.stub}.${construct}`;
-  const newLocalFilePath = `${newStub}/${newStub}.${construct}`;
+  const oldLocalFilePath = `${folderRenamed && selectedFileDetails.stub + '/'}${
+    selectedFileDetails.stub
+  }.${construct}`;
+  const newLocalFilePath = `${
+    folderRenamed && newStub + '/'
+  }${newStub}.${construct}`;
   const newSelector = classFileDetails.selector.replace(
     selectedFileDetails.stub,
     newStub

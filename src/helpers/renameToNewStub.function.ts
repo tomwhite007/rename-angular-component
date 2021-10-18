@@ -14,6 +14,9 @@ import { applyInClassFileChanges } from './inFileEdits/applyInClassFileChanges.f
 import { renameFolder } from './fileManipulation/renameFolder.function';
 import { renameEachFile } from './fileManipulation/renameEachFile.function';
 import { checkCanRenameFolder } from './fileManipulation/checkCanRenameFolder.function';
+import { renameFolderIfComponentWithNotExtraFiles as renameFolderIfComponentWithNoExtraFiles } from './logic/renameFolderIfComponentWithNoExtraFiles';
+
+const validSelectorPattern = /^[a-zA-Z][.0-9a-zA-Z]*(:?-[a-zA-Z][.0-9a-zA-Z]*)*$/;
 
 export function renameToNewStub(
   construct: AngularConstruct,
@@ -28,7 +31,7 @@ export function renameToNewStub(
   if (newStub === selectedFileDetails.stub) {
     return logInfo('. No files changed.', construct);
   }
-  if (!newStub.match(/^[a-zA-Z][.0-9a-zA-Z]*(:?-[a-zA-Z][.0-9a-zA-Z]*)*$/)) {
+  if (!newStub.match(validSelectorPattern)) {
     return logInfo('. Text entered is not a valid selector.', construct);
   }
   // TODO: LATER: check if cli allows any special characters when creating services!!!
@@ -36,35 +39,22 @@ export function renameToNewStub(
   newStub = paramCase(newStub);
 
   // rename folder if is component
-  let renameFolderErrorMsgs: string[] = [];
-  let folderRenamed = false;
-
-  if (construct === 'component') {
-    const {
-      canRenameFolder,
-      findFilesToNotRenameErrorMsgs,
-    } = checkCanRenameFolder(
-      selectedFileDetails.path,
-      selectedFileDetails.stub,
-      construct
-    );
-    if (findFilesToNotRenameErrorMsgs.length) {
-      return logErrors(construct, [...findFilesToNotRenameErrorMsgs]);
-    }
-
-    if (canRenameFolder) {
-      let newPath: string;
-      ({ newPath, renameFolderErrorMsgs, folderRenamed } = renameFolder(
-        selectedFileDetails.stub,
-        newStub,
-        selectedFileDetails.path
-      ));
-      if (folderRenamed) {
-        selectedFileDetails.path = newPath;
-      }
-    } else {
-      renameFolderErrorMsgs = ["Can't rename folder with extra files in it."];
-    }
+  const {
+    newPath,
+    folderRenamed,
+    renameFolderErrorMsgs,
+    findFilesToNotRenameErrorMsgs,
+  } = renameFolderIfComponentWithNoExtraFiles(
+    construct,
+    selectedFileDetails.path,
+    selectedFileDetails.stub,
+    newStub
+  );
+  if (findFilesToNotRenameErrorMsgs.length) {
+    return logErrors(construct, [...findFilesToNotRenameErrorMsgs]);
+  }
+  if (folderRenamed) {
+    selectedFileDetails.path = newPath;
   }
 
   // find files to rename

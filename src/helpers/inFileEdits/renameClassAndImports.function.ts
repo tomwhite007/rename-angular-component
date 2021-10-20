@@ -1,8 +1,8 @@
-import { getProjectRoot } from '../definitions/getProjectRootFilePath.function';
 import * as replace from 'replace-in-file';
 import escapeStringRegexp from 'escape-string-regexp';
 
 export function renameClassAndImports(
+  projectRoot: string,
   originalClassName: string,
   newClassName: string,
   oldLocalFilePath: string,
@@ -20,7 +20,7 @@ export function renameClassAndImports(
   );
 
   const options = {
-    files: `${getProjectRoot()}/**/*.ts`,
+    files: `${projectRoot}/**/*.ts`,
     from: [oriClassRegex, oriImportRegex],
     to: [
       newClassName,
@@ -32,7 +32,7 @@ export function renameClassAndImports(
   let renameClassErrorMsgs: string[] = [];
 
   try {
-    const results = replace.sync(options);
+    const results = replace.replaceInFileSync(options);
     renameClasssuccessMsg = `Renamed Class in ${
       results.filter((res) => res.hasChanged).length
     } files.`;

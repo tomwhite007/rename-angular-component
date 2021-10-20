@@ -1,14 +1,17 @@
-import { getProjectRoot } from '../definitions/getProjectRootFilePath.function';
 import * as replace from 'replace-in-file';
 
-export function renameSelector(originalSelector: string, newSelector: string) {
+export function renameSelector(
+  projectRoot: string,
+  originalSelector: string,
+  newSelector: string
+) {
   const oriSelectorRegex = new RegExp(
     `(?<=<|<\\/)${originalSelector}(?=\\n|\\s|>)`,
     'g'
   );
 
   const options = {
-    files: `${getProjectRoot()}/**/*.html`,
+    files: `${projectRoot}/**/*.html`,
     from: oriSelectorRegex,
     to: newSelector,
   };
@@ -17,7 +20,7 @@ export function renameSelector(originalSelector: string, newSelector: string) {
   let renameSelectorErrorMsgs: string[] = [];
 
   try {
-    const results = replace.sync(options);
+    const results = replace.replaceInFileSync(options);
     renameSelectorSuccessMsg = `Renamed selector in ${
       results.filter((res) => res.hasChanged).length
     } files.`;

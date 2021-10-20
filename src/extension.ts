@@ -19,19 +19,19 @@ export function activate(context: vscode.ExtensionContext) {
   // The commandId parameter must match the command field in package.json
   let renameComponent = vscode.commands.registerCommand(
     'rename-angular-component.renameComponent',
-    (e) => rename('component', e.path)
+    (uri: vscode.Uri) => rename('component', uri)
   );
   context.subscriptions.push(renameComponent);
 
   let renameDirective = vscode.commands.registerCommand(
     'rename-angular-component.renameDirective',
-    (e) => rename('directive', e.path)
+    (uri: vscode.Uri) => rename('directive', uri)
   );
   context.subscriptions.push(renameDirective);
 
   let renameService = vscode.commands.registerCommand(
     'rename-angular-component.renameService',
-    (e) => rename('service', e.path)
+    (uri: vscode.Uri) => rename('service', uri)
   );
   context.subscriptions.push(renameService);
 }

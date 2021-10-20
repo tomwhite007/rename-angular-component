@@ -11,9 +11,7 @@ import { logInfo } from './logging/logInfo.function';
 import { renameClassAndImports } from './inFileEdits/renameClassAndImports.function';
 import { renameSelector } from './inFileEdits/renameSelector.function';
 import { applyInClassFileChanges } from './inFileEdits/applyInClassFileChanges.function';
-import { renameFolder } from './fileManipulation/renameFolder.function';
 import { renameEachFile } from './fileManipulation/renameEachFile.function';
-import { checkCanRenameFolder } from './fileManipulation/checkCanRenameFolder.function';
 import { renameFolderIfComponentWithNotExtraFiles as renameFolderIfComponentWithNoExtraFiles } from './logic/renameFolderIfComponentWithNoExtraFiles';
 
 const validSelectorPattern = /^[a-zA-Z][.0-9a-zA-Z]*(:?-[a-zA-Z][.0-9a-zA-Z]*)*$/;
@@ -21,7 +19,8 @@ const validSelectorPattern = /^[a-zA-Z][.0-9a-zA-Z]*(:?-[a-zA-Z][.0-9a-zA-Z]*)*$
 export function renameToNewStub(
   construct: AngularConstruct,
   newStub: string | undefined,
-  selectedFileDetails: OriginalFileDetails
+  selectedFileDetails: OriginalFileDetails,
+  projectRoot: string
 ) {
   // component = 4 files, directive|service = 2 files to rename
 
@@ -111,7 +110,6 @@ export function renameToNewStub(
     selectedFileDetails.stub,
     newStub
   );
-  console.log('classFilePath', classFilePath);
 
   // rename Class and Selector inside Class File
   const {
@@ -133,6 +131,7 @@ export function renameToNewStub(
 
   // Rename Class and Imports
   const { renameClasssuccessMsg, renameClassErrorMsgs } = renameClassAndImports(
+    projectRoot,
     classFileDetails.className,
     newClassName,
     oldLocalFilePath,
@@ -144,6 +143,7 @@ export function renameToNewStub(
 
   // rename Selector
   const { renameSelectorSuccessMsg, renameSelectorErrorMsgs } = renameSelector(
+    projectRoot,
     classFileDetails.selector,
     newSelector
   );

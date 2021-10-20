@@ -1,7 +1,6 @@
 import { OriginalComponentClassFileDetails } from '../definitions/file.interfaces';
 import { componentClassFileRegexPartial } from '../definitions/file-regex.constants';
 import * as fs from 'fs';
-import { getNextWord } from './getNextWord.function';
 import { getClassName } from './getClassName.function';
 import { getSelector } from './getSelector.function';
 
@@ -24,6 +23,7 @@ export function getComponentClassFileDetails(
 
   classFileDetails.filePath =
     filesList.find((file: string) => componentClassFileRegex.test(file)) ?? '';
+  console.log('classFileDetails.filePath', classFileDetails.filePath);
 
   let classCode = '';
   try {

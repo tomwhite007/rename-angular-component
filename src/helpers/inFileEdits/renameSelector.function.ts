@@ -1,10 +1,18 @@
 import * as replace from 'replace-in-file';
+import { AngularConstruct } from '../definitions/file.interfaces';
 
 export function renameSelector(
+  construct: AngularConstruct,
   projectRoot: string,
   originalSelector: string,
   newSelector: string
 ) {
+  let renameSelectorSuccessMsg = '';
+  let renameSelectorErrorMsgs: string[] = [];
+  if (!['component', 'directive'].includes(construct)) {
+    return { renameSelectorSuccessMsg, renameSelectorErrorMsgs };
+  }
+
   const oriSelectorRegex = new RegExp(
     `(?<=<|<\\/)${originalSelector}(?=\\n|\\s|>)`,
     'g'
@@ -15,9 +23,6 @@ export function renameSelector(
     from: oriSelectorRegex,
     to: newSelector,
   };
-
-  let renameSelectorSuccessMsg = '';
-  let renameSelectorErrorMsgs: string[] = [];
 
   try {
     const results = replace.replaceInFileSync(options);

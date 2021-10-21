@@ -5,7 +5,7 @@ import {
 import { paramCase } from 'param-case';
 import { pascalCase } from 'pascal-case';
 import { findFilesToRename } from './fileManipulation/findFilesToRename.function';
-import { getComponentClassFileDetails } from './classFileDetails/getComponentClassFileDetails.function';
+import { getConstructClassFileDetails } from './classFileDetails/getConstructClassFileDetails.function';
 import { logErrors } from './logging/logErrors.function';
 import { logInfo } from './logging/logInfo.function';
 import { renameClassAndImports } from './inFileEdits/renameClassAndImports.function';
@@ -33,7 +33,7 @@ export function renameToNewStub(
   if (!newStub.match(validSelectorPattern)) {
     return logInfo('. Text entered is not a valid selector.', construct);
   }
-  // TODO: LATER: check if cli allows any special characters when creating services!!!
+  // TODO: LATER: check if cli allows any special characters and numbers when creating services!!!
   // make sure it's kebab
   newStub = paramCase(newStub);
 
@@ -89,7 +89,8 @@ export function renameToNewStub(
   const {
     classFileDetails,
     getComponentClassFileDetailsErrorMsgs,
-  } = getComponentClassFileDetails(
+  } = getConstructClassFileDetails(
+    construct,
     renamedFiles,
     selectedFileDetails.path + '/' + newStub
   );
@@ -143,6 +144,7 @@ export function renameToNewStub(
 
   // rename Selector
   const { renameSelectorSuccessMsg, renameSelectorErrorMsgs } = renameSelector(
+    construct,
     projectRoot,
     classFileDetails.selector,
     newSelector

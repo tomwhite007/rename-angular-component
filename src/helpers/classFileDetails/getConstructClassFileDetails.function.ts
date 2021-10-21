@@ -1,19 +1,20 @@
-import { OriginalComponentClassFileDetails } from '../definitions/file.interfaces';
-import { componentClassFileRegexPartial } from '../definitions/file-regex.constants';
+import {
+  AngularConstruct,
+  OriginalComponentClassFileDetails,
+} from '../definitions/file.interfaces';
 import * as fs from 'fs';
 import { getClassName } from './getClassName.function';
 import { getSelector } from './getSelector.function';
 
-export function getComponentClassFileDetails(
+export function getConstructClassFileDetails(
+  construct: AngularConstruct,
   filesList: string[],
   stub: string
 ): {
   classFileDetails: OriginalComponentClassFileDetails;
   getComponentClassFileDetailsErrorMsgs: string[];
 } {
-  const componentClassFileRegex = RegExp(
-    `^${stub}${componentClassFileRegexPartial}`
-  );
+  const componentClassFileRegex = RegExp(`^${stub}\.${construct}\.ts$`);
   const classFileDetails: OriginalComponentClassFileDetails = {
     filePath: '',
     className: '',
@@ -23,6 +24,7 @@ export function getComponentClassFileDetails(
 
   classFileDetails.filePath =
     filesList.find((file: string) => componentClassFileRegex.test(file)) ?? '';
+
   console.log('classFileDetails.filePath', classFileDetails.filePath);
 
   let classCode = '';
@@ -37,7 +39,7 @@ export function getComponentClassFileDetails(
 
   try {
     classFileDetails.className = getClassName(classCode);
-    classFileDetails.selector = getSelector(classCode);
+    classFileDetails.selector = getSelector(classCode, construct);
   } catch (e) {
     getComponentClassFileDetailsErrorMsgs = [e.message];
   }

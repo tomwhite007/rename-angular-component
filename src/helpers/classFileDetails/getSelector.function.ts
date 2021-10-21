@@ -1,6 +1,10 @@
+import { AngularConstruct } from '../definitions/file.interfaces';
 import { getNextWord } from './getNextWord.function';
 
-export function getSelector(classCode: string) {
+export function getSelector(classCode: string, construct: AngularConstruct) {
+  if (!['component', 'directive'].includes(construct)) {
+    return '';
+  }
   const metas = classCode.match(
     /@Component\(\{[\v\sa-zA-Z:'"\-,\.\/\[\]]*\}\)/g
   );

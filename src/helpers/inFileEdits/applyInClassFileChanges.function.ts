@@ -1,4 +1,5 @@
 import * as replace from 'replace-in-file';
+import escapeStringRegexp from 'escape-string-regexp';
 
 export function applyInClassFileChanges(
   filePath: string,
@@ -15,7 +16,7 @@ export function applyInClassFileChanges(
     'g'
   );
   const oriSelectorRegex = new RegExp(
-    `(?<=['"]{1})${originalSelector}(?=['"]{1})`,
+    `(?<=['"]{1})${escapeStringRegexp(originalSelector)}(?=['"]{1})`,
     'g'
   );
   const templateAndStylePathRegex = new RegExp(

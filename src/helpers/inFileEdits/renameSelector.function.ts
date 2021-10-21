@@ -9,7 +9,11 @@ export function renameSelector(
 ) {
   let renameSelectorSuccessMsg = '';
   let renameSelectorErrorMsgs: string[] = [];
-  if (!['component', 'directive'].includes(construct)) {
+  if (
+    !['component', 'directive'].includes(construct) ||
+    !originalSelector ||
+    !newSelector
+  ) {
     return { renameSelectorSuccessMsg, renameSelectorErrorMsgs };
   }
 

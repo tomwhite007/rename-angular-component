@@ -1,5 +1,6 @@
 import { AngularConstruct } from '../definitions/file.interfaces';
 import { getNextWord } from './getNextWord.function';
+import upperCaseFirst from 'upper-case-first';
 
 const componentMeta = /@Component\(\{[\v\sa-zA-Z:'"\-,\.\/\[\]]*\}\)/g;
 const directiveMeta = /@Directive\(\{[\v\sa-zA-Z:'"\-,\.\/\[\]]*\}\)/g;
@@ -22,10 +23,19 @@ export function getSelector(classCode: string, construct: AngularConstruct) {
     );
   }
 
-  const selectors = metas[0].match(/selector:\s?('|")[a-zA-Z\-\.\[\]]+('|")/g);
+  const selectors = metas[0].match(/selector:\s?('|")[a-zA-Z\-\[\]]+('|")/g);
   if (selectors?.length !== 1) {
+    if (construct === 'directive') {
+      // don't support .blah css selector for directives
+      return '';
+    }
+    if (selectors?.length === 0) {
+      throw new Error(
+        `Selector not found in @${upperCaseFirst(construct)} Meta`
+      );
+    }
     throw new Error(
-      'Unexpected number of Component Selectors in @Component Meta'
+      `Unexpected number of Selectors in @${upperCaseFirst(construct)} Meta`
     );
   }
 

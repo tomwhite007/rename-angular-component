@@ -13,6 +13,7 @@ import { renameSelector } from './inFileEdits/renameSelector.function';
 import { applyInClassFileChanges } from './inFileEdits/applyInClassFileChanges.function';
 import { renameEachFile } from './fileManipulation/renameEachFile.function';
 import { renameFolderIfComponentWithNotExtraFiles as renameFolderIfComponentWithNoExtraFiles } from './logic/renameFolderIfComponentWithNoExtraFiles';
+import { generateNewSelector } from './inFileEdits/generateNewSelector.funtion';
 
 const validSelectorPattern = /^[a-zA-Z][.0-9a-zA-Z]*(:?-[a-zA-Z][.0-9a-zA-Z]*)*$/;
 
@@ -107,7 +108,10 @@ export function renameToNewStub(
   const newLocalFilePath = `${
     folderRenamed && newStub + '/'
   }${newStub}.${construct}`;
-  const newSelector = classFileDetails.selector.replace(
+
+  const newSelector = generateNewSelector(
+    construct,
+    classFileDetails.selector,
     selectedFileDetails.stub,
     newStub
   );

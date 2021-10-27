@@ -1,5 +1,5 @@
 import { AngularConstruct } from '../definitions/file.interfaces';
-import * as camelcase from 'camelcase';
+import { pascalCase } from 'pascal-case';
 
 export function generateNewSelector(
   construct: AngularConstruct,
@@ -17,7 +17,10 @@ export function generateNewSelector(
       newSelector = oldSelector.replace(stub, newStub);
       break;
     case 'directive':
-      newSelector = oldSelector.replace(camelcase(stub), camelcase(newStub));
+      const oldBit = pascalCase(stub);
+      const newBit = pascalCase(newStub);
+      console.log(oldSelector, oldBit, newBit);
+      newSelector = oldSelector.replace(pascalCase(stub), pascalCase(newStub));
       break;
   }
 

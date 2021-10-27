@@ -1,5 +1,6 @@
 import * as replace from 'replace-in-file';
 import { AngularConstruct } from '../definitions/file.interfaces';
+import escapeStringRegexp from 'escape-string-regexp';
 
 export function renameSelector(
   construct: AngularConstruct,
@@ -9,18 +10,30 @@ export function renameSelector(
 ) {
   let renameSelectorSuccessMsg = '';
   let renameSelectorErrorMsgs: string[] = [];
-  if (
-    !['component', 'directive'].includes(construct) ||
-    !originalSelector ||
-    !newSelector
-  ) {
+  if (!originalSelector || !newSelector) {
     return { renameSelectorSuccessMsg, renameSelectorErrorMsgs };
   }
 
-  const oriSelectorRegex = new RegExp(
-    `(?<=<|<\\/)${originalSelector}(?=\\n|\\s|>)`,
-    'g'
-  );
+  let oriSelectorRegex: RegExp;
+
+  switch (construct) {
+    case 'component':
+      oriSelectorRegex = new RegExp(
+        `(?<=<|<\\/)${originalSelector}(?=\\n|\\s|>)`,
+        'g'
+      );
+      break;
+    case 'directive':
+      originalSelector = originalSelector.replace(/\[|\]/g, '');
+      newSelector = newSelector.replace(/\[|\]/g, '');
+      oriSelectorRegex = new RegExp(
+        `(?<=\\s)${originalSelector}(?=\\s|\\=|>)`,
+        'g'
+      );
+      break;
+    default:
+      return { renameSelectorSuccessMsg, renameSelectorErrorMsgs };
+  }
 
   const options = {
     files: `${projectRoot}/**/*.html`,

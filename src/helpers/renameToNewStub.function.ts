@@ -146,6 +146,9 @@ export function renameToNewStub(
     return logErrors(construct, renameClassErrorMsgs);
   }
 
+  // TODO: replace directive works for square brackets sort of needs more
+  //  missed clause for test file import!
+
   // rename Selector
   const { renameSelectorSuccessMsg, renameSelectorErrorMsgs } = renameSelector(
     construct,

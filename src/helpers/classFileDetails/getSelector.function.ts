@@ -1,6 +1,6 @@
 import { AngularConstruct } from '../definitions/file.interfaces';
 import { getNextWord } from './getNextWord.function';
-import upperCaseFirst from 'upper-case-first';
+import { capitalCase } from 'change-case';
 
 const componentMeta = /@Component\(\{[\v\sa-zA-Z:'"\-,\.\/\[\]]*\}\)/g;
 const directiveMeta = /@Directive\(\{[\v\sa-zA-Z:'"\-,\.\/\[\]]*\}\)/g;
@@ -30,12 +30,10 @@ export function getSelector(classCode: string, construct: AngularConstruct) {
       return '';
     }
     if (selectors?.length === 0) {
-      throw new Error(
-        `Selector not found in @${upperCaseFirst(construct)} Meta`
-      );
+      throw new Error(`Selector not found in @${capitalCase(construct)} Meta`);
     }
     throw new Error(
-      `Unexpected number of Selectors in @${upperCaseFirst(construct)} Meta`
+      `Unexpected number of Selectors in @${capitalCase(construct)} Meta`
     );
   }
 

@@ -2,7 +2,8 @@
   "name": "rename-angular-component",
   "displayName": "Rename Angular Component",
   "description": "Rename Angular Components, Directives and Services",
-  "version": "0.0.1",
+  "publisher": "tom",
+  "version": "0.1.0",
   "license": "MIT",
   "engines": {
     "vscode": "^1.58.0"

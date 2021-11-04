@@ -3,8 +3,11 @@
   "displayName": "Rename Angular Component",
   "description": "Rename Angular Components, Directives and Services",
   "publisher": "tom",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
+  "repository": {
+    "url": "https://github.com/tomwhite007/rename-angular-component"
+  },
   "engines": {
     "vscode": "^1.58.0"
   },
@@ -53,15 +56,16 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "yarn run package",
+    "vscode:prepublish": "npm run package",
     "compile": "webpack",
     "watch": "webpack --watch",
     "package": "webpack --mode production --devtool hidden-source-map",
     "test-compile": "tsc -p ./",
     "test-watch": "tsc -watch -p ./",
-    "pretest": "yarn run test-compile && yarn run lint",
+    "pretest": "npm run test-compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "build": "mkdir -p build && vsce package --out build/"
   },
   "devDependencies": {
     "@types/glob": "^7.1.3",

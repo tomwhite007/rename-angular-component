@@ -1,6 +1,6 @@
-import * as replace from 'replace-in-file';
-import { AngularConstruct } from '../definitions/file.interfaces';
-import escapeStringRegexp from 'escape-string-regexp';
+import * as replace from "replace-in-file";
+import { AngularConstruct } from "../definitions/file.interfaces";
+import escapeStringRegexp from "escape-string-regexp";
 
 export function renameSelector(
   construct: AngularConstruct,
@@ -8,7 +8,7 @@ export function renameSelector(
   originalSelector: string,
   newSelector: string
 ) {
-  let renameSelectorSuccessMsg = '';
+  let renameSelectorSuccessMsg = "";
   let renameSelectorErrorMsgs: string[] = [];
   if (!originalSelector || !newSelector) {
     return { renameSelectorSuccessMsg, renameSelectorErrorMsgs };
@@ -17,18 +17,18 @@ export function renameSelector(
   let oriSelectorRegex: RegExp;
 
   switch (construct) {
-    case 'component':
+    case "component":
       oriSelectorRegex = new RegExp(
         `(?<=<|<\\/)${originalSelector}(?=\\n|\\s|>)`,
-        'g'
+        "g"
       );
       break;
-    case 'directive':
-      originalSelector = originalSelector.replace(/\[|\]/g, '');
-      newSelector = newSelector.replace(/\[|\]/g, '');
+    case "directive":
+      originalSelector = originalSelector.replace(/\[|\]/g, "");
+      newSelector = newSelector.replace(/\[|\]/g, "");
       oriSelectorRegex = new RegExp(
         `(?<=\\s)${originalSelector}(?=\\s|\\=|>)`,
-        'g'
+        "g"
       );
       break;
     default:
@@ -37,6 +37,7 @@ export function renameSelector(
 
   const options = {
     files: `${projectRoot}/**/*.html`,
+    ignore: `${projectRoot}/node_modules/**/*`,
     from: oriSelectorRegex,
     to: newSelector,
   };
@@ -47,7 +48,7 @@ export function renameSelector(
       results.filter((res) => res.hasChanged).length
     } files.`;
   } catch (error) {
-    renameSelectorErrorMsgs = ['Error when renaming Class in files'];
+    renameSelectorErrorMsgs = ["Error when renaming Class in files"];
   }
 
   return { renameSelectorSuccessMsg, renameSelectorErrorMsgs };

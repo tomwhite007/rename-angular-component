@@ -37,7 +37,7 @@ export function renameSelector(
 
   const options = {
     files: `${projectRoot}/**/*.html`,
-    ignore: `${projectRoot}/node_modules/**/*`,
+    ignore: `${projectRoot}/node_modules/*`,
     from: oriSelectorRegex,
     to: newSelector,
   };

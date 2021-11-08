@@ -21,7 +21,7 @@ export function renameClassAndImports(
 
   const options = {
     files: `${projectRoot}/**/*.ts`,
-    ignore: `${projectRoot}/node_modules/**/*`,
+    ignore: `${projectRoot}/node_modules/*`,
     from: [oriClassRegex, oriImportRegex],
     to: [
       newClassName,

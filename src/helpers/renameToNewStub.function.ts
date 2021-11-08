@@ -15,7 +15,8 @@ import { renameEachFile } from './fileManipulation/renameEachFile.function';
 import { renameFolderIfComponentWithNotExtraFiles as renameFolderIfComponentWithNoExtraFiles } from './logic/renameFolderIfComponentWithNoExtraFiles';
 import { generateNewSelector } from './inFileEdits/generateNewSelector.funtion';
 
-const validSelectorPattern = /^[a-zA-Z][.0-9a-zA-Z]*(:?-[a-zA-Z][.0-9a-zA-Z]*)*$/;
+const validSelectorPattern =
+  /^[a-zA-Z][.0-9a-zA-Z]*(:?-[a-zA-Z][.0-9a-zA-Z]*)*$/;
 
 export function renameToNewStub(
   construct: AngularConstruct,
@@ -28,6 +29,9 @@ export function renameToNewStub(
   if (!newStub) {
     return logInfo('. Empty new name entered. No files changed.', construct);
   }
+
+  // remove postfix if present
+  newStub = newStub.replace(new RegExp(`\\.${construct}$`, 'i'), '');
   if (newStub === selectedFileDetails.stub) {
     return logInfo('. No files changed.', construct);
   }
@@ -87,14 +91,12 @@ export function renameToNewStub(
   // *** External file manipulations completed ***
 
   // get Class name and selector details
-  const {
-    classFileDetails,
-    getComponentClassFileDetailsErrorMsgs,
-  } = getConstructClassFileDetails(
-    construct,
-    renamedFiles,
-    selectedFileDetails.path + '/' + newStub
-  );
+  const { classFileDetails, getComponentClassFileDetailsErrorMsgs } =
+    getConstructClassFileDetails(
+      construct,
+      renamedFiles,
+      selectedFileDetails.path + '/' + newStub
+    );
   if (getComponentClassFileDetailsErrorMsgs.length) {
     return logErrors(construct, getComponentClassFileDetailsErrorMsgs);
   }
@@ -117,19 +119,17 @@ export function renameToNewStub(
   );
 
   // rename Class and Selector inside Class File
-  const {
-    applyInClassFileChangeSuccessMsg,
-    applyInClassFileChangesErrorMsgs,
-  } = applyInClassFileChanges(
-    classFilePath,
-    classFileDetails.className,
-    newClassName,
-    classFileDetails.selector,
-    newSelector,
-    selectedFileDetails.stub,
-    newStub,
-    construct
-  );
+  const { applyInClassFileChangeSuccessMsg, applyInClassFileChangesErrorMsgs } =
+    applyInClassFileChanges(
+      classFilePath,
+      classFileDetails.className,
+      newClassName,
+      classFileDetails.selector,
+      newSelector,
+      selectedFileDetails.stub,
+      newStub,
+      construct
+    );
   if (applyInClassFileChangesErrorMsgs.length) {
     return logErrors(construct, applyInClassFileChangesErrorMsgs);
   }

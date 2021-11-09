@@ -19,9 +19,7 @@ export function checkCanRenameFolder(
     foundFilesToNotRename = fs
       .readdirSync(path)
       .filter((file: string) => !likeFilesRegex.test(file));
-
-    console.log('foundFilesToNotRename', foundFilesToNotRename);
-  } catch {
+  } catch (e: any) {
     findFilesToNotRenameErrorMsgs = ['Finding files to not rename failed.'];
   }
 

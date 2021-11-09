@@ -1,5 +1,5 @@
-import * as replace from "replace-in-file";
-import escapeStringRegexp from "escape-string-regexp";
+import * as replace from 'replace-in-file';
+import escapeStringRegexp from 'escape-string-regexp';
 
 export function renameClassAndImports(
   projectRoot: string,
@@ -10,13 +10,13 @@ export function renameClassAndImports(
 ) {
   const oriClassRegex = new RegExp(
     `(?<![A-Za-z]+)${originalClassName}(?![A-Za-z]+)`,
-    "g"
+    'g'
   );
   const oriImportRegex = new RegExp(
     `import[\\s\\n]+\\{[\\s\\n]+[a-z,\\s]+[\\s\\n]+\\}[\\s\\n]+from[\\s\\n]+['"]{1}[^'"\\n]+${escapeStringRegexp(
       oldLocalFilePath
     )}['"]{1}`,
-    "gi"
+    'gi'
   );
 
   const options = {
@@ -29,16 +29,16 @@ export function renameClassAndImports(
     ],
   };
 
-  let renameClasssuccessMsg = "";
+  let renameClasssuccessMsg = '';
   let renameClassErrorMsgs: string[] = [];
 
   try {
     const results = replace.replaceInFileSync(options);
-    renameClasssuccessMsg = `Renamed Class in ${
+    renameClasssuccessMsg = `Renamed Class and import paths in ${
       results.filter((res) => res.hasChanged).length
     } files.`;
   } catch (error) {
-    renameClassErrorMsgs = ["Error when renaming Class in files"];
+    renameClassErrorMsgs = ['Error when renaming Class in files'];
   }
 
   return { renameClasssuccessMsg, renameClassErrorMsgs };

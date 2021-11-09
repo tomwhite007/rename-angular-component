@@ -14,6 +14,7 @@ import { applyInClassFileChanges } from './inFileEdits/applyInClassFileChanges.f
 import { renameEachFile } from './fileManipulation/renameEachFile.function';
 import { renameFolderIfComponentWithNotExtraFiles as renameFolderIfComponentWithNoExtraFiles } from './logic/renameFolderIfComponentWithNoExtraFiles';
 import { generateNewSelector } from './inFileEdits/generateNewSelector.funtion';
+import { performance } from 'perf_hooks';
 
 const validSelectorPattern =
   /^[a-zA-Z][.0-9a-zA-Z]*(:?-[a-zA-Z][.0-9a-zA-Z]*)*$/;
@@ -25,6 +26,8 @@ export function renameToNewStub(
   projectRoot: string
 ) {
   // component = 4 files, directive|service = 2 files to rename
+
+  const start = performance.now();
 
   if (!newStub) {
     return logInfo('. Empty new name entered. No files changed.', construct);
@@ -192,10 +195,13 @@ export function renameToNewStub(
 
   // console.log(vscode.workspace.getWorkspaceFolder({j}))
 
+  var end = performance.now();
+
   logInfo(' success', construct, [
     ...renameFolderErrorMsgs,
     applyInClassFileChangeSuccessMsg,
     renameClasssuccessMsg,
     renameSelectorSuccessMsg,
+    `Execution time: ${(end - start) / 1000} seconds`,
   ]);
 }

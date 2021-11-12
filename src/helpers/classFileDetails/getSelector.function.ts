@@ -2,8 +2,8 @@ import { AngularConstruct } from '../definitions/file.interfaces';
 import { getNextWord } from './getNextWord.function';
 import { capitalCase } from 'change-case';
 
-const componentMeta = /@Component\(\{[\v\sa-zA-Z:'"\-,\.\/\[\]]*\}\)/g;
-const directiveMeta = /@Directive\(\{[\v\sa-zA-Z:'"\-,\.\/\[\]]*\}\)/g;
+const componentMeta = /@Component\(\{(.|\n)*\}\)(?=[\s\n]*(export class))/g;
+const directiveMeta = /@Directive\(\{(.|\n)*\}\)(?=[\s\n]*(export class))/g;
 
 export function getSelector(classCode: string, construct: AngularConstruct) {
   let metas: RegExpMatchArray | null = [];
@@ -19,7 +19,7 @@ export function getSelector(classCode: string, construct: AngularConstruct) {
   }
   if (metas?.length !== 1) {
     throw new Error(
-      `Unexpected number of @${construct} Meta definitions in file`
+      `Unexpected number of @${capitalCase(construct)} Meta definitions in file`
     );
   }
 

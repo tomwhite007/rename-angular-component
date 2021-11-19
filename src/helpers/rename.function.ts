@@ -4,11 +4,19 @@ import { AngularConstruct } from './definitions/file.interfaces';
 import { renameToNewStub } from './renameToNewStub.function';
 import { originalFileDetails } from './fileManipulation/originalFileDetails.function';
 import { getProjectRoot } from './definitions/getProjectRootFilePath.function';
+import { ReferenceIndexer } from '../indexer/referenceindexer';
 
-export function rename(construct: AngularConstruct, uri: vscode.Uri) {
+export function rename(
+  construct: AngularConstruct,
+  uri: vscode.Uri,
+  importer: ReferenceIndexer
+) {
   const fileDetails = originalFileDetails(uri.path);
   const projectRoot = getProjectRoot(uri) as string;
   const title = `Rename Angular ${pascalCase(construct)}`;
+
+  const test = importer.index.references[uri.path];
+  console.log('ref', test);
 
   vscode.window
     .showInputBox({

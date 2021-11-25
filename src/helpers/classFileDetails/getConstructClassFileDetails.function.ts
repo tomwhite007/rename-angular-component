@@ -41,7 +41,7 @@ export function getConstructClassFileDetails(
     classFileDetails.className = getClassName(classCode);
     classFileDetails.selector = getSelector(classCode, construct);
   } catch (e) {
-    getComponentClassFileDetailsErrorMsgs = [e.message];
+    getComponentClassFileDetailsErrorMsgs = [(<any>e).message];
   }
 
   return { classFileDetails, getComponentClassFileDetailsErrorMsgs };

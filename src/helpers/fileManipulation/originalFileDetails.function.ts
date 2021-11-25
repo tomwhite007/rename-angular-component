@@ -5,7 +5,11 @@ export function originalFileDetails(filePath: string): OriginalFileDetails {
   const lastSlash = filePath.lastIndexOf('/');
 
   const windowsDriveMatch = filePath.match(/^\/[a-z]:/);
-  let path = filePath.substr(0, lastSlash).replace(/^\/c:/, 'C:');
+  let path = filePath.substr(0, lastSlash);
+  /* 
+  TODO: check if old windows hack is still required: .replace(/^\/c:/, 'C:'); 
+watch out that the replace to create the glob doesn't have an issue with case
+  */
   if (windowsDriveMatch) {
     path = upperCaseFirst(path.replace(/^\//, ''));
   }

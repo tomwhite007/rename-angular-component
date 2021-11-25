@@ -104,7 +104,6 @@ export function renameToNewStub(
     return logErrors(construct, getComponentClassFileDetailsErrorMsgs);
   }
 
-  // TODO: add replace for folder if required
   const classFilePath = `${selectedFileDetails.path}/${newStub}.${construct}.ts`;
   const newClassName = `${pascalCase(newStub)}${pascalCase(construct)}`;
   const oldLocalFilePath = `${folderRenamed && selectedFileDetails.stub + '/'}${
@@ -150,7 +149,6 @@ export function renameToNewStub(
   }
 
   // TODO: replace directive works for square brackets sort of needs more
-  //  missed clause for test file import!
 
   // rename Selector
   const { renameSelectorSuccessMsg, renameSelectorErrorMsgs } = renameSelector(
@@ -163,9 +161,6 @@ export function renameToNewStub(
     return logErrors(construct, renameSelectorErrorMsgs);
   }
 
-  // TODO: how to limit scope? I have two apps with same named components
-
-  // TODO: may need allowance for special chars in file path / name...
   // Inside Class File:
 
   // imports:

@@ -10,7 +10,7 @@ import { getProjectRoot } from './definitions/getProjectRootFilePath.function';
 import { ReferenceIndexer } from '../indexer/referenceindexer';
 import { likeFilesRegexPartialLookup } from './definitions/file-regex.constants';
 import { FileItem } from '../indexer/fileitem';
-import * as fs from 'fs';
+import * as fs from 'fs-extra-promise';
 import escapeStringRegexp from 'escape-string-regexp';
 
 export function rename(
@@ -53,7 +53,7 @@ export function rename(
 
             const filesToMove = filesRelatedToStub.getFilesToMove(newStub);
 
-            const newLocations = filesToMove.map((f) => {
+            const fileMoveJobs = filesToMove.map((f) => {
               return new FileItem(
                 f.filePath,
                 f.newFilePath,
@@ -61,40 +61,43 @@ export function rename(
               );
             });
 
-            newLocations.map((l) => {
-              if (l.exists()) {
-                console.log('exists!', l);
-              }
-            });
+            console.log('fileMoveJobs', fileMoveJobs);
 
-            if (newLocations.some((l) => l.exists())) {
+            // fileMoveJobs.map((l) => {
+            //   if (l.exists()) {
+            //     console.log('exists!', l);
+            //   }
+            // });
+
+            if (fileMoveJobs.some((l) => l.exists())) {
               vscode.window.showErrorMessage(
                 'Not allowed to overwrite existing files'
               );
               return;
             }
 
-            importer.startNewMoves(newLocations);
-            const move = FileItem.moveMultiple(newLocations, importer);
-            move.catch((e) => {
+            importer.startNewMoves(fileMoveJobs);
+            try {
+              for (const item of fileMoveJobs) {
+                await item.move(importer);
+              }
+            } catch (e) {
               console.log('error in extension.ts', e);
-            });
+            }
 
             /* TODO - big steps left...
-              if the folder matches the stub, rename it
+              delete the old folder
 
-              find all the files in the folder
-              rename all the ones with the same stub - decide if to only do the 4 or all
               if they're .ts, rename the classes too
 
-              fix up all imports
               fix up all selectors
+              fix up all test descriptions
               */
 
             progress.report({ increment: 100 });
 
             setTimeout(async () => {
-              move.then(() => resolve());
+              resolve();
             }, 0);
           });
 

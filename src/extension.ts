@@ -8,62 +8,61 @@ import * as fs from 'fs-extra-promise';
 import * as ts from 'typescript';
 
 export function activate(context: vscode.ExtensionContext) {
-  // console.log('Extension activated');
-  // const importer: ReferenceIndexer = new ReferenceIndexer();
+  const importer: ReferenceIndexer = new ReferenceIndexer();
 
-  // function initWithProgress() {
-  //   return vscode.window.withProgress(
-  //     {
-  //       location: vscode.ProgressLocation.Window,
-  //       title: 'Rename Angular Component is indexing',
-  //     },
-  //     async (progress) => {
-  //       return importer.init(progress);
-  //     }
-  //   );
-  // }
+  const initWithProgress = () => {
+    return vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Window,
+        title: 'Rename Angular Component is indexing',
+      },
+      async (progress) => {
+        return importer.init(progress);
+      }
+    );
+  };
 
-  // const initialize = () => {
-  //   if (importer.isInitialized) {
-  //     return Promise.resolve();
-  //   }
-  //   return initWithProgress();
-  // };
+  const initialise = () => {
+    if (importer.isinitialised) {
+      return Promise.resolve();
+    }
+    return initWithProgress();
+  };
 
-  /* TODO run initialize() and show Input Box at the same time - 
-  then make sure / wait for importer.isInitialized without running 
-  a second instance of initWithProgress */
+  const initialisePromise = initialise();
 
   let renameComponent = vscode.commands.registerCommand(
     'rename-angular-component.renameComponent',
-    async (uri: vscode.Uri) => {
-      const filePath =
-        '/Users/tom/Development/dng/dgx-sales-spa-dev2/libs/sales/feature-appliance-details/src/lib/appliance-details/appliance-details.component.ts';
+    async (uri: vscode.Uri) =>
+      // TODO: remove when no direct test process is needed
+      // {
+      //   const filePath =
+      //     '/Users/tom/Development/dng/dgx-sales-spa-dev2/libs/sales/feature-appliance-details/src/lib/appliance-details/appliance-details.component.ts';
 
-      const testText = await fs.readFileAsync(filePath, 'utf8');
+      //   const testText = await fs.readFileAsync(filePath, 'utf8');
 
-      applyClassNameEdits(
-        filePath,
-        testText,
-        'ApplianceDetailsComponent',
-        'TestClass'
-      );
-    }
-    // initialize().then(() => rename('component', uri, importer))
+      //   applyClassNameEdits(
+      //     filePath,
+      //     testText,
+      //     'ApplianceDetailsComponent',
+      //     'TestClass'
+      //   );
+      // }
+      rename('component', uri, importer, initialisePromise)
   );
   context.subscriptions.push(renameComponent);
 
   // let renameDirective = vscode.commands.registerCommand(
   //   'rename-angular-component.renameDirective',
   //   (uri: vscode.Uri) =>
-  //     initialize().then(() => rename('directive', uri, importer))
+  //     initialise().then(() => rename('directive', uri, importer))
   // );
   // context.subscriptions.push(renameDirective);
 
   // let renameService = vscode.commands.registerCommand(
   //   'rename-angular-component.renameService',
   //   (uri: vscode.Uri) =>
-  //     initialize().then(() => rename('service', uri, importer))
+  //     initialise().then(() => rename('service', uri, importer))
   // );
   // context.subscriptions.push(renameService);
 }

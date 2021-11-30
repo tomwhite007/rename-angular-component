@@ -49,7 +49,7 @@ export class ReferenceIndexer {
   private filesToExclude: string[] = [];
   private fileWatcher!: vscode.FileSystemWatcher;
 
-  public isInitialized: boolean = false;
+  public isinitialised: boolean = false;
 
   public init(progress?: vscode.Progress<{ message: string }>): Thenable<any> {
     this.index = new ReferenceIndex();
@@ -60,8 +60,8 @@ export class ReferenceIndexer {
           return this.attachFileWatcher();
         })
         .then(() => {
-          console.log('move-ts initialized');
-          this.isInitialized = true;
+          console.log('move-ts initialised');
+          this.isinitialised = true;
         });
     });
   }
@@ -143,10 +143,10 @@ export class ReferenceIndexer {
 
   private get filesToScanGlob(): string {
     const filesToScan = this.conf('filesToScan', ['**/*.ts', '**/*.tsx']);
-    if (filesToScan.length == 0) {
+    if (filesToScan.length === 0) {
       return '';
     }
-    return filesToScan.length == 1
+    return filesToScan.length === 1
       ? filesToScan[0]
       : `{${filesToScan.join(',')}}`;
   }
@@ -154,7 +154,6 @@ export class ReferenceIndexer {
   private scanAll(progress?: vscode.Progress<{ message: string }>) {
     this.index = new ReferenceIndex();
     const start = Date.now();
-    console.log('Tom test: findFiles', this.filesToScanGlob);
     return vscode.workspace
       .findFiles(this.filesToScanGlob, '**/node_modules/**', 100000)
       .then((files) => {
@@ -244,7 +243,7 @@ export class ReferenceIndexer {
     replacements.forEach((replacement) => {
       const before = replacement[0];
       const after = replacement[1];
-      if (before == after) {
+      if (before === after) {
         return;
       }
       const beforeReference = this.resolveRelativeReference(
@@ -254,7 +253,7 @@ export class ReferenceIndexer {
       const seen: any = {};
       const beforeReplacements = relativeReferences.filter((ref) => {
         return (
-          this.resolveRelativeReference(fromPath || path, ref.specifier) ==
+          this.resolveRelativeReference(fromPath || path, ref.specifier) ===
           beforeReference
         );
       });
@@ -515,7 +514,7 @@ export class ReferenceIndexer {
 
   public removeExtension(filePath: string): string {
     let ext = path.extname(filePath);
-    if (ext == '.ts' && filePath.endsWith('.d.ts')) {
+    if (ext === '.ts' && filePath.endsWith('.d.ts')) {
       ext = '.d.ts';
     }
     if (this.extensions.indexOf(ext) >= 0) {
@@ -735,7 +734,7 @@ export class ReferenceIndexer {
                   return potential;
                 }
               }
-              if (config.compilerOptions.paths[p].length == 1) {
+              if (config.compilerOptions.paths[p].length === 1) {
                 const mapped = config.compilerOptions.paths[p][0].slice(0, -1);
                 const mappedDir = path.resolve(
                   path.dirname(configPath),
@@ -765,7 +764,7 @@ export class ReferenceIndexer {
   private getTsConfig(filePath: string): any {
     let prevDir = filePath;
     let dir = path.dirname(filePath);
-    while (dir != prevDir) {
+    while (dir !== prevDir) {
       const tsConfigPaths = [
         path.join(dir, 'tsconfig.json'),
         path.join(dir, 'tsconfig.build.json'),

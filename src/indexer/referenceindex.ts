@@ -1,11 +1,11 @@
-import * as path from "path";
+import * as path from 'path';
 
 export interface Reference {
   path: string;
 }
 
 export function isPathToAnotherDir(path: string) {
-  return path.startsWith("../") || path.startsWith("..\\");
+  return path.startsWith('../') || path.startsWith('..\\');
 }
 
 export class ReferenceIndex {
@@ -28,7 +28,7 @@ export class ReferenceIndex {
 
     if (
       !this.references[path].some((ref) => {
-        return ref.path == reference;
+        return ref.path === reference;
       })
     ) {
       this.references[path].push({ path: reference });
@@ -36,7 +36,7 @@ export class ReferenceIndex {
 
     if (
       !this.referencedBy[reference].some((reference) => {
-        return reference.path == path;
+        return reference.path === path;
       })
     ) {
       this.referencedBy[reference].push({
@@ -51,7 +51,7 @@ export class ReferenceIndex {
         if (this.referencedBy.hasOwnProperty(p.path)) {
           this.referencedBy[p.path] = this.referencedBy[p.path].filter(
             (reference) => {
-              return reference.path != path;
+              return reference.path !== path;
             }
           );
         }

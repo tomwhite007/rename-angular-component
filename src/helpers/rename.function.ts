@@ -13,79 +13,83 @@ import { FileItem } from '../indexer/fileitem';
 import * as fs from 'fs-extra-promise';
 import escapeStringRegexp from 'escape-string-regexp';
 
-export function rename(
+export async function rename(
   construct: AngularConstruct,
   uri: vscode.Uri,
-  importer: ReferenceIndexer
+  importer: ReferenceIndexer,
+  initialisePromise: Thenable<any>
 ) {
   const fileDetails = originalFileDetails(uri.path);
   const projectRoot = getProjectRoot(uri) as string;
   const title = `Rename Angular ${pascalCase(construct)}`;
 
-  vscode.window
-    .showInputBox({
-      title,
-      prompt: `Enter the new ${construct} name.`,
-      value: fileDetails.stub,
-    })
-    .then((newStub) => {
-      if (!newStub) {
-        return;
-      }
+  const newStub = await vscode.window.showInputBox({
+    title,
+    prompt: `Enter the new ${construct} name.`,
+    value: fileDetails.stub,
+  });
 
-      vscode.window.withProgress(
-        {
-          location: vscode.ProgressLocation.Notification,
-          title: title + ' in progress',
-          cancellable: false,
-        },
-        async (progress) => {
-          progress.report({ increment: 0 });
+  if (!newStub) {
+    return;
+  }
 
-          const p = new Promise<void>(async (resolve) => {
-            // renameToNewStub(construct, newStub, fileDetails, projectRoot);
+  // wait for initialise to complete
+  await initialisePromise;
 
-            const filesRelatedToStub = await FilesRelatedToStub.init(
-              fileDetails,
-              projectRoot,
-              construct
-            );
+  await vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: title + ' in progress',
+      cancellable: false,
+    },
+    async (progress) => {
+      progress.report({ increment: 0 });
 
-            const filesToMove = filesRelatedToStub.getFilesToMove(newStub);
+      const p = new Promise<void>(async (resolve) => {
+        // TODO: REMOVE OLD PROCSESS...
+        // renameToNewStub(construct, newStub, fileDetails, projectRoot);
 
-            const fileMoveJobs = filesToMove.map((f) => {
-              return new FileItem(
-                f.filePath,
-                f.newFilePath,
-                fs.statSync(f.filePath).isDirectory()
-              );
-            });
+        const filesRelatedToStub = await FilesRelatedToStub.init(
+          fileDetails,
+          projectRoot,
+          construct
+        );
 
-            console.log('fileMoveJobs', fileMoveJobs);
+        const filesToMove = filesRelatedToStub.getFilesToMove(newStub);
 
-            // fileMoveJobs.map((l) => {
-            //   if (l.exists()) {
-            //     console.log('exists!', l);
-            //   }
-            // });
+        const fileMoveJobs = filesToMove.map((f) => {
+          return new FileItem(
+            f.filePath,
+            f.newFilePath,
+            fs.statSync(f.filePath).isDirectory()
+          );
+        });
 
-            if (fileMoveJobs.some((l) => l.exists())) {
-              vscode.window.showErrorMessage(
-                'Not allowed to overwrite existing files'
-              );
-              return;
-            }
+        console.log('fileMoveJobs', fileMoveJobs);
 
-            importer.startNewMoves(fileMoveJobs);
-            try {
-              for (const item of fileMoveJobs) {
-                await item.move(importer);
-              }
-            } catch (e) {
-              console.log('error in extension.ts', e);
-            }
+        // fileMoveJobs.map((l) => {
+        //   if (l.exists()) {
+        //     console.log('exists!', l);
+        //   }
+        // });
 
-            /* TODO - big steps left...
+        if (fileMoveJobs.some((l) => l.exists())) {
+          vscode.window.showErrorMessage(
+            'Not allowed to overwrite existing files'
+          );
+          return;
+        }
+
+        importer.startNewMoves(fileMoveJobs);
+        try {
+          for (const item of fileMoveJobs) {
+            await item.move(importer);
+          }
+        } catch (e) {
+          console.log('error in extension.ts', e);
+        }
+
+        /* TODO - big steps left...
               delete the old folder
 
               in the construct file, rename the class, selector, and html and scss/css imports
@@ -95,17 +99,16 @@ export function rename(
               fix up all test descriptions
               */
 
-            progress.report({ increment: 100 });
+        progress.report({ increment: 100 });
 
-            setTimeout(async () => {
-              resolve();
-            }, 0);
-          });
+        setTimeout(async () => {
+          resolve();
+        }, 0);
+      });
 
-          return p;
-        }
-      );
-    });
+      return p;
+    }
+  );
 }
 
 class FilesRelatedToStub {

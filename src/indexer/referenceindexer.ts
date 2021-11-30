@@ -230,7 +230,7 @@ export class ReferenceIndexer {
     });
   }
 
-  private getEdits(
+  private getReferenceEdits(
     path: string,
     text: string,
     replacements: Replacement[],
@@ -271,7 +271,7 @@ export class ReferenceIndexer {
     return edits;
   }
 
-  private applyEdits(text: string, edits: Edit[]): string {
+  private applyReferenceEdits(text: string, edits: Edit[]): string {
     const replaceBetween = (
       str: string,
       start: number,
@@ -301,18 +301,34 @@ export class ReferenceIndexer {
 
   private replaceReferences(
     filePath: string,
-    getReplacements: (text: string) => Replacement[],
-    fromPath?: string
+    getReferenceReplacements: (text: string) => Replacement[],
+    fromPath?: string,
+    originalClassName?: string,
+    newClassName?: string
   ): Thenable<any> {
     if (!this.conf('openEditors', false)) {
       return fs.readFileAsync(filePath, 'utf8').then((text) => {
-        const replacements = getReplacements(text);
-        const edits = this.getEdits(filePath, text, replacements, fromPath);
-        if (edits.length == 0) {
+        const replacements = getReferenceReplacements(text);
+        const edits = this.getReferenceEdits(
+          filePath,
+          text,
+          replacements,
+          fromPath
+        );
+        if (edits.length === 0) {
           return Promise.resolve();
         }
 
-        const newText = this.applyEdits(text, edits);
+        let newText = this.applyReferenceEdits(text, edits);
+
+        if (originalClassName && newClassName) {
+          // newText = this.applyClassNameEdits(
+          //   filePath,
+          //   text,
+          //   originalClassName,
+          //   newClassName
+          // );
+        }
 
         this.output.show();
         this.output.appendLine(filePath);
@@ -338,9 +354,9 @@ export class ReferenceIndexer {
         .openTextDocument(filePath)
         .then((doc: vscode.TextDocument): Thenable<any> => {
           const text = doc.getText();
-          const replacements = getReplacements(text);
+          const replacements = getReferenceReplacements(text);
 
-          const rawEdits = this.getEdits(filePath, text, replacements);
+          const rawEdits = this.getReferenceEdits(filePath, text, replacements);
           const edits = rawEdits.map((edit: Edit) => {
             return vscode.TextEdit.replace(
               new vscode.Range(
@@ -356,7 +372,7 @@ export class ReferenceIndexer {
             const edit = new vscode.WorkspaceEdit();
             edit.set(doc.uri, edits);
             return attemptEdit(edit).then(() => {
-              const newText = this.applyEdits(text, rawEdits);
+              const newText = this.applyReferenceEdits(text, rawEdits);
               this.processFile(newText, filePath, true);
             });
           } else {
@@ -519,7 +535,11 @@ export class ReferenceIndexer {
     return filePath;
   }
 
-  public updateImports(from: string, to: string): Promise<any> {
+  public updateImports(
+    from: string,
+    to: string,
+    className?: string
+  ): Promise<any> {
     const affectedFiles = this.index.getReferences(from);
     const promises = affectedFiles.map((filePath) => {
       return this.replaceReferences(

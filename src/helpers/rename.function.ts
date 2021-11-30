@@ -88,6 +88,7 @@ export function rename(
             /* TODO - big steps left...
               delete the old folder
 
+              in the construct file, rename the class, selector, and html and scss/css imports
               if they're .ts, rename the classes too
 
               fix up all selectors

@@ -52,19 +52,17 @@ export function activate(context: vscode.ExtensionContext) {
   );
   context.subscriptions.push(renameComponent);
 
-  // let renameDirective = vscode.commands.registerCommand(
-  //   'rename-angular-component.renameDirective',
-  //   (uri: vscode.Uri) =>
-  //     initialise().then(() => rename('directive', uri, importer))
-  // );
-  // context.subscriptions.push(renameDirective);
+  let renameDirective = vscode.commands.registerCommand(
+    'rename-angular-component.renameDirective',
+    (uri: vscode.Uri) => rename('directive', uri, importer, initialisePromise)
+  );
+  context.subscriptions.push(renameDirective);
 
-  // let renameService = vscode.commands.registerCommand(
-  //   'rename-angular-component.renameService',
-  //   (uri: vscode.Uri) =>
-  //     initialise().then(() => rename('service', uri, importer))
-  // );
-  // context.subscriptions.push(renameService);
+  let renameService = vscode.commands.registerCommand(
+    'rename-angular-component.renameService',
+    (uri: vscode.Uri) => rename('service', uri, importer, initialisePromise)
+  );
+  context.subscriptions.push(renameService);
 }
 
 export function deactivate() {}

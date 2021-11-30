@@ -76,16 +76,12 @@ interface Reference {
   location: { start: number; end: number };
 }
 
-const decoratorPropertiesRequired = ['selector', 'templateUrl', 'styleUrls'];
-
 function applyClassNameEdits(
   fileName: string,
   sourceText: string,
   originalClassName: string,
   newClassName: string
 ) {
-  console.log('new session4');
-
   const file = ts.createSourceFile(
     fileName,
     sourceText,
@@ -95,86 +91,76 @@ function applyClassNameEdits(
   const result: Reference[] = [];
 
   file.statements.forEach((node: ts.Node) => {
+    // get class
     if (
       ts.isClassDeclaration(node) &&
       node.name?.escapedText === originalClassName
     ) {
       result.push({
-        specifier: node.name?.escapedText,
+        specifier: 'class',
+        originalText: node.name?.escapedText,
         location: {
           start: node.name.pos,
           end: node.name.end,
         },
       });
 
-      try {
-        node.decorators?.find((decorator: ts.Decorator) => {
-          if (
-            ts.isCallExpression(decorator.expression) &&
-            ts.isIdentifier(decorator.expression.expression) &&
-            decorator.expression.expression.text === 'Component'
-          ) {
-            const test = decorator.expression.arguments[0];
-            if (ts.isObjectLiteralExpression(test)) {
-              test.properties.forEach((prop) => {
-                if (
-                  ts.isPropertyAssignment(prop) &&
-                  ts.isIdentifier(prop.name) &&
-                  decoratorPropertiesRequired.includes(prop.name.text)
-                ) {
-                  if (ts.isStringLiteral(prop.initializer)) {
-                    result.push({
-                      specifier: prop.name.text,
-                      originalText: prop.initializer.text,
-                      location: {
-                        start: prop.initializer.pos,
-                        end: prop.initializer.end,
-                      },
-                    });
-                  }
-                  if (ts.isArrayLiteralExpression(prop.initializer)) {
-                    const specifier = prop.name.text;
-                    prop.initializer.elements.find((elem) => {
-                      if (ts.isStringLiteral(elem)) {
-                        result.push({
-                          specifier,
-                          originalText: elem.text,
-                          location: {
-                            start: elem.pos,
-                            end: elem.end,
-                          },
-                        });
-                        return true;
-                      }
-                    });
-                  }
+      const decoratorPropertiesRequired = [
+        'selector',
+        'templateUrl',
+        'styleUrls',
+      ];
+
+      // get decorator props for 'Component' decorator
+      node.decorators?.find((decorator: ts.Decorator) => {
+        if (
+          ts.isCallExpression(decorator.expression) &&
+          ts.isIdentifier(decorator.expression.expression) &&
+          decorator.expression.expression.text === 'Component'
+        ) {
+          const test = decorator.expression.arguments[0];
+          if (ts.isObjectLiteralExpression(test)) {
+            test.properties.forEach((prop) => {
+              if (
+                ts.isPropertyAssignment(prop) &&
+                ts.isIdentifier(prop.name) &&
+                decoratorPropertiesRequired.includes(prop.name.text)
+              ) {
+                // 'selector' and 'templateUrl' are StringLiteral
+                if (ts.isStringLiteral(prop.initializer)) {
+                  result.push({
+                    specifier: prop.name.text,
+                    originalText: prop.initializer.text,
+                    location: {
+                      start: prop.initializer.pos,
+                      end: prop.initializer.end,
+                    },
+                  });
                 }
-              });
-            }
-            // (arg =>{
 
-            // })
-
-            return true;
+                // 'styleUrls' are an ArrayLiteralExpression
+                if (ts.isArrayLiteralExpression(prop.initializer)) {
+                  const specifier = prop.name.text;
+                  prop.initializer.elements.forEach((elem) => {
+                    if (ts.isStringLiteral(elem)) {
+                      result.push({
+                        specifier,
+                        originalText: elem.text,
+                        location: {
+                          start: elem.pos,
+                          end: elem.end,
+                        },
+                      });
+                    }
+                  });
+                }
+              }
+            });
           }
-        });
 
-        // const child = decorator?.
-        // const count = child?.getChildCount();
-        // const test = child?.getFirstToken();
-
-        // console.log('isClassDeclaration4', !!isInjectableDecorator);
-      } catch (e) {
-        console.log(e);
-      }
-
-      // node.decorators?[0].
-
-      // for(let i=0;i<node.decorators?.entries.length??0;i++)
-
-      // if (ts.isDecorator(node)) {
-      //   console.log('decorator', node);
-      // }
+          return true;
+        }
+      });
     }
   });
 

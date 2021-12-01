@@ -5,13 +5,14 @@ import { AngularConstruct } from '../definitions/file.interfaces';
 export function logInfo(
   additionalInfoMessage: string,
   construct: AngularConstruct,
+  output: vscode.OutputChannel,
   textLines?: string[]
 ) {
   const title = `Rename Angular ${pascalCase(construct)}`;
   vscode.window.showInformationMessage(`${title}${additionalInfoMessage}`);
 
   if (textLines) {
-    const channel = vscode.window.createOutputChannel(title);
+    const channel = output;
     channel.appendLine(``);
     channel.appendLine(`*** ${title} output: ***`);
     channel.appendLine(``);

@@ -36,10 +36,9 @@ export function asUnix(fsPath: string) {
 export class ReferenceIndexer {
   changeDocumentEvent!: vscode.Disposable;
   private tsconfigs!: { [key: string]: any };
-  public index: ReferenceIndex = new ReferenceIndex();
+  index: ReferenceIndex = new ReferenceIndex();
 
-  private output: vscode.OutputChannel =
-    vscode.window.createOutputChannel('move-ts');
+  private output!: vscode.OutputChannel;
 
   private packageNames: { [key: string]: string } = {};
 
@@ -49,9 +48,9 @@ export class ReferenceIndexer {
   private filesToExclude: string[] = [];
   private fileWatcher!: vscode.FileSystemWatcher;
 
-  public isinitialised: boolean = false;
+  isinitialised: boolean = false;
 
-  public init(progress?: vscode.Progress<{ message: string }>): Thenable<any> {
+  init(progress?: vscode.Progress<{ message: string }>): Thenable<any> {
     this.index = new ReferenceIndex();
 
     return this.readPackageNames().then(() => {
@@ -60,13 +59,23 @@ export class ReferenceIndexer {
           return this.attachFileWatcher();
         })
         .then(() => {
-          console.log('move-ts initialised');
+          console.log('indexer initialised');
           this.isinitialised = true;
         });
     });
   }
 
-  public conf<T>(property: string, defaultValue: T): T {
+  setOutputChannel(name: string) {
+    this.output = vscode.window.createOutputChannel(name);
+    const line = new Array(name.length + 1).join('-');
+    this.output.appendLine(line);
+    this.output.appendLine(name);
+    this.output.appendLine(line);
+    this.output.show();
+    return this.output;
+  }
+
+  conf<T>(property: string, defaultValue: T): T {
     return vscode.workspace
       .getConfiguration('movets')
       .get<T>(property, defaultValue);
@@ -114,23 +123,24 @@ export class ReferenceIndexer {
     return Promise.all([packagePromise, tsConfigPromise]);
   }
 
-  public startNewMoves(moves: FileItem[]) {
-    this.output.appendLine(
-      '--------------------------------------------------'
-    );
-    this.output.appendLine(`Moving:`);
-    for (let i = 0; i < moves.length; i++) {
-      this.output.appendLine(
-        `           ${moves[i].sourcePath} -> ${moves[i].targetPath}`
-      );
-    }
-    this.output.appendLine(
-      '--------------------------------------------------'
-    );
+  startNewMoves(moves: FileItem[]) {
+    // this.output.appendLine(
+    //   '--------------------------------------------------'
+    // );
+    // this.output.appendLine(`Moving:`);
+    // for (let i = 0; i < moves.length; i++) {
+    //   this.output.appendLine(
+    //     `           ${moves[i].sourcePath} -> ${moves[i].targetPath}`
+    //   );
+    // }
+    // this.output.appendLine(
+    //   '--------------------------------------------------'
+    // );
+
     this.output.appendLine('Files changed:');
   }
 
-  public startNewMove(from: string, to: string) {
+  startNewMove(from: string, to: string) {
     this.output.appendLine(
       '--------------------------------------------------'
     );
@@ -161,10 +171,7 @@ export class ReferenceIndexer {
       })
       .then(() => {
         console.log('scan finished in ' + (Date.now() - start) + 'ms');
-        console.log(`Indexed ${this.index.fileCount()} files!!! `);
-        vscode.window.showInformationMessage(
-          Date.now() - start + `ms. Indexed ${this.index.fileCount()} files!!! `
-        );
+        console.log(`Indexed ${this.index.fileCount()} files`);
       });
   }
 
@@ -381,7 +388,7 @@ export class ReferenceIndexer {
     }
   }
 
-  public updateMovedFile(from: string, to: string): Thenable<any> {
+  updateMovedFile(from: string, to: string): Thenable<any> {
     return this.replaceReferences(
       to,
       (text: string): Replacement[] => {
@@ -402,7 +409,7 @@ export class ReferenceIndexer {
     });
   }
 
-  public updateMovedDir(
+  updateMovedDir(
     from: string,
     to: string,
     fileNames: string[] = []
@@ -466,7 +473,7 @@ export class ReferenceIndexer {
       });
   }
 
-  public updateDirImports(
+  updateDirImports(
     from: string,
     to: string,
     fileNames: string[] = []
@@ -512,7 +519,7 @@ export class ReferenceIndexer {
     return Promise.all(promises);
   }
 
-  public removeExtension(filePath: string): string {
+  removeExtension(filePath: string): string {
     let ext = path.extname(filePath);
     if (ext === '.ts' && filePath.endsWith('.d.ts')) {
       ext = '.d.ts';
@@ -523,7 +530,7 @@ export class ReferenceIndexer {
     return filePath;
   }
 
-  public removeIndexSuffix(filePath: string): string {
+  removeIndexSuffix(filePath: string): string {
     if (!this.conf('removeIndexSuffix', true)) {
       return filePath;
     }
@@ -534,11 +541,7 @@ export class ReferenceIndexer {
     return filePath;
   }
 
-  public updateImports(
-    from: string,
-    to: string,
-    className?: string
-  ): Promise<any> {
+  updateImports(from: string, to: string, className?: string): Promise<any> {
     const affectedFiles = this.index.getReferences(from);
     const promises = affectedFiles.map((filePath) => {
       return this.replaceReferences(

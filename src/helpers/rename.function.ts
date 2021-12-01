@@ -17,8 +17,9 @@ export async function rename(
   construct: AngularConstruct,
   uri: vscode.Uri,
   importer: ReferenceIndexer,
-  initialisePromise: Thenable<any>
+  indexerInitialisePromise: Thenable<any>
 ) {
+  const start = Date.now();
   const fileDetails = originalFileDetails(uri.path);
   const projectRoot = getProjectRoot(uri) as string;
   const title = `Rename Angular ${pascalCase(construct)}`;
@@ -33,8 +34,16 @@ export async function rename(
     return;
   }
 
-  // wait for initialise to complete
-  await initialisePromise;
+  const timeoutPause = async (wait = 0) => {
+    await new Promise((res) => setTimeout(res, wait));
+    return;
+  };
+
+  // wait for indexer initialise to complete
+  await indexerInitialisePromise;
+  const output = importer.setOutputChannel(
+    `Rename Angular ${pascalCase(construct)}`
+  );
 
   await vscode.window.withProgress(
     {
@@ -44,52 +53,54 @@ export async function rename(
     },
     async (progress) => {
       progress.report({ increment: 0 });
+      await timeoutPause();
 
-      const p = new Promise<void>(async (resolve) => {
-        // TODO: REMOVE OLD PROCSESS...
-        // renameToNewStub(construct, newStub, fileDetails, projectRoot);
+      // TODO: REMOVE OLD PROCSESS...
+      // renameToNewStub(construct, newStub, fileDetails, projectRoot);
 
-        const filesRelatedToStub = await FilesRelatedToStub.init(
-          fileDetails,
-          projectRoot,
-          construct
+      const filesRelatedToStub = await FilesRelatedToStub.init(
+        fileDetails,
+        projectRoot,
+        construct
+      );
+
+      const filesToMove = filesRelatedToStub.getFilesToMove(newStub);
+
+      const fileMoveJobs = filesToMove.map((f) => {
+        return new FileItem(
+          f.filePath,
+          f.newFilePath,
+          fs.statSync(f.filePath).isDirectory()
         );
+      });
 
-        const filesToMove = filesRelatedToStub.getFilesToMove(newStub);
+      console.log('fileMoveJobs', fileMoveJobs);
 
-        const fileMoveJobs = filesToMove.map((f) => {
-          return new FileItem(
-            f.filePath,
-            f.newFilePath,
-            fs.statSync(f.filePath).isDirectory()
-          );
-        });
+      if (fileMoveJobs.some((l) => l.exists())) {
+        vscode.window.showErrorMessage(
+          'Not allowed to overwrite existing files'
+        );
+        return;
+      }
 
-        console.log('fileMoveJobs', fileMoveJobs);
+      progress.report({ increment: 20 });
+      await timeoutPause();
 
-        // fileMoveJobs.map((l) => {
-        //   if (l.exists()) {
-        //     console.log('exists!', l);
-        //   }
-        // });
-
-        if (fileMoveJobs.some((l) => l.exists())) {
-          vscode.window.showErrorMessage(
-            'Not allowed to overwrite existing files'
-          );
-          return;
+      const progressIncrement = Math.floor(80 / fileMoveJobs.length);
+      let currentProgress = 20;
+      importer.startNewMoves(fileMoveJobs);
+      try {
+        for (const item of fileMoveJobs) {
+          currentProgress += progressIncrement;
+          progress.report({ increment: currentProgress });
+          await timeoutPause(10);
+          await item.move(importer);
         }
+      } catch (e) {
+        console.log('error in extension.ts', e);
+      }
 
-        importer.startNewMoves(fileMoveJobs);
-        try {
-          for (const item of fileMoveJobs) {
-            await item.move(importer);
-          }
-        } catch (e) {
-          console.log('error in extension.ts', e);
-        }
-
-        /* TODO - big steps left...
+      /* TODO - big steps left...
               delete the old folder
 
               in the construct file, rename the class, selector, and html and scss/css imports
@@ -97,16 +108,13 @@ export async function rename(
 
               fix up all selectors
               fix up all test descriptions
+
+              fix up / remove tsmove conf() configuration
               */
 
-        progress.report({ increment: 100 });
-
-        setTimeout(async () => {
-          resolve();
-        }, 0);
-      });
-
-      return p;
+      progress.report({ increment: 100 });
+      console.log('all done: ', Date.now() - start + `ms.`);
+      await timeoutPause(50);
     }
   );
 }

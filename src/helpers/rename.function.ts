@@ -12,6 +12,7 @@ import { likeFilesRegexPartialLookup } from './definitions/file-regex.constants'
 import { FileItem } from '../indexer/fileitem';
 import * as fs from 'fs-extra-promise';
 import escapeStringRegexp from 'escape-string-regexp';
+import { paramCase } from 'change-case';
 
 export async function rename(
   construct: AngularConstruct,
@@ -24,15 +25,19 @@ export async function rename(
   const projectRoot = getProjectRoot(uri) as string;
   const title = `Rename Angular ${pascalCase(construct)}`;
 
-  const newStub = await vscode.window.showInputBox({
+  let newStub = await vscode.window.showInputBox({
     title,
     prompt: `Enter the new ${construct} name.`,
     value: fileDetails.stub,
   });
 
-  if (!newStub) {
+  if (!newStub || fileDetails.stub === newStub) {
+    // TODO: add pop up - nothing changed
+
     return;
   }
+  // make sure it's kebab
+  newStub = paramCase(newStub);
 
   const timeoutPause = async (wait = 0) => {
     await new Promise((res) => setTimeout(res, wait));
@@ -109,7 +114,24 @@ export async function rename(
               fix up all selectors
               fix up all test descriptions
 
+              make sure services and directives work - or disable features
+
+              make sure I don't need to leave a compliment to MoveTS
+
+              check what happens with open editors
+
+              ---- v2 -----
+
+              handle open editors
+                looks like reference indexer, replaceReferences() already can - need same for core class file
+
               fix up / remove tsmove conf() configuration
+
+              make sure input newStub matches constraints and formatting allowed by CLI
+
+              refactor for clean classes, functions and pure async await
+
+              ---- v3 -----
               */
 
       progress.report({ increment: 100 });

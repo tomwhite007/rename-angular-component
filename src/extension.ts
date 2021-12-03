@@ -6,6 +6,7 @@ import { rename } from './helpers/rename.function';
 import { ReferenceIndexer } from './indexer/referenceindexer';
 import * as fs from 'fs-extra-promise';
 import * as ts from 'typescript';
+import { AngularConstruct } from './helpers/definitions/file.interfaces';
 
 export function activate(context: vscode.ExtensionContext) {
   const importer: ReferenceIndexer = new ReferenceIndexer();
@@ -67,25 +68,78 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {}
 
-interface Reference {
-  specifier: string;
-  originalText?: string;
+interface FoundItem {
+  itemType: 'class' | 'selector' | 'templateUrl' | 'styleUrls';
+  itemText: string;
   location: { start: number; end: number };
 }
 
-function applyClassNameEdits(
+type SelectorOrTemplateUrl = 'selector' | 'templateUrl';
+
+interface GenericEdit {
+  start: number;
+  end: number;
+  replacement: string;
+}
+
+function getCoreClassEdits(
   fileName: string,
   sourceText: string,
   originalClassName: string,
-  newClassName: string
-) {
+  newClassName: string,
+  originalFileStub: string,
+  newFileStub: string,
+  construct: AngularConstruct
+): GenericEdit[] {
+  const foundItems = getCoreClassFoundItems(
+    fileName,
+    sourceText,
+    originalClassName
+  );
+
+  return foundItems
+    .map((foundItem) => {
+      let replacement = '';
+      switch (foundItem.itemType) {
+        case 'class':
+          replacement = newClassName;
+          break;
+        case 'selector':
+        case 'templateUrl':
+        case 'styleUrls':
+          replacement = foundItem.itemText.replace(
+            originalFileStub,
+            newFileStub
+          );
+          // TODO: fix selector replacement for Directives
+          break;
+      }
+
+      if (replacement === foundItem.itemText) {
+        return null;
+      }
+
+      return {
+        replacement,
+        start: foundItem.location.start,
+        end: foundItem.location.end,
+      };
+    })
+    .filter((edit) => edit !== null) as GenericEdit[];
+}
+
+function getCoreClassFoundItems(
+  fileName: string,
+  sourceText: string,
+  originalClassName: string
+): FoundItem[] {
   const file = ts.createSourceFile(
     fileName,
     sourceText,
     ts.ScriptTarget.Latest
   );
 
-  const result: Reference[] = [];
+  const result: FoundItem[] = [];
 
   file.statements.forEach((node: ts.Node) => {
     // get class
@@ -94,8 +148,8 @@ function applyClassNameEdits(
       node.name?.escapedText === originalClassName
     ) {
       result.push({
-        specifier: 'class',
-        originalText: node.name?.escapedText,
+        itemType: 'class',
+        itemText: node.name?.escapedText,
         location: {
           start: node.name.pos,
           end: node.name.end,
@@ -126,8 +180,8 @@ function applyClassNameEdits(
                 // 'selector' and 'templateUrl' are StringLiteral
                 if (ts.isStringLiteral(prop.initializer)) {
                   result.push({
-                    specifier: prop.name.text,
-                    originalText: prop.initializer.text,
+                    itemType: prop.name.text as SelectorOrTemplateUrl,
+                    itemText: prop.initializer.text,
                     location: {
                       start: prop.initializer.pos,
                       end: prop.initializer.end,
@@ -136,13 +190,16 @@ function applyClassNameEdits(
                 }
 
                 // 'styleUrls' are an ArrayLiteralExpression
-                if (ts.isArrayLiteralExpression(prop.initializer)) {
+                if (
+                  ts.isArrayLiteralExpression(prop.initializer) &&
+                  prop.name.text === 'styleUrls'
+                ) {
                   const specifier = prop.name.text;
                   prop.initializer.elements.forEach((elem) => {
                     if (ts.isStringLiteral(elem)) {
                       result.push({
-                        specifier,
-                        originalText: elem.text,
+                        itemType: specifier,
+                        itemText: elem.text,
                         location: {
                           start: elem.pos,
                           end: elem.end,
@@ -161,8 +218,5 @@ function applyClassNameEdits(
     }
   });
 
-  console.log(result);
-
-  const editedText = sourceText;
-  return editedText;
+  return result;
 }

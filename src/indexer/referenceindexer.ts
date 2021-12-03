@@ -6,6 +6,7 @@ import * as vscode from 'vscode';
 import { FileItem } from './fileitem';
 
 import { isPathToAnotherDir, ReferenceIndex } from './referenceindex';
+import { applyGenericEdits, GenericEdit } from './ts-file-helpers';
 
 const minimatch = require('minimatch');
 
@@ -13,14 +14,9 @@ const BATCH_SIZE = 50;
 
 type Replacement = [string, string];
 
-interface Edit {
-  start: number;
-  end: number;
-  replacement: string;
-}
-
-interface Reference {
-  specifier: string;
+interface FoundItem {
+  itemType: 'importPath' | 'class' | 'selector' | 'templateUrl' | 'styleUrls';
+  itemText: string;
   location: { start: number; end: number };
 }
 
@@ -241,8 +237,8 @@ export class ReferenceIndexer {
     text: string,
     replacements: Replacement[],
     fromPath?: string
-  ): Edit[] {
-    const edits: Edit[] = [];
+  ): GenericEdit[] {
+    const edits: GenericEdit[] = [];
     const relativeReferences = this.getRelativeReferences(
       text,
       fromPath || path
@@ -260,7 +256,7 @@ export class ReferenceIndexer {
       const seen: any = {};
       const beforeReplacements = relativeReferences.filter((ref) => {
         return (
-          this.resolveRelativeReference(fromPath || path, ref.specifier) ===
+          this.resolveRelativeReference(fromPath || path, ref.itemText) ===
           beforeReference
         );
       });
@@ -275,34 +271,6 @@ export class ReferenceIndexer {
     });
 
     return edits;
-  }
-
-  private applyReferenceEdits(text: string, edits: Edit[]): string {
-    const replaceBetween = (
-      str: string,
-      start: number,
-      end: number,
-      replacement: string
-    ): string => {
-      return str.substr(0, start) + replacement + str.substr(end);
-    };
-
-    edits.sort((a, b) => {
-      return a.start - b.start;
-    });
-
-    let editOffset = 0;
-    for (let i = 0; i < edits.length; i++) {
-      const edit = edits[i];
-      text = replaceBetween(
-        text,
-        edit.start + editOffset,
-        edit.end + editOffset,
-        edit.replacement
-      );
-      editOffset += edit.replacement.length - (edit.end - edit.start);
-    }
-    return text;
   }
 
   private replaceReferences(
@@ -325,7 +293,7 @@ export class ReferenceIndexer {
           return Promise.resolve();
         }
 
-        let newText = this.applyReferenceEdits(text, edits);
+        let newText = applyGenericEdits(text, edits);
 
         if (originalClassName && newClassName) {
           // newText = this.applyClassNameEdits(
@@ -363,7 +331,7 @@ export class ReferenceIndexer {
           const replacements = getReferenceReplacements(text);
 
           const rawEdits = this.getReferenceEdits(filePath, text, replacements);
-          const edits = rawEdits.map((edit: Edit) => {
+          const edits = rawEdits.map((edit: GenericEdit) => {
             return vscode.TextEdit.replace(
               new vscode.Range(
                 doc.positionAt(edit.start),
@@ -378,7 +346,7 @@ export class ReferenceIndexer {
             const edit = new vscode.WorkspaceEdit();
             edit.set(doc.uri, edits);
             return attemptEdit(edit).then(() => {
-              const newText = this.applyReferenceEdits(text, rawEdits);
+              const newText = applyGenericEdits(text, rawEdits);
               this.processFile(newText, filePath, true);
             });
           } else {
@@ -793,19 +761,20 @@ export class ReferenceIndexer {
     filePath: string
   ): string[] {
     return this.getRelativeReferences(data, filePath).map(
-      (ref) => ref.specifier
+      (ref) => ref.itemText
     );
   }
 
-  private getReferences(fileName: string, data: string): Reference[] {
-    const result: Reference[] = [];
+  private getReferences(fileName: string, data: string): FoundItem[] {
+    const result: FoundItem[] = [];
     const file = ts.createSourceFile(fileName, data, ts.ScriptTarget.Latest);
 
     file.statements.forEach((node: ts.Node) => {
       if (ts.isImportDeclaration(node)) {
         if (ts.isStringLiteral(node.moduleSpecifier)) {
           result.push({
-            specifier: node.moduleSpecifier.text,
+            itemType: 'importPath',
+            itemText: node.moduleSpecifier.text,
             location: {
               start: node.moduleSpecifier.getStart(file),
               end: node.moduleSpecifier.getEnd(),
@@ -818,7 +787,7 @@ export class ReferenceIndexer {
     return result;
   }
 
-  private getRelativeReferences(data: string, filePath: string): Reference[] {
+  private getRelativeReferences(data: string, filePath: string): FoundItem[] {
     const references: Set<string> = new Set();
     let cachedConfig: any = undefined;
     const getConfig = () => {
@@ -829,7 +798,7 @@ export class ReferenceIndexer {
     };
     const imports = this.getReferences(filePath, data);
     for (let i = 0; i < imports.length; i++) {
-      const importModule = imports[i].specifier;
+      const importModule = imports[i].itemText;
       if (importModule.startsWith('.')) {
         references.add(importModule);
       } else {
@@ -839,7 +808,7 @@ export class ReferenceIndexer {
         }
       }
     }
-    return imports.filter((i) => references.has(i.specifier));
+    return imports.filter((i) => references.has(i.itemText));
   }
 
   private processFile(

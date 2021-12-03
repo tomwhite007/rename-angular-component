@@ -1,7 +1,7 @@
 import { OriginalFileDetails } from '../definitions/file.interfaces';
 import { upperCaseFirst } from 'upper-case-first';
 
-export function originalFileDetails(filePath: string): OriginalFileDetails {
+export function getOriginalFileDetails(filePath: string): OriginalFileDetails {
   const lastSlash = filePath.lastIndexOf('/');
 
   const windowsDriveMatch = filePath.match(/^\/[a-z]:/);

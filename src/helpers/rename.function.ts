@@ -5,7 +5,6 @@ import {
   OriginalFileDetails,
 } from './definitions/file.interfaces';
 import { renameToNewStub } from './renameToNewStub.function';
-import { originalFileDetails } from './fileManipulation/originalFileDetails.function';
 import { getProjectRoot } from './definitions/getProjectRootFilePath.function';
 import { ReferenceIndexer } from '../indexer/referenceindexer';
 import { likeFilesRegexPartialLookup } from './definitions/file-regex.constants';
@@ -13,6 +12,7 @@ import { FileItem } from '../indexer/fileitem';
 import * as fs from 'fs-extra-promise';
 import escapeStringRegexp from 'escape-string-regexp';
 import { paramCase } from 'change-case';
+import { getOriginalFileDetails } from './fileManipulation/getOriginalFileDetails.function';
 
 export async function rename(
   construct: AngularConstruct,
@@ -21,17 +21,18 @@ export async function rename(
   indexerInitialisePromise: Thenable<any>
 ) {
   const start = Date.now();
-  const fileDetails = originalFileDetails(uri.path);
+  const originalFileDetails: Readonly<OriginalFileDetails> =
+    getOriginalFileDetails(uri.path);
   const projectRoot = getProjectRoot(uri) as string;
   const title = `Rename Angular ${pascalCase(construct)}`;
 
   let newStub = await vscode.window.showInputBox({
     title,
     prompt: `Enter the new ${construct} name.`,
-    value: fileDetails.stub,
+    value: originalFileDetails.stub,
   });
 
-  if (!newStub || fileDetails.stub === newStub) {
+  if (!newStub || originalFileDetails.stub === newStub) {
     // TODO: add pop up - nothing changed
 
     return;
@@ -64,12 +65,12 @@ export async function rename(
       // renameToNewStub(construct, newStub, fileDetails, projectRoot);
 
       const filesRelatedToStub = await FilesRelatedToStub.init(
-        fileDetails,
+        originalFileDetails,
         projectRoot,
         construct
       );
 
-      const filesToMove = filesRelatedToStub.getFilesToMove(newStub);
+      const filesToMove = filesRelatedToStub.getFilesToMove(newStub as string);
 
       const fileMoveJobs = filesToMove.map((f) => {
         return new FileItem(
@@ -106,33 +107,35 @@ export async function rename(
       }
 
       /* TODO - big steps left...
-              delete the old folder
 
-              in the construct file, rename the class, selector, and html and scss/css imports
-              if they're .ts, rename the classes too
+      in the construct file, rename the class, selector, and html and scss/css imports
+      if they're .ts, rename the classes too
 
-              fix up all selectors
-              fix up all test descriptions
+      fix up all selectors
+      fix up all test descriptions
 
-              make sure services and directives work - or disable features
+      make sure services and directives work - or disable features
 
-              make sure I don't need to leave a compliment to MoveTS
+      make sure I don't need to leave a compliment to MoveTS
 
-              check what happens with open editors
+      check what happens with open editors
 
-              ---- v2 -----
+      ---- v2 -----
 
-              handle open editors
-                looks like reference indexer, replaceReferences() already can - need same for core class file
+      handle open editors
+        looks like reference indexer, replaceReferences() already can - need same for core class file
 
-              fix up / remove tsmove conf() configuration
+      fix up / remove tsmove conf() configuration
 
-              make sure input newStub matches constraints and formatting allowed by CLI
+      make sure input newStub matches constraints and formatting allowed by CLI
 
-              refactor for clean classes, functions and pure async await
+      refactor for clean classes, functions and pure async await
 
-              ---- v3 -----
-              */
+      ---- v3 -----
+      */
+
+      // delete original folder
+      fs.remove(originalFileDetails.path);
 
       progress.report({ increment: 100 });
       console.log('all done: ', Date.now() - start + `ms.`);

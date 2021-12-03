@@ -273,36 +273,18 @@ export class ReferenceIndexer {
     return edits;
   }
 
-  private replaceReferences(
+  private replaceEdits(
     filePath: string,
-    getReferenceReplacements: (text: string) => Replacement[],
-    fromPath?: string,
-    originalClassName?: string,
-    newClassName?: string
+    getEdits: (filePath: string, text: string) => GenericEdit[]
   ): Thenable<any> {
     if (!this.conf('openEditors', false)) {
       return fs.readFileAsync(filePath, 'utf8').then((text) => {
-        const replacements = getReferenceReplacements(text);
-        const edits = this.getReferenceEdits(
-          filePath,
-          text,
-          replacements,
-          fromPath
-        );
+        const edits = getEdits(filePath, text);
         if (edits.length === 0) {
           return Promise.resolve();
         }
 
         let newText = applyGenericEdits(text, edits);
-
-        if (originalClassName && newClassName) {
-          // newText = this.applyClassNameEdits(
-          //   filePath,
-          //   text,
-          //   originalClassName,
-          //   newClassName
-          // );
-        }
 
         this.output.show();
         this.output.appendLine(filePath);
@@ -328,9 +310,7 @@ export class ReferenceIndexer {
         .openTextDocument(filePath)
         .then((doc: vscode.TextDocument): Thenable<any> => {
           const text = doc.getText();
-          const replacements = getReferenceReplacements(text);
-
-          const rawEdits = this.getReferenceEdits(filePath, text, replacements);
+          const rawEdits = getEdits(filePath, text);
           const edits = rawEdits.map((edit: GenericEdit) => {
             return vscode.TextEdit.replace(
               new vscode.Range(
@@ -357,21 +337,23 @@ export class ReferenceIndexer {
   }
 
   updateMovedFile(from: string, to: string): Thenable<any> {
-    return this.replaceReferences(
-      to,
-      (text: string): Replacement[] => {
-        const references = Array.from(
-          new Set(this.getRelativeImportSpecifiers(text, from))
-        );
+    const replacements = (text: string): Replacement[] => {
+      const references = Array.from(
+        new Set(this.getRelativeImportSpecifiers(text, from))
+      );
 
-        const replacements = references.map((reference): [string, string] => {
-          const absReference = this.resolveRelativeReference(from, reference);
-          const newReference = this.getRelativePath(to, absReference);
-          return [reference, newReference];
-        });
-        return replacements;
-      },
-      from
+      return references.map((reference): [string, string] => {
+        const absReference = this.resolveRelativeReference(from, reference);
+        const newReference = this.getRelativePath(to, absReference);
+        return [reference, newReference];
+      });
+    };
+
+    return this.replaceEdits(
+      to,
+      (filePath: string, text: string): GenericEdit[] => {
+        return this.getReferenceEdits(filePath, text, replacements(text), from);
+      }
     ).then(() => {
       this.index.deleteByPath(from);
     });
@@ -403,38 +385,47 @@ export class ReferenceIndexer {
               from,
               path.relative(to, file.fsPath)
             );
-            return this.replaceReferences(
-              file.fsPath,
-              (text: string): Replacement[] => {
-                const references = this.getRelativeImportSpecifiers(
-                  text,
-                  file.fsPath
-                );
-                const change = references
-                  .filter((p) => {
-                    const abs = this.resolveRelativeReference(originalPath, p);
-                    if (whiteList.size > 0) {
-                      const name = path.relative(from, abs).split(path.sep)[0];
-                      if (whiteList.has(name)) {
+
+            const replacements = (text: string): Replacement[] => {
+              const references = this.getRelativeImportSpecifiers(
+                text,
+                file.fsPath
+              );
+              const change = references
+                .filter((p) => {
+                  const abs = this.resolveRelativeReference(originalPath, p);
+                  if (whiteList.size > 0) {
+                    const name = path.relative(from, abs).split(path.sep)[0];
+                    if (whiteList.has(name)) {
+                      return false;
+                    }
+                    for (let i = 0; i < this.extensions.length; i++) {
+                      if (whiteList.has(name + this.extensions[i])) {
                         return false;
                       }
-                      for (let i = 0; i < this.extensions.length; i++) {
-                        if (whiteList.has(name + this.extensions[i])) {
-                          return false;
-                        }
-                      }
-                      return true;
                     }
-                    return isPathToAnotherDir(path.relative(from, abs));
-                  })
-                  .map((p): Replacement => {
-                    const abs = this.resolveRelativeReference(originalPath, p);
-                    const relative = this.getRelativePath(file.fsPath, abs);
-                    return [p, relative];
-                  });
-                return change;
-              },
-              originalPath
+                    return true;
+                  }
+                  return isPathToAnotherDir(path.relative(from, abs));
+                })
+                .map((p): Replacement => {
+                  const abs = this.resolveRelativeReference(originalPath, p);
+                  const relative = this.getRelativePath(file.fsPath, abs);
+                  return [p, relative];
+                });
+              return change;
+            };
+
+            return this.replaceEdits(
+              file.fsPath,
+              (filePath: string, text: string): GenericEdit[] => {
+                return this.getReferenceEdits(
+                  filePath,
+                  text,
+                  replacements(text),
+                  originalPath
+                );
+              }
             );
           });
         return Promise.all(promises);
@@ -449,38 +440,39 @@ export class ReferenceIndexer {
     const whiteList = new Set(fileNames);
     const affectedFiles = this.index.getDirReferences(from, fileNames);
     const promises = affectedFiles.map((reference) => {
-      return this.replaceReferences(
-        reference.path,
-        (text: string): Replacement[] => {
-          const imports = this.getRelativeImportSpecifiers(
-            text,
-            reference.path
-          );
-          const change = imports
-            .filter((p) => {
-              const abs = this.resolveRelativeReference(reference.path, p);
-              if (fileNames.length > 0) {
-                const name = path.relative(from, abs).split(path.sep)[0];
-                if (whiteList.has(name)) {
+      const replacements = (text: string): Replacement[] => {
+        const imports = this.getRelativeImportSpecifiers(text, reference.path);
+        const change = imports
+          .filter((p) => {
+            const abs = this.resolveRelativeReference(reference.path, p);
+            if (fileNames.length > 0) {
+              const name = path.relative(from, abs).split(path.sep)[0];
+              if (whiteList.has(name)) {
+                return true;
+              }
+              for (let i = 0; i < this.extensions.length; i++) {
+                if (whiteList.has(name + this.extensions[i])) {
                   return true;
                 }
-                for (let i = 0; i < this.extensions.length; i++) {
-                  if (whiteList.has(name + this.extensions[i])) {
-                    return true;
-                  }
-                }
-                return false;
               }
-              return !isPathToAnotherDir(path.relative(from, abs));
-            })
-            .map((p): [string, string] => {
-              const abs = this.resolveRelativeReference(reference.path, p);
-              const relative = path.relative(from, abs);
-              const newabs = path.resolve(to, relative);
-              const changeTo = this.getRelativePath(reference.path, newabs);
-              return [p, changeTo];
-            });
-          return change;
+              return false;
+            }
+            return !isPathToAnotherDir(path.relative(from, abs));
+          })
+          .map((p): [string, string] => {
+            const abs = this.resolveRelativeReference(reference.path, p);
+            const relative = path.relative(from, abs);
+            const newabs = path.resolve(to, relative);
+            const changeTo = this.getRelativePath(reference.path, newabs);
+            return [p, changeTo];
+          });
+        return change;
+      };
+
+      return this.replaceEdits(
+        reference.path,
+        (filePath: string, text: string): GenericEdit[] => {
+          return this.getReferenceEdits(filePath, text, replacements(text));
         }
       );
     });
@@ -512,17 +504,21 @@ export class ReferenceIndexer {
   updateImports(from: string, to: string, className?: string): Promise<any> {
     const affectedFiles = this.index.getReferences(from);
     const promises = affectedFiles.map((filePath) => {
-      return this.replaceReferences(
+      const replacements = (text: string): Replacement[] => {
+        let relative = this.getRelativePath(filePath.path, from);
+        relative = this.removeExtension(relative);
+
+        let newRelative = this.getRelativePath(filePath.path, to);
+        newRelative = this.removeExtension(newRelative);
+        newRelative = this.removeIndexSuffix(newRelative);
+
+        return [[relative, newRelative]];
+      };
+
+      return this.replaceEdits(
         filePath.path,
-        (text: string): Replacement[] => {
-          let relative = this.getRelativePath(filePath.path, from);
-          relative = this.removeExtension(relative);
-
-          let newRelative = this.getRelativePath(filePath.path, to);
-          newRelative = this.removeExtension(newRelative);
-          newRelative = this.removeIndexSuffix(newRelative);
-
-          return [[relative, newRelative]];
+        (filePath: string, text: string): GenericEdit[] => {
+          return this.getReferenceEdits(filePath, text, replacements(text));
         }
       );
     });

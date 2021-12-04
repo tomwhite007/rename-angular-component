@@ -336,7 +336,11 @@ export class ReferenceIndexer {
     }
   }
 
-  updateMovedFile(from: string, to: string): Thenable<any> {
+  updateMovedFile(
+    from: string,
+    to: string,
+    additionalEdits?: (filePath: string, text: string) => GenericEdit[]
+  ): Thenable<any> {
     const replacements = (text: string): Replacement[] => {
       const references = Array.from(
         new Set(this.getRelativeImportSpecifiers(text, from))
@@ -349,11 +353,13 @@ export class ReferenceIndexer {
       });
     };
 
+    // TODO: do the same for updateImports
     return this.replaceEdits(
       to,
-      (filePath: string, text: string): GenericEdit[] => {
-        return this.getReferenceEdits(filePath, text, replacements(text), from);
-      }
+      (filePath: string, text: string): GenericEdit[] => [
+        ...this.getReferenceEdits(filePath, text, replacements(text), from),
+        ...(additionalEdits ? additionalEdits(filePath, text) : []),
+      ]
     ).then(() => {
       this.index.deleteByPath(from);
     });

@@ -3,12 +3,16 @@ import * as fs from 'fs-extra-promise';
 import * as path from 'path';
 
 import { ReferenceIndexer } from './referenceindexer';
+import { GenericEdit } from './ts-file-helpers';
 
 export class FileItem {
   constructor(
     public sourcePath: string,
     public targetPath: string,
-    public isDir: boolean
+    public isDir: boolean,
+    public originalClassName?: string,
+    public newClassName?: string,
+    public additionalEdits?: (filePath: string, text: string) => GenericEdit[]
   ) {}
 
   exists(): boolean {
@@ -37,7 +41,11 @@ export class FileItem {
               return fs.renameAsync(this.sourcePath, this.targetPath);
             })
             .then(() => {
-              return index.updateMovedFile(this.sourcePath, this.targetPath);
+              return index.updateMovedFile(
+                this.sourcePath,
+                this.targetPath
+                // this.additionalEdits
+              );
             })
             .then(() => {
               return this;

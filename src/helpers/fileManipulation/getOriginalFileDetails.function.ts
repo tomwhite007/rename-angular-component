@@ -18,5 +18,5 @@ watch out that the replace to create the glob doesn't have an issue with case
   const stub = file.split(
     /\.(component|directive|service)\.(spec.ts|scss|html|ts)$/
   )[0];
-  return { path, file, stub };
+  return { path, file, stub, filePath };
 }

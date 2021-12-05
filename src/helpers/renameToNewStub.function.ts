@@ -15,6 +15,7 @@ import { renameEachFile } from './fileManipulation/renameEachFile.function';
 import { renameFolderIfComponentWithNotExtraFiles as renameFolderIfComponentWithNoExtraFiles } from './logic/renameFolderIfComponentWithNoExtraFiles';
 import { generateNewSelector } from './inFileEdits/generateNewSelector.funtion';
 import { performance } from 'perf_hooks';
+import * as vscode from 'vscode';
 
 const validSelectorPattern =
   /^[a-zA-Z][.0-9a-zA-Z]*(:?-[a-zA-Z][.0-9a-zA-Z]*)*$/;
@@ -23,23 +24,32 @@ export function renameToNewStub(
   construct: AngularConstruct,
   newStub: string | undefined,
   selectedFileDetails: OriginalFileDetails,
-  projectRoot: string
+  projectRoot: string,
+  output: vscode.OutputChannel
 ) {
   // component = 4 files, directive|service = 2 files to rename
 
   const start = performance.now();
 
   if (!newStub) {
-    return logInfo('. Empty new name entered. No files changed.', construct);
+    return logInfo(
+      '. Empty new name entered. No files changed.',
+      construct,
+      output
+    );
   }
 
   // remove postfix if present
   newStub = newStub.replace(new RegExp(`\\.${construct}$`, 'i'), '');
   if (newStub === selectedFileDetails.stub) {
-    return logInfo('. No files changed.', construct);
+    return logInfo('. No files changed.', construct, output);
   }
   if (!newStub.match(validSelectorPattern)) {
-    return logInfo('. Text entered is not a valid selector.', construct);
+    return logInfo(
+      '. Text entered is not a valid selector.',
+      construct,
+      output
+    );
   }
   // TODO: LATER: check if cli allows any special characters and numbers when creating services!!!
   // make sure it's kebab
@@ -192,7 +202,7 @@ export function renameToNewStub(
 
   var end = performance.now();
 
-  logInfo(' success', construct, [
+  logInfo(' success', construct, output, [
     ...renameFolderErrorMsgs,
     applyInClassFileChangeSuccessMsg,
     renameClasssuccessMsg,

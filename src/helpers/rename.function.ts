@@ -13,6 +13,7 @@ import * as fs from 'fs-extra-promise';
 import escapeStringRegexp from 'escape-string-regexp';
 import { paramCase } from 'change-case';
 import { getOriginalFileDetails } from './fileManipulation/getOriginalFileDetails.function';
+import { getCoreClassEdits } from '../indexer/ts-file-helpers';
 
 export async function rename(
   construct: AngularConstruct,
@@ -26,19 +27,19 @@ export async function rename(
   const projectRoot = getProjectRoot(uri) as string;
   const title = `Rename Angular ${pascalCase(construct)}`;
 
-  let newStub = await vscode.window.showInputBox({
+  const inputResult = await vscode.window.showInputBox({
     title,
     prompt: `Enter the new ${construct} name.`,
     value: originalFileDetails.stub,
   });
 
-  if (!newStub || originalFileDetails.stub === newStub) {
+  if (!inputResult || originalFileDetails.stub === inputResult) {
     // TODO: add pop up - nothing changed
 
     return;
   }
   // make sure it's kebab
-  newStub = paramCase(newStub);
+  const newStub = paramCase(inputResult ?? '');
 
   const timeoutPause = async (wait = 0) => {
     await new Promise((res) => setTimeout(res, wait));
@@ -61,7 +62,7 @@ export async function rename(
       progress.report({ increment: 0 });
       await timeoutPause();
 
-      // TODO: REMOVE OLD PROCSESS...
+      // TODO: REMOVE OLD PROCESS...
       // renameToNewStub(construct, newStub, fileDetails, projectRoot);
 
       const filesRelatedToStub = await FilesRelatedToStub.init(
@@ -71,12 +72,39 @@ export async function rename(
       );
 
       const filesToMove = filesRelatedToStub.getFilesToMove(newStub as string);
+      const oldClassName = `${pascalCase(originalFileDetails.stub)}${pascalCase(
+        construct
+      )}`;
+      const newClassName = `${pascalCase(newStub)}${pascalCase(construct)}`;
 
       const fileMoveJobs = filesToMove.map((f) => {
+        const edits = getCoreClassEdits(
+          originalFileDetails.filePath,
+          fs.readFileSync(originalFileDetails.filePath, 'utf-8'),
+          oldClassName,
+          newClassName,
+          originalFileDetails.stub,
+          newStub,
+          construct
+        );
+
         return new FileItem(
           f.filePath,
           f.newFilePath,
-          fs.statSync(f.filePath).isDirectory()
+          fs.statSync(f.filePath).isDirectory(),
+          oldClassName,
+          newClassName
+          // f.isCoreConstruct
+          //   ? getCoreClassEdits(
+          //       originalFileDetails.filePath,
+          //       fs.readFileSync(originalFileDetails.filePath, 'utf-8'),
+          //       oldClassName,
+          //       newClassName,
+          //       originalFileDetails.stub,
+          //       newStub,
+          //       construct
+          //     )
+          //   : undefined
         );
       });
 
@@ -151,6 +179,7 @@ class FilesRelatedToStub {
     filePath: string;
     sameConstruct: boolean;
     sameStub: boolean;
+    isCoreConstruct: boolean;
   }[] = [];
   constructFilesRegex!: RegExp;
   relatedFilesRegex!: RegExp;
@@ -198,11 +227,14 @@ class FilesRelatedToStub {
       }`
     );
 
+    const isCoreConstructRegex = new RegExp(`\\.${construct}\\.ts$`);
+
     uris.forEach((uri) => {
       this.fileDetails.push({
         filePath: uri.fsPath,
         sameConstruct: !!uri.fsPath.match(this.constructFilesRegex),
         sameStub: !!uri.fsPath.match(this.relatedFilesRegex),
+        isCoreConstruct: !!uri.fsPath.match(isCoreConstructRegex),
       });
     });
   }
@@ -226,6 +258,7 @@ class FilesRelatedToStub {
       .map((fd) => ({
         filePath: fd.filePath,
         newFilePath: replaceStub(fd.filePath),
+        isCoreConstruct: fd.isCoreConstruct,
       }));
   }
 }

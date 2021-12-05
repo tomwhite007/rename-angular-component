@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
 import { FileItem } from './fileitem';
 
 import { isPathToAnotherDir, ReferenceIndex } from './referenceindex';
-import { applyGenericEdits, GenericEdit } from './ts-file-helpers';
+import { applyGenericEdits, ClassChange, GenericEdit } from './ts-file-helpers';
 
 const minimatch = require('minimatch');
 
@@ -507,7 +507,7 @@ export class ReferenceIndexer {
     return filePath;
   }
 
-  updateImports(from: string, to: string, className?: string): Promise<any> {
+  updateImports(from: string, to: string): Promise<any> {
     const affectedFiles = this.index.getReferences(from);
     const promises = affectedFiles.map((filePath) => {
       const replacements = (text: string): Replacement[] => {

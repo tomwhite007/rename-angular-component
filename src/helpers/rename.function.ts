@@ -4,7 +4,6 @@ import {
   AngularConstruct,
   OriginalFileDetails,
 } from './definitions/file.interfaces';
-import { renameToNewStub } from './renameToNewStub.function';
 import { getProjectRoot } from './definitions/getProjectRootFilePath.function';
 import { ReferenceIndexer } from '../indexer/referenceindexer';
 import { likeFilesRegexPartialLookup } from './definitions/file-regex.constants';
@@ -78,37 +77,24 @@ export async function rename(
       const newClassName = `${pascalCase(newStub)}${pascalCase(construct)}`;
 
       const fileMoveJobs = filesToMove.map((f) => {
-        const edits = getCoreClassEdits(
-          originalFileDetails.filePath,
-          fs.readFileSync(originalFileDetails.filePath, 'utf-8'),
-          oldClassName,
-          newClassName,
-          originalFileDetails.stub,
-          newStub,
-          construct
-        );
-
         return new FileItem(
           f.filePath,
           f.newFilePath,
           fs.statSync(f.filePath).isDirectory(),
           oldClassName,
-          newClassName
-          // f.isCoreConstruct
-          //   ? getCoreClassEdits(
-          //       originalFileDetails.filePath,
-          //       fs.readFileSync(originalFileDetails.filePath, 'utf-8'),
-          //       oldClassName,
-          //       newClassName,
-          //       originalFileDetails.stub,
-          //       newStub,
-          //       construct
-          //     )
-          //   : undefined
+          newClassName,
+          f.isCoreConstruct
+            ? (() =>
+                getCoreClassEdits(
+                  oldClassName,
+                  newClassName,
+                  originalFileDetails.stub,
+                  newStub,
+                  construct
+                ))()
+            : undefined
         );
       });
-
-      console.log('fileMoveJobs', fileMoveJobs);
 
       if (fileMoveJobs.some((l) => l.exists())) {
         vscode.window.showErrorMessage(

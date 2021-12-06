@@ -3,7 +3,7 @@ import * as fs from 'fs-extra-promise';
 import * as path from 'path';
 
 import { ReferenceIndexer } from './referenceindexer';
-import { GenericEdit } from './ts-file-helpers';
+import { GenericEdit, GenericEditsCallback } from './ts-file-helpers';
 
 export class FileItem {
   constructor(
@@ -12,7 +12,7 @@ export class FileItem {
     public isDir: boolean,
     public originalClassName?: string,
     public newClassName?: string,
-    public additionalEdits?: (filePath: string, text: string) => GenericEdit[]
+    public additionalEdits?: GenericEditsCallback
   ) {}
 
   exists(): boolean {
@@ -43,8 +43,8 @@ export class FileItem {
             .then(() => {
               return index.updateMovedFile(
                 this.sourcePath,
-                this.targetPath
-                // this.additionalEdits
+                this.targetPath,
+                this.additionalEdits
               );
             })
             .then(() => {

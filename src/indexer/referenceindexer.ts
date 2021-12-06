@@ -6,7 +6,11 @@ import * as vscode from 'vscode';
 import { FileItem } from './fileitem';
 
 import { isPathToAnotherDir, ReferenceIndex } from './referenceindex';
-import { applyGenericEdits, ClassChange, GenericEdit } from './ts-file-helpers';
+import {
+  applyGenericEdits,
+  GenericEdit,
+  GenericEditsCallback,
+} from './ts-file-helpers';
 
 const minimatch = require('minimatch');
 
@@ -339,7 +343,7 @@ export class ReferenceIndexer {
   updateMovedFile(
     from: string,
     to: string,
-    additionalEdits?: (filePath: string, text: string) => GenericEdit[]
+    additionalEdits?: GenericEditsCallback
   ): Thenable<any> {
     const replacements = (text: string): Replacement[] => {
       const references = Array.from(

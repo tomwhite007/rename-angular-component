@@ -17,6 +17,11 @@ export interface GenericEdit {
   replacement: string;
 }
 
+export type GenericEditsCallback = (
+  filePath: string,
+  text: string
+) => GenericEdit[];
+
 export function applyGenericEdits(text: string, edits: GenericEdit[]): string {
   const replaceBetween = (
     str: string,
@@ -45,68 +50,50 @@ export function applyGenericEdits(text: string, edits: GenericEdit[]): string {
   return text;
 }
 
-// async function replaceEditsInFile(
-//   filePath: string,
-//   edits: GenericEdit[],
-//   output: vscode.OutputChannel
-// ) {
-//   const text = await fs.readFileAsync(filePath, 'utf8');
-//   if (edits.length === 0) {
-//     return;
-//   }
-
-//   let newText = applyGenericEdits(text, edits);
-
-//   output.show();
-//   output.appendLine(filePath);
-
-//   await fs.writeFileAsync(filePath, newText, 'utf-8');
-// }
-
 export function getCoreClassEdits(
-  fileName: string,
-  sourceText: string,
   originalClassName: string,
   newClassName: string,
   originalFileStub: string,
   newFileStub: string,
   construct: AngularConstruct
-): GenericEdit[] {
-  const foundItems = getCoreClassFoundItems(
-    fileName,
-    sourceText,
-    originalClassName
-  );
+): GenericEditsCallback {
+  return (fileName: string, sourceText: string) => {
+    const foundItems = getCoreClassFoundItems(
+      fileName,
+      sourceText,
+      originalClassName
+    );
 
-  return foundItems
-    .map((foundItem) => {
-      let replacement = '';
-      switch (foundItem.itemType) {
-        case 'class':
-          replacement = newClassName;
-          break;
-        case 'selector':
-        case 'templateUrl':
-        case 'styleUrls':
-          replacement = foundItem.itemText.replace(
-            originalFileStub,
-            newFileStub
-          );
+    return foundItems
+      .map((foundItem) => {
+        let replacement = '';
+        switch (foundItem.itemType) {
+          case 'class':
+            replacement = newClassName;
+            break;
+          case 'selector':
+          case 'templateUrl':
+          case 'styleUrls':
+            replacement = `'${foundItem.itemText.replace(
+              originalFileStub,
+              newFileStub
+            )}'`;
+            break;
           // TODO: fix selector replacement for Directives
-          break;
-      }
+        }
 
-      if (replacement === foundItem.itemText) {
-        return null;
-      }
+        if (replacement === foundItem.itemText) {
+          return null;
+        }
 
-      return {
-        replacement,
-        start: foundItem.location.start,
-        end: foundItem.location.end,
-      };
-    })
-    .filter((edit) => edit !== null) as GenericEdit[];
+        return {
+          replacement,
+          start: foundItem.location.start,
+          end: foundItem.location.end,
+        };
+      })
+      .filter((edit) => edit !== null) as GenericEdit[];
+  };
 }
 
 function getCoreClassFoundItems(
@@ -132,7 +119,7 @@ function getCoreClassFoundItems(
         itemType: 'class',
         itemText: node.name?.escapedText,
         location: {
-          start: node.name.pos,
+          start: node.name.pos + 1,
           end: node.name.end,
         },
       });
@@ -164,7 +151,7 @@ function getCoreClassFoundItems(
                     itemType: prop.name.text as SelectorOrTemplateUrl,
                     itemText: prop.initializer.text,
                     location: {
-                      start: prop.initializer.pos,
+                      start: prop.initializer.pos + 1,
                       end: prop.initializer.end,
                     },
                   });

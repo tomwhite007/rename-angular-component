@@ -39,7 +39,11 @@ export class FileItem {
             });
         } else {
           return index
-            .updateImports(this.sourcePath, this.targetPath)
+            .updateImports(
+              this.sourcePath,
+              this.targetPath,
+              this.additionalEdits?.importsEdits
+            )
             .then(() => {
               return fs.renameAsync(this.sourcePath, this.targetPath);
             })

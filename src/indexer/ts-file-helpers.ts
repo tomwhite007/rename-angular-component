@@ -202,7 +202,7 @@ export function getClassNameEdits(
     );
 
     return foundItems
-      .map((foundItem) => {
+      ?.map((foundItem) => {
         if (foundItem.itemType === 'class') {
           return {
             replacement: newClassName,
@@ -221,49 +221,54 @@ function getClassNameFoundItems(
   sourceText: string,
   className: string
 ) {
-  const file = ts.createSourceFile(
-    fileName,
-    sourceText,
-    ts.ScriptTarget.Latest
-  );
+  try {
+    const file = ts.createSourceFile(
+      fileName,
+      sourceText,
+      ts.ScriptTarget.Latest
+    );
 
-  const result: FoundItem[] = [];
+    const result: FoundItem[] = [];
+    const recurseThroughNodeTree = (node: ts.Node) => {
+      if (ts.isIdentifier(node)) {
+        if (node.text === className) {
+          result.push({
+            itemType: 'class',
+            itemText: className,
+            location: { start: node.pos, end: node.end },
+          });
+        }
+      } else {
+        ts.forEachChild(node, recurseThroughNodeTree);
+      }
+    };
 
-  const recurseThroughNodeTree = (node: ts.Node) => {
-    if (ts.isIdentifier(node)) {
-      if (node.text === className) {
-        result.push({
-          itemType: 'class',
-          itemText: className,
-          location: { start: node.pos, end: node.end },
+    file.statements.forEach((node: ts.Node) => {
+      if (ts.isExpressionStatement(node)) {
+        node.expression.forEachChild((arg) => {
+          if (ts.isStringLiteral(arg)) {
+            const argIndex = arg.text.indexOf(className);
+            if (argIndex >= 0) {
+              result.push({
+                itemType: 'class',
+                itemText: className,
+                location: {
+                  start: arg.pos + argIndex + 1,
+                  end: arg.pos + argIndex + className.length,
+                },
+              });
+            }
+          }
         });
       }
-    } else {
-      ts.forEachChild(node, recurseThroughNodeTree);
-    }
-  };
 
-  file.statements.forEach((node: ts.Node) => {
-    if (ts.isExpressionStatement(node)) {
-      node.expression.forEachChild((arg) => {
-        if (ts.isStringLiteral(arg)) {
-          const argIndex = arg.text.indexOf(className);
-          if (argIndex >= 0) {
-            result.push({
-              itemType: 'class',
-              itemText: className,
-              location: {
-                start: arg.pos + argIndex,
-                end: arg.pos + argIndex + className.length,
-              },
-            });
-          }
-        }
-      });
-    }
+      recurseThroughNodeTree(node);
+    });
 
-    recurseThroughNodeTree(node);
-  });
+    console.log('classNameEdits', result);
 
-  return result;
+    return result;
+  } catch (e) {
+    console.log('fileName', fileName, e);
+  }
 }

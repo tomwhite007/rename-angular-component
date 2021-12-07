@@ -67,68 +67,68 @@ export async function rename(
       // TODO: REMOVE OLD PROCESS...
       // renameToNewStub(construct, newStub, fileDetails, projectRoot);
 
-      const filesRelatedToStub = await FilesRelatedToStub.init(
-        originalFileDetails,
-        projectRoot,
-        construct
-      );
-
-      const filesToMove = filesRelatedToStub.getFilesToMove(newStub as string);
-      const oldClassName = `${pascalCase(originalFileDetails.stub)}${pascalCase(
-        construct
-      )}`;
-      const newClassName = `${pascalCase(newStub)}${pascalCase(construct)}`;
-
-      const fileMoveJobs = filesToMove.map((f) => {
-        const additionalEdits = {
-          importsEdits: (() => getClassNameEdits(oldClassName, newClassName))(),
-          movedFileEdits: f.isCoreConstruct
-            ? (() =>
-                getCoreClassEdits(
-                  oldClassName,
-                  newClassName,
-                  originalFileDetails.stub,
-                  newStub,
-                  construct
-                ))()
-            : undefined,
-        };
-
-        return new FileItem(
-          f.filePath,
-          f.newFilePath,
-          fs.statSync(f.filePath).isDirectory(),
-          oldClassName,
-          newClassName,
-          additionalEdits
-        );
-      });
-
-      if (fileMoveJobs.some((l) => l.exists())) {
-        vscode.window.showErrorMessage(
-          'Not allowed to overwrite existing files'
-        );
-        return;
-      }
-
-      progress.report({ increment: 20 });
-      await timeoutPause();
-
-      const progressIncrement = Math.floor(80 / fileMoveJobs.length);
-      let currentProgress = 20;
-      importer.startNewMoves(fileMoveJobs);
       try {
+        const filesRelatedToStub = await FilesRelatedToStub.init(
+          originalFileDetails,
+          projectRoot,
+          construct
+        );
+
+        const filesToMove = filesRelatedToStub.getFilesToMove(
+          newStub as string
+        );
+        const oldClassName = `${pascalCase(
+          originalFileDetails.stub
+        )}${pascalCase(construct)}`;
+        const newClassName = `${pascalCase(newStub)}${pascalCase(construct)}`;
+
+        const fileMoveJobs = filesToMove.map((f) => {
+          const additionalEdits = {
+            importsEdits: (() =>
+              getClassNameEdits(oldClassName, newClassName))(),
+            movedFileEdits: f.isCoreConstruct
+              ? (() =>
+                  getCoreClassEdits(
+                    oldClassName,
+                    newClassName,
+                    originalFileDetails.stub,
+                    newStub,
+                    construct
+                  ))()
+              : undefined,
+          };
+
+          return new FileItem(
+            f.filePath,
+            f.newFilePath,
+            fs.statSync(f.filePath).isDirectory(),
+            oldClassName,
+            newClassName,
+            additionalEdits
+          );
+        });
+
+        if (fileMoveJobs.some((l) => l.exists())) {
+          vscode.window.showErrorMessage(
+            'Not allowed to overwrite existing files'
+          );
+          return;
+        }
+
+        progress.report({ increment: 20 });
+        await timeoutPause();
+
+        const progressIncrement = Math.floor(80 / fileMoveJobs.length);
+        let currentProgress = 20;
+        importer.startNewMoves(fileMoveJobs);
         for (const item of fileMoveJobs) {
           currentProgress += progressIncrement;
           progress.report({ increment: currentProgress });
           await timeoutPause(10);
           await item.move(importer);
         }
-      } catch (e) {
-        console.log('error in extension.ts', e);
-      }
 
-      /* TODO - big steps left...
+        /* TODO - big steps left...
 
       in the construct file, rename the class, selector, and html and scss/css imports
       if they're .ts, rename the classes too
@@ -156,12 +156,15 @@ export async function rename(
       ---- v3 -----
       */
 
-      // delete original folder
-      fs.remove(originalFileDetails.path);
+        // delete original folder
+        fs.remove(originalFileDetails.path);
 
-      progress.report({ increment: 100 });
-      console.log('all done: ', Date.now() - start + `ms.`);
-      await timeoutPause(50);
+        progress.report({ increment: 100 });
+        console.log('all done: ', Date.now() - start + `ms.`);
+        await timeoutPause(50);
+      } catch (e) {
+        console.log('error in extension.ts', e);
+      }
     }
   );
 }

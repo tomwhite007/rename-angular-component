@@ -12,7 +12,10 @@ export class FileItem {
     public isDir: boolean,
     public originalClassName?: string,
     public newClassName?: string,
-    public additionalEdits?: GenericEditsCallback
+    public additionalEdits?: {
+      importsEdits?: GenericEditsCallback;
+      movedFileEdits?: GenericEditsCallback;
+    }
   ) {}
 
   exists(): boolean {
@@ -44,7 +47,7 @@ export class FileItem {
               return index.updateMovedFile(
                 this.sourcePath,
                 this.targetPath,
-                this.additionalEdits
+                this.additionalEdits?.movedFileEdits
               );
             })
             .then(() => {

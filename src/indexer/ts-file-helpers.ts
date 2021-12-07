@@ -110,6 +110,7 @@ function getCoreClassFoundItems(
   const result: FoundItem[] = [];
 
   file.statements.forEach((node: ts.Node) => {
+    // TODO; use recurseThroughNodeTree pattern for class name instead - to pick up Static Calls and CVA providers
     // get class
     if (
       ts.isClassDeclaration(node) &&
@@ -184,6 +185,84 @@ function getCoreClassFoundItems(
         }
       });
     }
+  });
+
+  return result;
+}
+
+export function getClassNameEdits(
+  originalClassName: string,
+  newClassName: string
+): GenericEditsCallback {
+  return (fileName: string, sourceText: string) => {
+    const foundItems = getClassNameFoundItems(
+      fileName,
+      sourceText,
+      originalClassName
+    );
+
+    return foundItems
+      .map((foundItem) => {
+        if (foundItem.itemType === 'class') {
+          return {
+            replacement: newClassName,
+            start: foundItem.location.start,
+            end: foundItem.location.end,
+          };
+        }
+        return null;
+      })
+      .filter((edit) => edit !== null) as GenericEdit[];
+  };
+}
+
+function getClassNameFoundItems(
+  fileName: string,
+  sourceText: string,
+  className: string
+) {
+  const file = ts.createSourceFile(
+    fileName,
+    sourceText,
+    ts.ScriptTarget.Latest
+  );
+
+  const result: FoundItem[] = [];
+
+  const recurseThroughNodeTree = (node: ts.Node) => {
+    if (ts.isIdentifier(node)) {
+      if (node.text === className) {
+        result.push({
+          itemType: 'class',
+          itemText: className,
+          location: { start: node.pos, end: node.end },
+        });
+      }
+    } else {
+      ts.forEachChild(node, recurseThroughNodeTree);
+    }
+  };
+
+  file.statements.forEach((node: ts.Node) => {
+    if (ts.isExpressionStatement(node)) {
+      node.expression.forEachChild((arg) => {
+        if (ts.isStringLiteral(arg)) {
+          const argIndex = arg.text.indexOf(className);
+          if (argIndex >= 0) {
+            result.push({
+              itemType: 'class',
+              itemText: className,
+              location: {
+                start: arg.pos + argIndex,
+                end: arg.pos + argIndex + className.length,
+              },
+            });
+          }
+        }
+      });
+    }
+
+    recurseThroughNodeTree(node);
   });
 
   return result;

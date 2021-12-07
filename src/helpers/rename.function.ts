@@ -12,7 +12,10 @@ import * as fs from 'fs-extra-promise';
 import escapeStringRegexp from 'escape-string-regexp';
 import { paramCase } from 'change-case';
 import { getOriginalFileDetails } from './fileManipulation/getOriginalFileDetails.function';
-import { getCoreClassEdits } from '../indexer/ts-file-helpers';
+import {
+  getClassNameEdits,
+  getCoreClassEdits,
+} from '../indexer/ts-file-helpers';
 
 export async function rename(
   construct: AngularConstruct,
@@ -77,13 +80,9 @@ export async function rename(
       const newClassName = `${pascalCase(newStub)}${pascalCase(construct)}`;
 
       const fileMoveJobs = filesToMove.map((f) => {
-        return new FileItem(
-          f.filePath,
-          f.newFilePath,
-          fs.statSync(f.filePath).isDirectory(),
-          oldClassName,
-          newClassName,
-          f.isCoreConstruct
+        const additionalEdits = {
+          importsEdits: (() => getClassNameEdits(oldClassName, newClassName))(),
+          movedFileEdits: f.isCoreConstruct
             ? (() =>
                 getCoreClassEdits(
                   oldClassName,
@@ -92,7 +91,16 @@ export async function rename(
                   newStub,
                   construct
                 ))()
-            : undefined
+            : undefined,
+        };
+
+        return new FileItem(
+          f.filePath,
+          f.newFilePath,
+          fs.statSync(f.filePath).isDirectory(),
+          oldClassName,
+          newClassName,
+          additionalEdits
         );
       });
 

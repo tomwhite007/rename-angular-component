@@ -5,6 +5,8 @@ import * as vscode from 'vscode';
 import { rename } from './helpers/rename.function';
 import { ReferenceIndexer } from './indexer/referenceindexer';
 import { AngularConstruct } from './helpers/definitions/file.interfaces';
+import { getClassNameEdits } from './indexer/ts-file-helpers';
+import * as fs from 'fs-extra-promise';
 
 export function activate(context: vscode.ExtensionContext) {
   const importer: ReferenceIndexer = new ReferenceIndexer();
@@ -36,16 +38,11 @@ export function activate(context: vscode.ExtensionContext) {
       // TODO: remove when no direct test process is needed
       // {
       //   const filePath =
-      //     '/Users/tom/Development/dng/dgx-sales-spa-dev2/libs/sales/feature-appliance-details/src/lib/appliance-details/appliance-details.component.ts';
+      //     '/Users/tom/Development/dng/dgx-sales-spa-dev2/libs/sales/feature-appliance-details/src/lib/appliance-details/appliance-details.component.spec.ts';
 
       //   const testText = await fs.readFileAsync(filePath, 'utf8');
 
-      //   applyClassNameEdits(
-      //     filePath,
-      //     testText,
-      //     'ApplianceDetailsComponent',
-      //     'TestClass'
-      //   );
+      //   getClassNameEdits(filePath, testText);
       // }
       rename('component', uri, importer, initialisePromise)
   );

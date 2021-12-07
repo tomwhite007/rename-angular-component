@@ -357,7 +357,6 @@ export class ReferenceIndexer {
       });
     };
 
-    // TODO: do the same for updateImports
     return this.replaceEdits(
       to,
       (filePath: string, text: string): GenericEdit[] => [
@@ -511,7 +510,11 @@ export class ReferenceIndexer {
     return filePath;
   }
 
-  updateImports(from: string, to: string): Promise<any> {
+  updateImports(
+    from: string,
+    to: string,
+    additionalEdits?: GenericEditsCallback
+  ): Promise<any> {
     const affectedFiles = this.index.getReferences(from);
     const promises = affectedFiles.map((filePath) => {
       const replacements = (text: string): Replacement[] => {
@@ -527,9 +530,10 @@ export class ReferenceIndexer {
 
       return this.replaceEdits(
         filePath.path,
-        (filePath: string, text: string): GenericEdit[] => {
-          return this.getReferenceEdits(filePath, text, replacements(text));
-        }
+        (filePath: string, text: string): GenericEdit[] => [
+          ...this.getReferenceEdits(filePath, text, replacements(text)),
+          ...(additionalEdits ? additionalEdits(filePath, text) : []),
+        ]
       );
     });
     return Promise.all(promises).catch((e) => {

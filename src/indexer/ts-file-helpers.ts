@@ -108,23 +108,15 @@ function getCoreClassFoundItems(
   );
 
   const result: FoundItem[] = [];
+  const recurseThroughNodeTree = (() =>
+    getTreeRecursor(originalClassName, sourceText, result))();
 
   file.statements.forEach((node: ts.Node) => {
-    // TODO; use recurseThroughNodeTree pattern for class name instead - to pick up Static Calls and CVA providers
     // get class
     if (
       ts.isClassDeclaration(node) &&
       node.name?.escapedText === originalClassName
     ) {
-      result.push({
-        itemType: 'class',
-        itemText: node.name?.escapedText,
-        location: {
-          start: node.name.pos + 1,
-          end: node.name.end,
-        },
-      });
-
       const decoratorPropertiesRequired = [
         'selector',
         'templateUrl',
@@ -185,6 +177,8 @@ function getCoreClassFoundItems(
         }
       });
     }
+
+    recurseThroughNodeTree(node);
   });
 
   return result;
@@ -229,25 +223,8 @@ function getClassNameFoundItems(
     );
 
     const result: FoundItem[] = [];
-    const recurseThroughNodeTree = (node: ts.Node) => {
-      if (ts.isIdentifier(node)) {
-        if (node.text === className) {
-          const realString = sourceText.substring(node.pos, node.end);
-          const shim = realString.indexOf(className);
-
-          result.push({
-            itemType: 'class',
-            itemText: className,
-            location: {
-              start: node.pos + shim,
-              end: node.end,
-            },
-          });
-        }
-      } else {
-        ts.forEachChild(node, recurseThroughNodeTree);
-      }
-    };
+    const recurseThroughNodeTree = (() =>
+      getTreeRecursor(className, sourceText, result))();
 
     file.statements.forEach((node: ts.Node) => {
       if (ts.isExpressionStatement(node)) {
@@ -271,10 +248,35 @@ function getClassNameFoundItems(
       recurseThroughNodeTree(node);
     });
 
-    console.log('classNameEdits', result);
-
     return result;
   } catch (e) {
-    console.log('fileName', fileName, e);
+    console.log('ERROR PROCESSING: ', fileName, e);
   }
+}
+
+function getTreeRecursor(
+  className: string,
+  sourceText: string,
+  result: FoundItem[]
+) {
+  const recurseThroughNodeTree = (node: ts.Node) => {
+    if (ts.isIdentifier(node)) {
+      if (node.text === className) {
+        const realString = sourceText.substring(node.pos, node.end);
+        const shim = realString.indexOf(className);
+
+        result.push({
+          itemType: 'class',
+          itemText: className,
+          location: {
+            start: node.pos + shim,
+            end: node.end,
+          },
+        });
+      }
+    } else {
+      ts.forEachChild(node, recurseThroughNodeTree);
+    }
+  };
+  return recurseThroughNodeTree;
 }

@@ -232,10 +232,16 @@ function getClassNameFoundItems(
     const recurseThroughNodeTree = (node: ts.Node) => {
       if (ts.isIdentifier(node)) {
         if (node.text === className) {
+          const realString = sourceText.substring(node.pos, node.end);
+          const shim = realString.indexOf(className);
+
           result.push({
             itemType: 'class',
             itemText: className,
-            location: { start: node.pos, end: node.end },
+            location: {
+              start: node.pos + shim,
+              end: node.end,
+            },
           });
         }
       } else {
@@ -254,7 +260,7 @@ function getClassNameFoundItems(
                 itemText: className,
                 location: {
                   start: arg.pos + argIndex + 1,
-                  end: arg.pos + argIndex + className.length,
+                  end: arg.pos + argIndex + className.length + 1,
                 },
               });
             }

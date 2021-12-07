@@ -19,7 +19,8 @@ export class FileItem {
   ) {}
 
   exists(): boolean {
-    return fs.existsSync(this.targetPath);
+    const exists = fs.existsSync(this.targetPath);
+    return exists;
   }
 
   public move(index: ReferenceIndexer): Promise<FileItem> {

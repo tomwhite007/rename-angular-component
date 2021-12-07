@@ -251,6 +251,7 @@ function getClassNameFoundItems(
     return result;
   } catch (e) {
     console.log('ERROR PROCESSING: ', fileName, e);
+    throw e;
   }
 }
 

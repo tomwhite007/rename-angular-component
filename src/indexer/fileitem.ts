@@ -64,6 +64,7 @@ export class FileItem {
       })
       .catch((e) => {
         console.log('error in move', e);
+        throw e;
       });
   }
 

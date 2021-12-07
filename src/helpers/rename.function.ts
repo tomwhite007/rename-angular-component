@@ -16,6 +16,8 @@ import {
   getClassNameEdits,
   getCoreClassEdits,
 } from '../indexer/ts-file-helpers';
+import { logInfo } from './logging/logInfo.function';
+import { windowsFilePathFix } from './fileManipulation/windows-file-path-fix.function';
 
 export async function rename(
   construct: AngularConstruct,
@@ -26,7 +28,7 @@ export async function rename(
   const start = Date.now();
   const originalFileDetails: Readonly<OriginalFileDetails> =
     getOriginalFileDetails(uri.path);
-  const projectRoot = getProjectRoot(uri) as string;
+  const projectRoot = windowsFilePathFix(getProjectRoot(uri) as string);
   const title = `Rename Angular ${pascalCase(construct)}`;
 
   const inputResult = await vscode.window.showInputBox({
@@ -53,6 +55,13 @@ export async function rename(
   const output = importer.setOutputChannel(
     `Rename Angular ${pascalCase(construct)}`
   );
+
+  logInfo('Path Stuff', construct, output, [
+    originalFileDetails.path,
+    originalFileDetails.filePath,
+    projectRoot,
+    'If not now then when?',
+  ]);
 
   await vscode.window.withProgress(
     {
@@ -164,6 +173,7 @@ export async function rename(
         await timeoutPause(50);
       } catch (e) {
         console.log('error in extension.ts', e);
+        logInfo('ERROR: ', construct, output, [(<any>e).toSting()]);
       }
     }
   );

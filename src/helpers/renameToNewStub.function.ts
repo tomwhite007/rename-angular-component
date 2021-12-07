@@ -68,7 +68,7 @@ export function renameToNewStub(
     newStub
   );
   if (findFilesToNotRenameErrorMsgs.length) {
-    return logErrors(construct, [...findFilesToNotRenameErrorMsgs]);
+    return logErrors(construct, output, [...findFilesToNotRenameErrorMsgs]);
   }
   if (folderRenamed) {
     selectedFileDetails.path = newPath;
@@ -81,7 +81,7 @@ export function renameToNewStub(
     construct
   );
   if (findFileErrorMsgs.length) {
-    return logErrors(construct, [
+    return logErrors(construct, output, [
       ...renameFolderErrorMsgs,
       ...findFileErrorMsgs,
     ]);
@@ -95,7 +95,7 @@ export function renameToNewStub(
     selectedFileDetails.path
   );
   if (renameFilesErrorMsgs.length) {
-    return logErrors(construct, [
+    return logErrors(construct, output, [
       ...renameFolderErrorMsgs,
       ...renameFilesErrorMsgs,
     ]);
@@ -111,7 +111,7 @@ export function renameToNewStub(
       selectedFileDetails.path + '/' + newStub
     );
   if (getComponentClassFileDetailsErrorMsgs.length) {
-    return logErrors(construct, getComponentClassFileDetailsErrorMsgs);
+    return logErrors(construct, output, getComponentClassFileDetailsErrorMsgs);
   }
 
   const classFilePath = `${selectedFileDetails.path}/${newStub}.${construct}.ts`;
@@ -143,7 +143,7 @@ export function renameToNewStub(
       construct
     );
   if (applyInClassFileChangesErrorMsgs.length) {
-    return logErrors(construct, applyInClassFileChangesErrorMsgs);
+    return logErrors(construct, output, applyInClassFileChangesErrorMsgs);
   }
 
   // Rename Class and Imports
@@ -155,7 +155,7 @@ export function renameToNewStub(
     newLocalFilePath
   );
   if (renameClassErrorMsgs.length) {
-    return logErrors(construct, renameClassErrorMsgs);
+    return logErrors(construct, output, renameClassErrorMsgs);
   }
 
   // TODO: replace directive works for square brackets sort of needs more
@@ -168,7 +168,7 @@ export function renameToNewStub(
     newSelector
   );
   if (renameSelectorErrorMsgs.length) {
-    return logErrors(construct, renameSelectorErrorMsgs);
+    return logErrors(construct, output, renameSelectorErrorMsgs);
   }
 
   // Inside Class File:

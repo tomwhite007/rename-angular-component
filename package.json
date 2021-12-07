@@ -3,7 +3,7 @@
   "displayName": "Rename Angular Component",
   "description": "Rename Angular Components, Directives and Services",
   "publisher": "tom",
-  "version": "0.2.0-alpha1",
+  "version": "0.2.0-alpha2",
   "license": "MIT",
   "repository": {
     "url": "https://github.com/tomwhite007/rename-angular-component"

@@ -6,17 +6,14 @@ import {
 } from './definitions/file.interfaces';
 import { getProjectRoot } from './definitions/getProjectRootFilePath.function';
 import { ReferenceIndexer } from '../indexer/referenceindexer';
-import { likeFilesRegexPartialLookup } from './definitions/file-regex.constants';
 import { FileItem } from '../indexer/fileitem';
 import * as fs from 'fs-extra-promise';
-import escapeStringRegexp from 'escape-string-regexp';
 import { paramCase } from 'change-case';
 import { getOriginalFileDetails } from './fileManipulation/getOriginalFileDetails.function';
 import {
   getClassNameEdits,
   getCoreClassEdits,
 } from '../indexer/ts-file-helpers';
-import { logInfo } from './logging/logInfo.function';
 import { windowsFilePathFix } from './fileManipulation/windows-file-path-fix.function';
 import { FilesRelatedToStub } from './filesRelatedtToStub.class';
 
@@ -128,33 +125,36 @@ export async function rename(
           await item.move(importer);
         }
 
-        /* TODO - big steps left...
+        /* TODO - big steps left...    
 
-      in the construct file, rename the class, selector, and html and scss/css imports
-      if they're .ts, rename the classes too
+        fix popup messages
 
-      fix up all selectors
-      fix up all test descriptions
+        fix logging
 
-      make sure services and directives work - or disable features
+        check for other to dos
 
-      make sure I don't need to leave a compliment to MoveTS
+        fix up all selectors
 
-      check what happens with open editors
+        make sure services and directives work - or disable features
 
-      ---- v2 -----
+        make sure I don't need to leave a compliment to MoveTS
 
-      handle open editors
-        looks like reference indexer, replaceReferences() already can - need same for core class file
+        check what happens with open editors
 
-      fix up / remove tsmove conf() configuration
+        ---- v2 -----
 
-      make sure input newStub matches constraints and formatting allowed by CLI
+        handle open editors
+          looks like reference indexer, replaceReferences() already can - need same for core class file
+            close affected open tabs except if unsaved - then warn and stop?
 
-      refactor for clean classes, functions and pure async await
+        fix up / remove tsmove conf() configuration
 
-      ---- v3 -----
-      */
+        make sure input newStub matches constraints and formatting allowed by CLI
+
+        refactor for clean classes, functions and pure async await
+
+        ---- v3 -----
+        */
 
         // delete original folder
         fs.remove(originalFileDetails.path);

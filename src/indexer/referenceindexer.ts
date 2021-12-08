@@ -65,19 +65,13 @@ export class ReferenceIndexer {
     });
   }
 
-  setOutputChannel(name: string) {
-    this.output = vscode.window.createOutputChannel(name);
-    const line = new Array(name.length + 1).join('-');
-    this.output.appendLine(line);
-    this.output.appendLine(name);
-    this.output.appendLine(line);
-    this.output.show();
-    return this.output;
+  setOutputChannel(output: vscode.OutputChannel) {
+    this.output = output;
   }
 
   conf<T>(property: string, defaultValue: T): T {
     return vscode.workspace
-      .getConfiguration('movets')
+      .getConfiguration('renameAngularComponent')
       .get<T>(property, defaultValue);
   }
 
@@ -572,8 +566,7 @@ export class ReferenceIndexer {
 
         if (progress) {
           progress.report({
-            message:
-              'move-ts indexing... ' + index + '/' + files.length + ' indexed',
+            message: index + '/' + files.length + ' indexed',
           });
         }
 

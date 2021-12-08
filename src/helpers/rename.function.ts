@@ -18,6 +18,9 @@ import {
 import { windowsFilePathFix } from './fileManipulation/windows-file-path-fix.function';
 import { FilesRelatedToStub } from './filesRelatedtToStub.class';
 import { findReplaceSelectorsInTemplateFiles } from './fileManipulation/findReplaceSelectorsInTemplateFiles.function';
+import { createOutputChannel } from './createOutputChannel.function';
+import { logInfo } from './logging/logInfo.function';
+import { popupMessage } from './logging/popupMessage.function';
 
 export async function rename(
   construct: AngularConstruct,
@@ -25,7 +28,6 @@ export async function rename(
   importer: ReferenceIndexer,
   indexerInitialisePromise: Thenable<any>
 ) {
-  const start = Date.now();
   const originalFileDetails: Readonly<OriginalFileDetails> =
     getOriginalFileDetails(uri.path);
   const projectRoot = windowsFilePathFix(getProjectRoot(uri) as string);
@@ -36,10 +38,15 @@ export async function rename(
     prompt: `Enter the new ${construct} name.`,
     value: originalFileDetails.stub,
   });
+  const start = Date.now();
 
-  if (!inputResult || originalFileDetails.stub === inputResult) {
-    // TODO: add pop up - nothing changed
-
+  const output = createOutputChannel(title);
+  if (!inputResult) {
+    popupMessage(`New ${construct} name not entered. Stopped.`);
+    return;
+  }
+  if (originalFileDetails.stub === inputResult) {
+    popupMessage(`${pascalCase(construct)} name same as original. Stopped.`);
     return;
   }
   // make sure it's kebab
@@ -51,10 +58,12 @@ export async function rename(
   };
 
   // wait for indexer initialise to complete
-  await indexerInitialisePromise;
-  const output = importer.setOutputChannel(
-    `Rename Angular ${pascalCase(construct)}`
-  );
+  const indexTime = await indexerInitialisePromise;
+  logInfo(output, [
+    `Index files completed in ${Math.round(indexTime * 100) / 100} seconds`,
+    '',
+  ]);
+  importer.setOutputChannel(output);
 
   await vscode.window.withProgress(
     {
@@ -120,7 +129,7 @@ export async function rename(
         progress.report({ increment: 20 });
         await timeoutPause();
 
-        const progressIncrement = Math.floor(80 / fileMoveJobs.length);
+        const progressIncrement = Math.floor(70 / fileMoveJobs.length);
         let currentProgress = 20;
         importer.startNewMoves(fileMoveJobs);
         for (const item of fileMoveJobs) {
@@ -134,7 +143,8 @@ export async function rename(
           await findReplaceSelectorsInTemplateFiles(
             construct,
             selectorTransfer.oldSelector,
-            selectorTransfer.newSelector
+            selectorTransfer.newSelector,
+            output
           );
         } else {
           throw new Error('selectorTransfer not set');
@@ -142,19 +152,23 @@ export async function rename(
 
         /* TODO - big steps left...    
 
+
         fix popup messages
 
         fix logging
 
-        check for other to dos
+        log selector changed files to Output list
 
-        fix up all selectors
+        check for other to dos
 
         make sure services and directives work - or disable features
 
         make sure I don't need to leave a compliment to MoveTS
 
         check what happens with open editors
+
+
+        look at supporting custom paths within app - indexer issue
 
         ---- v2 -----
 
@@ -175,7 +189,8 @@ export async function rename(
         fs.remove(originalFileDetails.path);
 
         progress.report({ increment: 100 });
-        console.log('all done: ', Date.now() - start + `ms.`);
+        const renameTime = Math.round((Date.now() - start) / 10) / 100;
+        logInfo(output, ['', `${title} completed in ${renameTime} seconds`]);
         await timeoutPause(50);
       } catch (e) {
         console.log('error in extension.ts', e);

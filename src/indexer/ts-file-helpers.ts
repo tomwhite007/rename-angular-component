@@ -77,14 +77,14 @@ export function getCoreClassEdits(
             replacement = newClassName;
             break;
           case 'selector':
-            replacement = generateNewSelector(
+            selectorTransfer.oldSelector = foundItem.itemText;
+            selectorTransfer.newSelector = generateNewSelector(
               construct,
               foundItem.itemText,
               originalFileStub,
               newFileStub
             );
-            selectorTransfer.oldSelector = foundItem.itemText;
-            selectorTransfer.newSelector = replacement;
+            replacement = `'${selectorTransfer.newSelector}'`;
             // TODO: fix selector replacement for Directives [] .[a-z] etc.
             break;
           case 'templateUrl':

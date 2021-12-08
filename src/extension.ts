@@ -4,17 +4,15 @@ import { FileHandle } from 'fs/promises';
 import * as vscode from 'vscode';
 import { rename } from './helpers/rename.function';
 import { ReferenceIndexer } from './indexer/referenceindexer';
-import { AngularConstruct } from './helpers/definitions/file.interfaces';
-import { getClassNameEdits } from './indexer/ts-file-helpers';
-import * as fs from 'fs-extra-promise';
 
 export function activate(context: vscode.ExtensionContext) {
+  const indexStart = Date.now();
   const importer: ReferenceIndexer = new ReferenceIndexer();
 
   const initWithProgress = () => {
     return vscode.window.withProgress(
       {
-        location: vscode.ProgressLocation.Window,
+        location: vscode.ProgressLocation.Notification,
         title: 'Rename Angular Component is indexing',
       },
       async (progress) => {
@@ -23,11 +21,12 @@ export function activate(context: vscode.ExtensionContext) {
     );
   };
 
-  const initialise = () => {
+  const initialise = async () => {
     if (importer.isinitialised) {
       return Promise.resolve();
     }
-    return initWithProgress();
+    await initWithProgress();
+    return (Date.now() - indexStart) / 1000;
   };
 
   const initialisePromise = initialise();

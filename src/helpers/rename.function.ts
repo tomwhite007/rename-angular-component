@@ -164,7 +164,6 @@ export async function rename(
         await timeoutPause(50);
       } catch (e) {
         console.log('error in extension.ts', e);
-        logInfo('ERROR: ', construct, output, [(<any>e).toSting()]);
       }
     }
   );

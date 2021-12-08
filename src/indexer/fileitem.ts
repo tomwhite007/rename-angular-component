@@ -19,8 +19,7 @@ export class FileItem {
   ) {}
 
   exists(): boolean {
-    const exists = fs.existsSync(this.targetPath);
-    return exists;
+    return fs.existsSync(this.targetPath);
   }
 
   public move(index: ReferenceIndexer): Promise<FileItem> {
@@ -65,7 +64,6 @@ export class FileItem {
       })
       .catch((e) => {
         console.log('error in move', e);
-        throw e;
       });
   }
 

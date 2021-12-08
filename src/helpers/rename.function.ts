@@ -13,9 +13,11 @@ import { getOriginalFileDetails } from './fileManipulation/getOriginalFileDetail
 import {
   getClassNameEdits,
   getCoreClassEdits,
+  SelectorTransfer,
 } from '../indexer/ts-file-helpers';
 import { windowsFilePathFix } from './fileManipulation/windows-file-path-fix.function';
 import { FilesRelatedToStub } from './filesRelatedtToStub.class';
+import { findReplaceSelectorsInTemplateFiles } from './fileManipulation/findReplaceSelectorsInTemplateFiles.function';
 
 export async function rename(
   construct: AngularConstruct,
@@ -79,6 +81,8 @@ export async function rename(
         )}${pascalCase(construct)}`;
         const newClassName = `${pascalCase(newStub)}${pascalCase(construct)}`;
 
+        const selectorTransfer = new SelectorTransfer();
+
         const fileMoveJobs = filesToMove.map((f) => {
           const additionalEdits = {
             importsEdits: (() =>
@@ -90,7 +94,8 @@ export async function rename(
                     newClassName,
                     originalFileDetails.stub,
                     newStub,
-                    construct
+                    construct,
+                    selectorTransfer
                   ))()
               : undefined,
           };
@@ -123,6 +128,16 @@ export async function rename(
           progress.report({ increment: currentProgress });
           await timeoutPause(10);
           await item.move(importer);
+        }
+
+        if (selectorTransfer.oldSelector && selectorTransfer.newSelector) {
+          await findReplaceSelectorsInTemplateFiles(
+            construct,
+            selectorTransfer.oldSelector,
+            selectorTransfer.newSelector
+          );
+        } else {
+          throw new Error('selectorTransfer not set');
         }
 
         /* TODO - big steps left...    

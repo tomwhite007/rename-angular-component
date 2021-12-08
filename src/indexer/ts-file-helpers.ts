@@ -1,7 +1,6 @@
-import * as fs from 'fs-extra-promise';
-import * as vscode from 'vscode';
 import * as ts from 'typescript';
 import { AngularConstruct } from '../helpers/definitions/file.interfaces';
+import { generateNewSelector } from '../helpers/inFileEdits/generateNewSelector.funtion';
 
 interface FoundItem {
   itemType: 'class' | 'selector' | 'templateUrl' | 'styleUrls';
@@ -50,12 +49,18 @@ export function applyGenericEdits(text: string, edits: GenericEdit[]): string {
   return text;
 }
 
+export class SelectorTransfer {
+  oldSelector?: string;
+  newSelector?: string;
+}
+
 export function getCoreClassEdits(
   originalClassName: string,
   newClassName: string,
   originalFileStub: string,
   newFileStub: string,
-  construct: AngularConstruct
+  construct: AngularConstruct,
+  selectorTransfer: SelectorTransfer
 ): GenericEditsCallback {
   return (fileName: string, sourceText: string) => {
     const foundItems = getCoreClassFoundItems(
@@ -72,6 +77,16 @@ export function getCoreClassEdits(
             replacement = newClassName;
             break;
           case 'selector':
+            replacement = generateNewSelector(
+              construct,
+              foundItem.itemText,
+              originalFileStub,
+              newFileStub
+            );
+            selectorTransfer.oldSelector = foundItem.itemText;
+            selectorTransfer.newSelector = replacement;
+            // TODO: fix selector replacement for Directives [] .[a-z] etc.
+            break;
           case 'templateUrl':
           case 'styleUrls':
             replacement = `'${foundItem.itemText.replace(
@@ -79,7 +94,6 @@ export function getCoreClassEdits(
               newFileStub
             )}'`;
             break;
-          // TODO: fix selector replacement for Directives
         }
 
         if (replacement === foundItem.itemText) {

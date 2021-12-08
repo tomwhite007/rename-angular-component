@@ -6,16 +6,21 @@ import {
 } from './definitions/file.interfaces';
 import { getProjectRoot } from './definitions/getProjectRootFilePath.function';
 import { ReferenceIndexer } from '../indexer/referenceindexer';
-import { likeFilesRegexPartialLookup } from './definitions/file-regex.constants';
 import { FileItem } from '../indexer/fileitem';
 import * as fs from 'fs-extra-promise';
-import escapeStringRegexp from 'escape-string-regexp';
 import { paramCase } from 'change-case';
 import { getOriginalFileDetails } from './fileManipulation/getOriginalFileDetails.function';
 import {
   getClassNameEdits,
   getCoreClassEdits,
+  SelectorTransfer,
 } from '../indexer/ts-file-helpers';
+import { windowsFilePathFix } from './fileManipulation/windows-file-path-fix.function';
+import { FilesRelatedToStub } from './filesRelatedtToStub.class';
+import { findReplaceSelectorsInTemplateFiles } from './fileManipulation/findReplaceSelectorsInTemplateFiles.function';
+import { createOutputChannel } from './createOutputChannel.function';
+import { logInfo } from './logging/logInfo.function';
+import { popupMessage } from './logging/popupMessage.function';
 
 export async function rename(
   construct: AngularConstruct,
@@ -23,10 +28,9 @@ export async function rename(
   importer: ReferenceIndexer,
   indexerInitialisePromise: Thenable<any>
 ) {
-  const start = Date.now();
   const originalFileDetails: Readonly<OriginalFileDetails> =
     getOriginalFileDetails(uri.path);
-  const projectRoot = getProjectRoot(uri) as string;
+  const projectRoot = windowsFilePathFix(getProjectRoot(uri) as string);
   const title = `Rename Angular ${pascalCase(construct)}`;
 
   const inputResult = await vscode.window.showInputBox({
@@ -34,10 +38,15 @@ export async function rename(
     prompt: `Enter the new ${construct} name.`,
     value: originalFileDetails.stub,
   });
+  const start = Date.now();
 
-  if (!inputResult || originalFileDetails.stub === inputResult) {
-    // TODO: add pop up - nothing changed
-
+  const output = createOutputChannel(title);
+  if (!inputResult) {
+    popupMessage(`New ${construct} name not entered. Stopped.`);
+    return;
+  }
+  if (originalFileDetails.stub === inputResult) {
+    popupMessage(`${pascalCase(construct)} name same as original. Stopped.`);
     return;
   }
   // make sure it's kebab
@@ -49,10 +58,12 @@ export async function rename(
   };
 
   // wait for indexer initialise to complete
-  await indexerInitialisePromise;
-  const output = importer.setOutputChannel(
-    `Rename Angular ${pascalCase(construct)}`
-  );
+  const indexTime = await indexerInitialisePromise;
+  logInfo(output, [
+    `Index files completed in ${Math.round(indexTime * 100) / 100} seconds`,
+    '',
+  ]);
+  importer.setOutputChannel(output);
 
   await vscode.window.withProgress(
     {
@@ -63,9 +74,6 @@ export async function rename(
     async (progress) => {
       progress.report({ increment: 0 });
       await timeoutPause();
-
-      // TODO: REMOVE OLD PROCESS...
-      // renameToNewStub(construct, newStub, fileDetails, projectRoot);
 
       try {
         const filesRelatedToStub = await FilesRelatedToStub.init(
@@ -82,6 +90,8 @@ export async function rename(
         )}${pascalCase(construct)}`;
         const newClassName = `${pascalCase(newStub)}${pascalCase(construct)}`;
 
+        const selectorTransfer = new SelectorTransfer();
+
         const fileMoveJobs = filesToMove.map((f) => {
           const additionalEdits = {
             importsEdits: (() =>
@@ -93,14 +103,15 @@ export async function rename(
                     newClassName,
                     originalFileDetails.stub,
                     newStub,
-                    construct
+                    construct,
+                    selectorTransfer
                   ))()
               : undefined,
           };
 
           return new FileItem(
-            f.filePath,
-            f.newFilePath,
+            windowsFilePathFix(f.filePath, true),
+            windowsFilePathFix(f.newFilePath, true),
             fs.statSync(f.filePath).isDirectory(),
             oldClassName,
             newClassName,
@@ -118,7 +129,7 @@ export async function rename(
         progress.report({ increment: 20 });
         await timeoutPause();
 
-        const progressIncrement = Math.floor(80 / fileMoveJobs.length);
+        const progressIncrement = Math.floor(70 / fileMoveJobs.length);
         let currentProgress = 20;
         importer.startNewMoves(fileMoveJobs);
         for (const item of fileMoveJobs) {
@@ -128,134 +139,62 @@ export async function rename(
           await item.move(importer);
         }
 
-        /* TODO - big steps left...
+        if (selectorTransfer.oldSelector && selectorTransfer.newSelector) {
+          await findReplaceSelectorsInTemplateFiles(
+            construct,
+            selectorTransfer.oldSelector,
+            selectorTransfer.newSelector,
+            output
+          );
+        } else {
+          throw new Error('selectorTransfer not set');
+        }
 
-      in the construct file, rename the class, selector, and html and scss/css imports
-      if they're .ts, rename the classes too
+        /* TODO - big steps left...    
 
-      fix up all selectors
-      fix up all test descriptions
 
-      make sure services and directives work - or disable features
+        fix popup messages
 
-      make sure I don't need to leave a compliment to MoveTS
+        fix logging
 
-      check what happens with open editors
+        log selector changed files to Output list
 
-      ---- v2 -----
+        check for other to dos
 
-      handle open editors
-        looks like reference indexer, replaceReferences() already can - need same for core class file
+        make sure services and directives work - or disable features
 
-      fix up / remove tsmove conf() configuration
+        make sure I don't need to leave a compliment to MoveTS
 
-      make sure input newStub matches constraints and formatting allowed by CLI
+        check what happens with open editors
 
-      refactor for clean classes, functions and pure async await
 
-      ---- v3 -----
-      */
+        look at supporting custom paths within app - indexer issue
+
+        ---- v2 -----
+
+        handle open editors
+          looks like reference indexer, replaceReferences() already can - need same for core class file
+            close affected open tabs except if unsaved - then warn and stop?
+
+        fix up / remove tsmove conf() configuration
+
+        make sure input newStub matches constraints and formatting allowed by CLI
+
+        refactor for clean classes, functions and pure async await
+
+        ---- v3 -----
+        */
 
         // delete original folder
         fs.remove(originalFileDetails.path);
 
         progress.report({ increment: 100 });
-        console.log('all done: ', Date.now() - start + `ms.`);
+        const renameTime = Math.round((Date.now() - start) / 10) / 100;
+        logInfo(output, ['', `${title} completed in ${renameTime} seconds`]);
         await timeoutPause(50);
       } catch (e) {
         console.log('error in extension.ts', e);
       }
     }
   );
-}
-
-class FilesRelatedToStub {
-  originalFileDetails!: OriginalFileDetails;
-  folderNameSameAsStub = false;
-  fileDetails: {
-    filePath: string;
-    sameConstruct: boolean;
-    sameStub: boolean;
-    isCoreConstruct: boolean;
-  }[] = [];
-  constructFilesRegex!: RegExp;
-  relatedFilesRegex!: RegExp;
-
-  static async init(
-    fileDetails: OriginalFileDetails,
-    projectRoot: string,
-    construct: AngularConstruct
-  ) {
-    const instance = new FilesRelatedToStub();
-    await instance.catalogueFilesInCurrentFolder(
-      fileDetails,
-      projectRoot,
-      construct
-    );
-    return instance;
-  }
-
-  private async catalogueFilesInCurrentFolder(
-    fileDetails: OriginalFileDetails,
-    projectRoot: string,
-    construct: AngularConstruct
-  ) {
-    this.originalFileDetails = fileDetails;
-
-    if (fileDetails.path.endsWith(fileDetails.stub)) {
-      this.folderNameSameAsStub = true;
-    }
-
-    const glob = `${fileDetails.path.replace(projectRoot + '/', '')}/**/*`;
-    const uris = await vscode.workspace.findFiles(
-      glob,
-      '**/node_modules/**',
-      100000
-    );
-
-    this.constructFilesRegex = RegExp(
-      `${escapeStringRegexp(fileDetails.stub)}${
-        likeFilesRegexPartialLookup[construct]
-      }`
-    );
-    this.relatedFilesRegex = new RegExp(
-      `${escapeStringRegexp(fileDetails.stub)}${
-        likeFilesRegexPartialLookup.any
-      }`
-    );
-
-    const isCoreConstructRegex = new RegExp(`\\.${construct}\\.ts$`);
-
-    uris.forEach((uri) => {
-      this.fileDetails.push({
-        filePath: uri.fsPath,
-        sameConstruct: !!uri.fsPath.match(this.constructFilesRegex),
-        sameStub: !!uri.fsPath.match(this.relatedFilesRegex),
-        isCoreConstruct: !!uri.fsPath.match(isCoreConstructRegex),
-      });
-    });
-  }
-
-  getFilesToMove(newStub: string) {
-    const folderReplaceRegex = new RegExp(
-      `(?<=\/)${escapeStringRegexp(this.originalFileDetails.stub)}$`
-    );
-    const replaceStub = (filePath: string) => {
-      if (this.folderNameSameAsStub) {
-        filePath = filePath.replace(
-          this.originalFileDetails.path,
-          this.originalFileDetails.path.replace(folderReplaceRegex, newStub)
-        );
-      }
-      return filePath.replace(this.constructFilesRegex, newStub);
-    };
-
-    return this.fileDetails
-      .filter((fd) => this.folderNameSameAsStub || fd.sameConstruct)
-      .map((fd) => ({
-        filePath: fd.filePath,
-        newFilePath: replaceStub(fd.filePath),
-        isCoreConstruct: fd.isCoreConstruct,
-      }));
-  }
 }

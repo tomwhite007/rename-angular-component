@@ -5,8 +5,3 @@ export interface OriginalFileDetails {
   stub: string;
   filePath: string;
 }
-export interface OriginalComponentClassFileDetails {
-  filePath: string;
-  className: string;
-  selector: string;
-}

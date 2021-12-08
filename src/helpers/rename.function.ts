@@ -99,8 +99,8 @@ export async function rename(
           };
 
           return new FileItem(
-            f.filePath,
-            f.newFilePath,
+            windowsFilePathFix(f.filePath, true),
+            windowsFilePathFix(f.newFilePath, true),
             fs.statSync(f.filePath).isDirectory(),
             oldClassName,
             newClassName,

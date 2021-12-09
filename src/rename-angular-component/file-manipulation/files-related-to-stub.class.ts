@@ -1,11 +1,11 @@
 import escapeStringRegexp from 'escape-string-regexp';
 import { workspace } from 'vscode';
-import { likeFilesRegexPartialLookup } from './definitions/file-regex.constants';
+import { likeFilesRegexPartialLookup } from '../definitions/file-regex.constants';
 import {
   OriginalFileDetails,
   AngularConstruct,
-} from './definitions/file.interfaces';
-import { windowsFilePathFix } from './file-manipulation/windows-file-path-fix.function';
+} from '../definitions/file.interfaces';
+import { windowsFilePathFix } from './windows-file-path-fix.function';
 
 export class FilesRelatedToStub {
   originalFileDetails!: OriginalFileDetails;

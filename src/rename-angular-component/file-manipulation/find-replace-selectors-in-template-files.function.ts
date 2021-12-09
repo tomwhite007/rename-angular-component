@@ -1,6 +1,6 @@
 import { OutputChannel, workspace } from 'vscode';
 import * as fs from 'fs-extra-promise';
-import { renameSelector } from '../inFileEdits/rename-selector.function';
+import { renameSelector } from '../in-file-edits/rename-selector.function';
 import { AngularConstruct } from '../definitions/file.interfaces';
 import { logInfo } from '../logging/log-info.function';
 

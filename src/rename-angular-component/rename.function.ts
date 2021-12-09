@@ -9,18 +9,18 @@ import { ReferenceIndexer } from '../move-ts-indexer/reference-indexer';
 import { FileItem } from '../move-ts-indexer/file-item';
 import * as fs from 'fs-extra-promise';
 import { paramCase } from 'change-case';
-import { getOriginalFileDetails } from './inFileEdits/get-original-file-details.function';
+import { getOriginalFileDetails } from './in-file-edits/get-original-file-details.function';
 import { windowsFilePathFix } from './file-manipulation/windows-file-path-fix.function';
-import { FilesRelatedToStub } from './files-related-to-stub.class';
+import { FilesRelatedToStub } from './file-manipulation/files-related-to-stub.class';
 import { findReplaceSelectorsInTemplateFiles } from './file-manipulation/find-replace-selectors-in-template-files.function';
-import { createOutputChannel } from './create-output-channel.function';
+import { createOutputChannel } from './logging/create-output-channel.function';
 import { logInfo } from './logging/log-info.function';
 import { popupMessage } from './logging/popup-message.function';
 import {
   getClassNameEdits,
   getCoreClassEdits,
   SelectorTransfer,
-} from './inFileEdits/custom-edits';
+} from './in-file-edits/custom-edits';
 
 export async function rename(
   construct: AngularConstruct,
@@ -156,14 +156,24 @@ export async function rename(
         make sure services and directives work - or disable features
         fix selector replacement for Directives [] .[a-z] etc.
 
-        make sure I don't need to leave a compliment to MoveTS
-
         disable some config item that should lock now
 
         check what happens with open editors
 
 
         look at supporting custom paths within app - indexer issue
+
+
+
+        Prep for publish:
+
+        update main readme
+
+        add icon / images / animation
+
+        update changelog
+
+        add additional stuff in package json - keywords etc
 
         ---- v2 -----
 

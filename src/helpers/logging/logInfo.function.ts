@@ -1,21 +1,8 @@
-import * as vscode from 'vscode';
-import { pascalCase } from 'pascal-case';
-import { AngularConstruct } from '../definitions/file.interfaces';
+import { OutputChannel } from 'vscode';
 
-export function logInfo(
-  additionalInfoMessage: string,
-  construct: AngularConstruct,
-  textLines?: string[]
-) {
-  const title = `Rename Angular ${pascalCase(construct)}`;
-  vscode.window.showInformationMessage(`${title}${additionalInfoMessage}`);
-
+export function logInfo(output: OutputChannel, textLines?: string[]) {
   if (textLines) {
-    const channel = vscode.window.createOutputChannel(title);
-    channel.appendLine(``);
-    channel.appendLine(`*** ${title} output: ***`);
-    channel.appendLine(``);
-    textLines.forEach((line) => channel.appendLine(line));
-    channel.show();
+    textLines.forEach((line) => output.appendLine(line));
+    output.show();
   }
 }

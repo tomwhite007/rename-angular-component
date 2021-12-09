@@ -4,23 +4,23 @@ import {
   AngularConstruct,
   OriginalFileDetails,
 } from './definitions/file.interfaces';
-import { getProjectRoot } from './definitions/getProjectRootFilePath.function';
-import { ReferenceIndexer } from '../indexer/referenceindexer';
-import { FileItem } from '../indexer/fileitem';
+import { getProjectRoot } from './definitions/get-project-root-file-path.function';
+import { ReferenceIndexer } from '../move-ts-indexer/reference-indexer';
+import { FileItem } from '../move-ts-indexer/file-item';
 import * as fs from 'fs-extra-promise';
 import { paramCase } from 'change-case';
-import { getOriginalFileDetails } from './fileManipulation/getOriginalFileDetails.function';
+import { getOriginalFileDetails } from './inFileEdits/get-original-file-details.function';
+import { windowsFilePathFix } from './file-manipulation/windows-file-path-fix.function';
+import { FilesRelatedToStub } from './files-related-to-stub.class';
+import { findReplaceSelectorsInTemplateFiles } from './file-manipulation/find-replace-selectors-in-template-files.function';
+import { createOutputChannel } from './create-output-channel.function';
+import { logInfo } from './logging/log-info.function';
+import { popupMessage } from './logging/popup-message.function';
 import {
   getClassNameEdits,
   getCoreClassEdits,
   SelectorTransfer,
-} from '../indexer/ts-file-helpers';
-import { windowsFilePathFix } from './fileManipulation/windows-file-path-fix.function';
-import { FilesRelatedToStub } from './filesRelatedtToStub.class';
-import { findReplaceSelectorsInTemplateFiles } from './fileManipulation/findReplaceSelectorsInTemplateFiles.function';
-import { createOutputChannel } from './createOutputChannel.function';
-import { logInfo } from './logging/logInfo.function';
-import { popupMessage } from './logging/popupMessage.function';
+} from './inFileEdits/custom-edits';
 
 export async function rename(
   construct: AngularConstruct,
@@ -153,17 +153,12 @@ export async function rename(
         /* TODO - big steps left...    
 
 
-        fix popup messages
-
-        fix logging
-
-        log selector changed files to Output list
-
-        check for other to dos
-
         make sure services and directives work - or disable features
+        fix selector replacement for Directives [] .[a-z] etc.
 
         make sure I don't need to leave a compliment to MoveTS
+
+        disable some config item that should lock now
 
         check what happens with open editors
 

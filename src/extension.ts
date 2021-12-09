@@ -2,8 +2,8 @@
 // Import the module and reference it with the alias vscode in your code below
 import { FileHandle } from 'fs/promises';
 import * as vscode from 'vscode';
-import { rename } from './helpers/rename.function';
-import { ReferenceIndexer } from './indexer/referenceindexer';
+import { rename } from './rename-angular-component/rename.function';
+import { ReferenceIndexer } from './move-ts-indexer/reference-indexer';
 
 export function activate(context: vscode.ExtensionContext) {
   const indexStart = Date.now();
@@ -34,7 +34,7 @@ export function activate(context: vscode.ExtensionContext) {
   let renameComponent = vscode.commands.registerCommand(
     'rename-angular-component.renameComponent',
     async (uri: vscode.Uri) =>
-      // TODO: remove when no direct test process is needed
+      // TODO: remove when no direct debug process is needed
       // {
       //   const filePath =
       //     '/Users/tom/Development/dng/dgx-sales-spa-dev2/libs/sales/feature-appliance-details/src/lib/appliance-details/appliance-details.component.spec.ts';

@@ -5,7 +5,7 @@ import {
   OriginalFileDetails,
   AngularConstruct,
 } from './definitions/file.interfaces';
-import { windowsFilePathFix } from './fileManipulation/windows-file-path-fix.function';
+import { windowsFilePathFix } from './file-manipulation/windows-file-path-fix.function';
 
 export class FilesRelatedToStub {
   originalFileDetails!: OriginalFileDetails;

@@ -1,6 +1,5 @@
 import { OriginalFileDetails } from '../definitions/file.interfaces';
-import { upperCaseFirst } from 'upper-case-first';
-import { windowsFilePathFix } from './windows-file-path-fix.function';
+import { windowsFilePathFix } from '../file-manipulation/windows-file-path-fix.function';
 
 export function getOriginalFileDetails(filePath: string): OriginalFileDetails {
   filePath = windowsFilePathFix(filePath);

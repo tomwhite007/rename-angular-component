@@ -3,14 +3,14 @@ import * as path from 'path';
 import * as ts from 'typescript';
 import * as vscode from 'vscode';
 
-import { FileItem } from './fileitem';
+import { FileItem } from './file-item';
 
-import { isPathToAnotherDir, ReferenceIndex } from './referenceindex';
+import { isPathToAnotherDir, ReferenceIndex } from './reference-index';
 import {
   applyGenericEdits,
   GenericEdit,
   GenericEditsCallback,
-} from './ts-file-helpers';
+} from './apply-generic-edits';
 
 const minimatch = require('minimatch');
 

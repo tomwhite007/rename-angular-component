@@ -1,8 +1,8 @@
 import { OutputChannel, workspace } from 'vscode';
 import * as fs from 'fs-extra-promise';
-import { renameSelector } from '../inFileEdits/renameSelector.function';
+import { renameSelector } from '../inFileEdits/rename-selector.function';
 import { AngularConstruct } from '../definitions/file.interfaces';
-import { logInfo } from '../logging/logInfo.function';
+import { logInfo } from '../logging/log-info.function';
 
 export async function findReplaceSelectorsInTemplateFiles(
   construct: AngularConstruct,

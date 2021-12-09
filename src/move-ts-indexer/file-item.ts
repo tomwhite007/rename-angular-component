@@ -2,8 +2,8 @@ import * as Promise from 'bluebird';
 import * as fs from 'fs-extra-promise';
 import * as path from 'path';
 
-import { ReferenceIndexer } from './referenceindexer';
-import { GenericEdit, GenericEditsCallback } from './ts-file-helpers';
+import { ReferenceIndexer } from './reference-indexer';
+import { GenericEdit, GenericEditsCallback } from './apply-generic-edits';
 
 export class FileItem {
   constructor(

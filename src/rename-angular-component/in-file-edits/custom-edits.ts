@@ -1,3 +1,4 @@
+import { pascalCase } from 'change-case';
 import * as ts from 'typescript';
 import {
   GenericEditsCallback,
@@ -31,7 +32,8 @@ export function getCoreClassEdits(
     const foundItems = getCoreClassFoundItems(
       fileName,
       sourceText,
-      originalClassName
+      originalClassName,
+      construct
     );
 
     return foundItems
@@ -78,7 +80,8 @@ export function getCoreClassEdits(
 function getCoreClassFoundItems(
   fileName: string,
   sourceText: string,
-  originalClassName: string
+  originalClassName: string,
+  construct: AngularConstruct
 ): FoundItem[] {
   const file = ts.createSourceFile(
     fileName,
@@ -90,71 +93,95 @@ function getCoreClassFoundItems(
   const recurseThroughNodeTree = (() =>
     getTreeRecursor(originalClassName, sourceText, result))();
 
+  console.log('getCoreClassFoundItems nodes', file.statements);
+
   file.statements.forEach((node: ts.Node) => {
     // get class
-    if (
-      ts.isClassDeclaration(node) &&
-      node.name?.escapedText === originalClassName
-    ) {
-      const decoratorPropertiesRequired = [
-        'selector',
-        'templateUrl',
-        'styleUrls',
-      ];
+    if (ts.isClassDeclaration(node)) {
+      console.log('getCoreClassFoundItems found class');
 
-      // get decorator props for 'Component' decorator
-      node.decorators?.find((decorator: ts.Decorator) => {
-        if (
-          ts.isCallExpression(decorator.expression) &&
-          ts.isIdentifier(decorator.expression.expression) &&
-          decorator.expression.expression.text === 'Component'
-        ) {
-          const test = decorator.expression.arguments[0];
-          if (ts.isObjectLiteralExpression(test)) {
-            test.properties.forEach((prop) => {
-              if (
-                ts.isPropertyAssignment(prop) &&
-                ts.isIdentifier(prop.name) &&
-                decoratorPropertiesRequired.includes(prop.name.text)
-              ) {
-                // 'selector' and 'templateUrl' are StringLiteral
-                if (ts.isStringLiteral(prop.initializer)) {
-                  result.push({
-                    itemType: prop.name.text as SelectorOrTemplateUrl,
-                    itemText: prop.initializer.text,
-                    location: {
-                      start: prop.initializer.pos + 1,
-                      end: prop.initializer.end,
-                    },
-                  });
-                }
+      if (node.name?.escapedText === originalClassName) {
+        const decoratorPropertiesRequired = [
+          'selector',
+          'templateUrl',
+          'styleUrls',
+        ];
 
-                // 'styleUrls' are an ArrayLiteralExpression
+        const decoratorName = pascalCase(construct);
+
+        // get decorator props for decoratorName
+        node.decorators?.find((decorator: ts.Decorator) => {
+          if (
+            ts.isCallExpression(decorator.expression) &&
+            ts.isIdentifier(decorator.expression.expression) &&
+            decorator.expression.expression.text === decoratorName
+          ) {
+            console.log(
+              'getCoreClassFoundItems found decorator ',
+              decoratorName
+            );
+            const test = decorator.expression.arguments[0];
+            if (ts.isObjectLiteralExpression(test)) {
+              test.properties.forEach((prop) => {
                 if (
-                  ts.isArrayLiteralExpression(prop.initializer) &&
-                  prop.name.text === 'styleUrls'
+                  ts.isPropertyAssignment(prop) &&
+                  ts.isIdentifier(prop.name) &&
+                  decoratorPropertiesRequired.includes(prop.name.text)
                 ) {
-                  const specifier = prop.name.text;
-                  prop.initializer.elements.forEach((elem) => {
-                    if (ts.isStringLiteral(elem)) {
-                      result.push({
-                        itemType: specifier,
-                        itemText: elem.text,
-                        location: {
-                          start: elem.pos,
-                          end: elem.end,
-                        },
-                      });
-                    }
-                  });
-                }
-              }
-            });
-          }
+                  console.log(
+                    'getCoreClassFoundItems found selector or templateUrl ',
+                    prop.name.text
+                  );
+                  // 'selector' and 'templateUrl' are StringLiteral
+                  if (ts.isStringLiteral(prop.initializer)) {
+                    console.log(
+                      'getCoreClassFoundItems found StringLiteral ',
+                      prop.name.text
+                    );
+                    result.push({
+                      itemType: prop.name.text as SelectorOrTemplateUrl,
+                      itemText: prop.initializer.text,
+                      location: {
+                        start: prop.initializer.pos + 1,
+                        end: prop.initializer.end,
+                      },
+                    });
+                  }
 
-          return true;
-        }
-      });
+                  // 'styleUrls' are an ArrayLiteralExpression
+                  if (
+                    ts.isArrayLiteralExpression(prop.initializer) &&
+                    prop.name.text === 'styleUrls'
+                  ) {
+                    const specifier = prop.name.text;
+                    prop.initializer.elements.forEach((elem) => {
+                      if (ts.isStringLiteral(elem)) {
+                        result.push({
+                          itemType: specifier,
+                          itemText: elem.text,
+                          location: {
+                            start: elem.pos,
+                            end: elem.end,
+                          },
+                        });
+                      }
+                    });
+                  }
+                }
+              });
+            }
+
+            return true;
+          }
+        });
+      } else {
+        console.log(
+          'node.name?.escapedText === originalClassName',
+          node.name?.escapedText === originalClassName
+        );
+        console.log(`|${node.name?.escapedText}|`);
+        console.log(`|${originalClassName}|`);
+      }
     }
 
     recurseThroughNodeTree(node);

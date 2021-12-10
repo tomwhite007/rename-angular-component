@@ -7,13 +7,13 @@ export function renameSelector(
   originalSelector: string,
   newSelector: string
 ) {
-  if (html.indexOf('</' + originalSelector + '>') < 0) {
-    return null;
-  }
   let oriSelectorRegex: RegExp;
 
   switch (construct) {
     case 'component':
+      if (html.indexOf('</' + originalSelector + '>') < 0) {
+        return null;
+      }
       oriSelectorRegex = new RegExp(
         `(?<=<|<\\/)${escapeStringRegexp(originalSelector)}(?=\\n|\\s|>)`,
         'g'
@@ -21,9 +21,12 @@ export function renameSelector(
       break;
     case 'directive':
       originalSelector = originalSelector.replace(/\[|\]/g, '');
+      if (html.indexOf(originalSelector) < 0) {
+        return null;
+      }
       newSelector = newSelector.replace(/\[|\]/g, '');
       oriSelectorRegex = new RegExp(
-        `(?<=\\s)${escapeStringRegexp(originalSelector)}(?=\\s|\\=|>)`,
+        `(?<=\\s|\[)${escapeStringRegexp(originalSelector)}(?=\\s|\]|\\=|>)`,
         'g'
       );
       break;

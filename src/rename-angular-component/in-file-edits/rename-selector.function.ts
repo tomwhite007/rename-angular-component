@@ -26,8 +26,8 @@ export function renameSelector(
       }
       newSelector = newSelector.replace(/\[|\]/g, '');
       oriSelectorRegex = new RegExp(
-        `(?<=\\s|\[)${escapeStringRegexp(originalSelector)}(?=\\s|\]|\\=|>)`,
-        'g'
+        `(?<=\\s|\\[)${escapeStringRegexp(originalSelector)}(?=\\s|\\]|\\=|>)`,
+        'gm'
       );
       break;
     default:

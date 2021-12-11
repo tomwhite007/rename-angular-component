@@ -152,6 +152,7 @@ export async function rename(
 
         /* TODO - big steps left...    
 
+        fix: directive replace in templates!
 
         make sure services and directives work - or disable features
         fix selector replacement for Directives [] .[a-z] etc.

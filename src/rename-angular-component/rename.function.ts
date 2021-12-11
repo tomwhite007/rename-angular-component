@@ -154,7 +154,7 @@ export async function rename(
 
         fix: directive replace in templates!
 
-        make sure services and directives work - or disable features
+        make sure directives work - or disable features
         fix selector replacement for Directives [] .[a-z] etc.
 
         disable some config item that should lock now

@@ -20,15 +20,49 @@ export function renameSelector(
       );
       break;
     case 'directive':
-      originalSelector = originalSelector.replace(/\[|\]/g, '');
+      originalSelector = originalSelector.replace(/\.|\[|\]/g, '');
       if (html.indexOf(originalSelector) < 0) {
         return null;
       }
-      newSelector = newSelector.replace(/\[|\]/g, '');
-      oriSelectorRegex = new RegExp(
-        `(?<=\\s|\\[)${escapeStringRegexp(originalSelector)}(?=\\s|\\]|\\=|>)`,
-        'gm'
-      );
+
+      // standard attribute [a-z] selector
+      if (originalSelector.startsWith('[')) {
+        newSelector = newSelector.replace(/\[|\]/g, '');
+        oriSelectorRegex = new RegExp(
+          `(?<=\\s|\\[)${escapeStringRegexp(
+            originalSelector
+          )}(?=\\s|\\]|\\=|>)`,
+          'gm'
+        );
+
+        // class .a-z selector
+      } else if (originalSelector.startsWith('.')) {
+        newSelector = newSelector.replace(/^\./, '');
+        oriSelectorRegex = new RegExp(
+          `(?<=class=("|'))[.\\s]*${escapeStringRegexp(
+            originalSelector
+          )}[.\\s]*(?="|')`,
+          'gm'
+        );
+        const inClassRegex = new RegExp(
+          `(?<=("|')|\s)${escapeStringRegexp(originalSelector)}(?=\s|("|'))`,
+          'gm'
+        );
+
+        // loop through matches and do sub-replacements
+        html.match(originalSelector)?.forEach((matchedText) => {
+          html = html.replace(
+            matchedText,
+            matchedText.replace(inClassRegex, newSelector)
+          );
+        });
+        return html;
+      } else {
+        console.error(
+          `originalSelector for directive is '${originalSelector}'. I can't handle that; no replace.`
+        );
+        return null;
+      }
       break;
     default:
       throw new Error(`No clause for construct: ${construct}`);

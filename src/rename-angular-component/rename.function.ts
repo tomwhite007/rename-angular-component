@@ -21,6 +21,7 @@ import {
   getCoreClassEdits,
   SelectorTransfer,
 } from './in-file-edits/custom-edits';
+import { checkForOpenUnsavedEditors } from './window/check-for-open-unsaved-editors.funtion';
 
 export async function rename(
   construct: AngularConstruct,
@@ -32,6 +33,11 @@ export async function rename(
     getOriginalFileDetails(uri.path);
   const projectRoot = windowsFilePathFix(getProjectRoot(uri) as string);
   const title = `Rename Angular ${pascalCase(construct)}`;
+
+  if (checkForOpenUnsavedEditors()) {
+    popupMessage(`Please save any edits before using ${title}`);
+    return;
+  }
 
   const inputResult = await vscode.window.showInputBox({
     title,

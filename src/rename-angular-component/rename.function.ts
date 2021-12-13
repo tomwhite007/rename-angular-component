@@ -49,6 +49,12 @@ export async function rename(
     popupMessage(`${pascalCase(construct)} name same as original. Stopped.`);
     return;
   }
+  if (!inputResult.match(/^[a-z0-9-_]*$/i)) {
+    popupMessage(
+      `Currently only supports letters, numbers, dashes and underscore in the new name. (To be improved in next release)`
+    );
+    return;
+  }
   // make sure it's kebab
   const newStub = paramCase(inputResult ?? '');
 
@@ -149,15 +155,11 @@ export async function rename(
           throw new Error('selectorTransfer not set');
         }
 
-        /* TODO - big steps left...    
-
-        fix: directive replace in templates! occaisional bug!
-
-        renameSelector should replace based on type of selector not on construct
+        /* TODO - big steps left...
+        
+        
 
 
-        make sure directives work - or disable features
-        fix selector replacement for Directives [] .[a-z] etc.
 
         disable some config item that should lock now
 

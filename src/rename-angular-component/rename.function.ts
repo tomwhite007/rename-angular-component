@@ -162,14 +162,6 @@ export async function rename(
         }
 
         /* TODO - big steps left...
-        
-        
-
-
-
-
-        check what happens with open editors
-
 
         look at supporting custom paths within app - indexer issue
 

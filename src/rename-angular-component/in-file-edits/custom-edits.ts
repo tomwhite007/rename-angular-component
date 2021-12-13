@@ -33,6 +33,7 @@ export function getCoreClassEdits(
       fileName,
       sourceText,
       originalClassName,
+      newClassName,
       construct
     );
 
@@ -80,6 +81,7 @@ function getCoreClassFoundItems(
   fileName: string,
   sourceText: string,
   originalClassName: string,
+  newClassName: string,
   construct: AngularConstruct
 ): FoundItem[] {
   const file = ts.createSourceFile(
@@ -93,13 +95,23 @@ function getCoreClassFoundItems(
     getTreeRecursor(originalClassName, sourceText, result))();
 
   console.log('getCoreClassFoundItems nodes', file.statements);
+  let classNameChangedAlready = false;
 
   file.statements.forEach((node: ts.Node) => {
     // get class
     if (ts.isClassDeclaration(node)) {
       console.log('getCoreClassFoundItems found class');
 
-      if (node.name?.escapedText === originalClassName) {
+      if (
+        node.name?.escapedText === newClassName // getClassNameEdits has been through here already
+      ) {
+        classNameChangedAlready = true;
+      }
+
+      if (
+        node.name?.escapedText === originalClassName ||
+        classNameChangedAlready
+      ) {
         const decoratorPropertiesRequired = [
           'selector',
           'templateUrl',
@@ -183,7 +195,9 @@ function getCoreClassFoundItems(
       }
     }
 
-    recurseThroughNodeTree(node);
+    if (!classNameChangedAlready) {
+      recurseThroughNodeTree(node);
+    }
   });
 
   return result;

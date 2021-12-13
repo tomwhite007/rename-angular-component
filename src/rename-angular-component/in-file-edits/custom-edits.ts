@@ -94,14 +94,11 @@ function getCoreClassFoundItems(
   const recurseThroughNodeTree = (() =>
     getTreeRecursor(originalClassName, sourceText, result))();
 
-  console.log('getCoreClassFoundItems nodes', file.statements);
   let classNameChangedAlready = false;
 
   file.statements.forEach((node: ts.Node) => {
     // get class
     if (ts.isClassDeclaration(node)) {
-      console.log('getCoreClassFoundItems found class');
-
       if (
         node.name?.escapedText === newClassName // getClassNameEdits has been through here already
       ) {
@@ -127,28 +124,16 @@ function getCoreClassFoundItems(
             ts.isIdentifier(decorator.expression.expression) &&
             decorator.expression.expression.text === decoratorName
           ) {
-            console.log(
-              'getCoreClassFoundItems found decorator ',
-              decoratorName
-            );
-            const test = decorator.expression.arguments[0];
-            if (ts.isObjectLiteralExpression(test)) {
-              test.properties.forEach((prop) => {
+            const arg = decorator.expression.arguments[0];
+            if (ts.isObjectLiteralExpression(arg)) {
+              arg.properties.forEach((prop) => {
                 if (
                   ts.isPropertyAssignment(prop) &&
                   ts.isIdentifier(prop.name) &&
                   decoratorPropertiesRequired.includes(prop.name.text)
                 ) {
-                  console.log(
-                    'getCoreClassFoundItems found selector or templateUrl ',
-                    prop.name.text
-                  );
                   // 'selector' and 'templateUrl' are StringLiteral
                   if (ts.isStringLiteral(prop.initializer)) {
-                    console.log(
-                      'getCoreClassFoundItems found StringLiteral ',
-                      prop.name.text
-                    );
                     result.push({
                       itemType: prop.name.text as SelectorOrTemplateUrl,
                       itemText: prop.initializer.text,
@@ -185,13 +170,6 @@ function getCoreClassFoundItems(
             return true;
           }
         });
-      } else {
-        console.log(
-          'node.name?.escapedText === originalClassName',
-          node.name?.escapedText === originalClassName
-        );
-        console.log(`|${node.name?.escapedText}|`);
-        console.log(`|${originalClassName}|`);
       }
     }
 
@@ -269,7 +247,7 @@ function getClassNameFoundItems(
 
     return result;
   } catch (e) {
-    console.log('ERROR PROCESSING: ', fileName, e);
+    console.error('ERROR PROCESSING: ', fileName, e);
   }
 }
 

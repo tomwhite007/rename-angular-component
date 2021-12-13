@@ -228,11 +228,6 @@ export class ReferenceIndexer {
     replacements: Replacement[],
     fromPath?: string
   ): GenericEdit[] {
-    console.log(
-      'getReferenceEdits',
-      path.basename(filePath),
-      fromPath ? path.basename(fromPath) : 'NO fromPath'
-    );
     const edits: GenericEdit[] = [];
     const relativeReferences = this.getRelativeReferences(
       text,
@@ -504,7 +499,6 @@ export class ReferenceIndexer {
     to: string,
     additionalEdits?: GenericEditsCallback
   ): Promise<any> {
-    console.log('updateImports', path.basename(from));
     const affectedFiles = this.index.getReferences(from);
     const promises = affectedFiles.map((filePath) => {
       const replacements = (text: string): Replacement[] => {

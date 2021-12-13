@@ -161,7 +161,6 @@ export async function rename(
 
 
 
-        disable some config item that should lock now
 
         check what happens with open editors
 

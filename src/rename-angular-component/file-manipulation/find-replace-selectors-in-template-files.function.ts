@@ -1,11 +1,9 @@
 import { OutputChannel, workspace } from 'vscode';
 import * as fs from 'fs-extra-promise';
-import { renameSelector } from '../in-file-edits/rename-selector.function';
-import { AngularConstruct } from '../definitions/file.interfaces';
+import { renameSelectorInTemplate } from '../in-file-edits/rename-selector-in-template.function';
 import { logInfo } from '../logging/log-info.function';
 
 export async function findReplaceSelectorsInTemplateFiles(
-  construct: AngularConstruct,
   originalSelector: string,
   newSelector: string,
   output: OutputChannel
@@ -22,7 +20,7 @@ export async function findReplaceSelectorsInTemplateFiles(
   for (const uri of uris) {
     let html: string | null = await fs.readFileAsync(uri.fsPath, 'utf-8');
     if (html) {
-      html = renameSelector(construct, html, originalSelector, newSelector);
+      html = renameSelectorInTemplate(html, originalSelector, newSelector);
     }
     if (html) {
       await fs.writeFileAsync(uri.fsPath, html, 'utf-8');

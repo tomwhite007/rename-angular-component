@@ -46,7 +46,6 @@ export function getCoreClassEdits(
           case 'selector':
             selectorTransfer.oldSelector = foundItem.itemText;
             selectorTransfer.newSelector = generateNewSelector(
-              construct,
               foundItem.itemText,
               originalFileStub,
               newFileStub

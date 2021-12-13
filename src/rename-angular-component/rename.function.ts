@@ -141,7 +141,6 @@ export async function rename(
 
         if (selectorTransfer.oldSelector && selectorTransfer.newSelector) {
           await findReplaceSelectorsInTemplateFiles(
-            construct,
             selectorTransfer.oldSelector,
             selectorTransfer.newSelector,
             output
@@ -152,7 +151,10 @@ export async function rename(
 
         /* TODO - big steps left...    
 
-        fix: directive replace in templates!
+        fix: directive replace in templates! occaisional bug!
+
+        renameSelector should replace based on type of selector not on construct
+
 
         make sure directives work - or disable features
         fix selector replacement for Directives [] .[a-z] etc.

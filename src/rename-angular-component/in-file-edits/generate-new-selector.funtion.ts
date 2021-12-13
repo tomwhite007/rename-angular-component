@@ -1,8 +1,7 @@
-import { AngularConstruct } from '../definitions/file.interfaces';
-import { camelCase } from 'change-case';
+import { camelCase, paramCase } from 'change-case';
+import { getSelectorType } from './get-selector-type.function';
 
 export function generateNewSelector(
-  construct: AngularConstruct,
   oldSelector: string,
   stub: string,
   newStub: string
@@ -11,13 +10,20 @@ export function generateNewSelector(
     return '';
   }
 
+  const type = getSelectorType(oldSelector);
+
   let newSelector = '';
-  switch (construct) {
-    case 'component':
+  switch (type) {
+    case 'element':
       newSelector = oldSelector.replace(stub, newStub);
       break;
-    case 'directive':
-      newSelector = oldSelector.replace(camelCase(stub), camelCase(newStub));
+    case 'attribute':
+      newSelector =
+        '[' + camelCase(paramCase(oldSelector).replace(stub, newStub)) + ']';
+      break;
+    case 'class':
+      newSelector =
+        '.' + camelCase(paramCase(oldSelector).replace(stub, newStub));
       break;
   }
 

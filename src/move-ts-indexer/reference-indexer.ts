@@ -145,15 +145,7 @@ export class ReferenceIndexer {
     this.output.appendLine('Files changed:');
   }
 
-  private get filesToScanGlob(): string {
-    const filesToScan = this.conf('filesToScan', ['**/*.ts', '**/*.tsx']);
-    if (filesToScan.length === 0) {
-      return '';
-    }
-    return filesToScan.length === 1
-      ? filesToScan[0]
-      : `{${filesToScan.join(',')}}`;
-  }
+  private readonly filesToScanGlob = '**/*.ts';
 
   private scanAll(progress?: vscode.Progress<{ message: string }>) {
     this.index = new ReferenceIndex();
@@ -280,6 +272,7 @@ export class ReferenceIndexer {
     filePath: string,
     getEdits: (filePath: string, text: string) => GenericEdit[]
   ): Thenable<any> {
+    // TODO: refactor to not use editors unless unsaved
     if (!this.conf('openEditors', false)) {
       return fs.readFileAsync(filePath, 'utf8').then((text) => {
         const edits = getEdits(filePath, text);
@@ -499,9 +492,6 @@ export class ReferenceIndexer {
   }
 
   removeIndexSuffix(filePath: string): string {
-    if (!this.conf('removeIndexSuffix', true)) {
-      return filePath;
-    }
     const indexSuffix = '/index';
     if (filePath.endsWith(indexSuffix)) {
       return filePath.slice(0, -indexSuffix.length);
@@ -662,6 +652,7 @@ export class ReferenceIndexer {
         return asUnix(path.join(packageName, path.relative(packagePath, to)));
       }
     }
+    // TODO: validate if doesn't have any future benefit, then remove
     const relativeToTsConfig = this.conf('relativeToTsconfig', false);
     if (relativeToTsConfig && configInfo) {
       const configDir = path.dirname(configInfo.configPath);
@@ -684,6 +675,7 @@ export class ReferenceIndexer {
       if (configInfo) {
         const config = configInfo.config;
         const configPath = configInfo.configPath;
+        // TODO: validate if doesn't have any future benefit, then remove
         const relativeToTsConfig = this.conf('relativeToTsconfig', false);
         if (relativeToTsConfig && configPath) {
           const check = path.resolve(path.dirname(configPath), reference);

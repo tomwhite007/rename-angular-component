@@ -53,39 +53,6 @@
           "group": "navigation"
         }
       ]
-    },
-    "configuration": {
-      "type": "object",
-      "title": "Rename Angular Component configuration",
-      "properties": {
-        "renameAngularComponent.relativeToTsconfig": {
-          "type": "boolean",
-          "default": false,
-          "description": "Create relative paths relative to the tsconfig.json"
-        },
-        "renameAngularComponent.skipWarning": {
-          "type": "boolean",
-          "default": true,
-          "description": "Skip the warning when using the move typescript command"
-        },
-        "renameAngularComponent.filesToScan": {
-          "type": "array",
-          "default": [
-            "**/*.ts"
-          ],
-          "description": "Glob of files to scan and watch. Defaults to [**/*.ts]"
-        },
-        "renameAngularComponent.openEditors": {
-          "type": "boolean",
-          "default": false,
-          "description": "Make edits in vscode instead of saving the changes to disk."
-        },
-        "renameAngularComponent.removeIndexSuffix": {
-          "type": "boolean",
-          "default": true,
-          "description": "Removes index filename from imports"
-        }
-      }
     }
   },
   "scripts": {

@@ -78,6 +78,8 @@ export async function rename(
   ]);
   importer.setOutputChannel(output);
 
+  console.log(importer);
+
   await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,

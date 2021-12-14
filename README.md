@@ -29,7 +29,7 @@ This extension contributes the following settings:
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+1. Doesn't support changing element selectors inside component inline templates or inside test spec files. This will be added soon.
 
 ## Release Notes
 

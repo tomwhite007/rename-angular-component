@@ -2,24 +2,27 @@ import * as fs from 'fs-extra-promise';
 import * as path from 'path';
 import * as ts from 'typescript';
 import * as vscode from 'vscode';
-
 import { FileItem } from './file-item';
-
 import { isPathToAnotherDir, ReferenceIndex } from './reference-index';
 import {
   applyGenericEdits,
   GenericEdit,
   GenericEditsCallback,
 } from './apply-generic-edits';
-
-const minimatch = require('minimatch');
+import * as minimatch from 'minimatch';
 
 const BATCH_SIZE = 50;
 
 type Replacement = [string, string];
 
 interface FoundItem {
-  itemType: 'importPath' | 'class' | 'selector' | 'templateUrl' | 'styleUrls';
+  itemType:
+    | 'importPath'
+    | 'exportPath'
+    | 'class'
+    | 'selector'
+    | 'templateUrl'
+    | 'styleUrls';
   itemText: string;
   location: { start: number; end: number };
 }
@@ -42,7 +45,7 @@ export class ReferenceIndexer {
 
   private packageNames: { [key: string]: string } = {};
 
-  private extensions: string[] = ['.ts', '.tsx'];
+  private extensions: string[] = ['.ts'];
 
   private paths: string[] = [];
   private filesToExclude: string[] = [];
@@ -777,6 +780,17 @@ export class ReferenceIndexer {
         if (ts.isStringLiteral(node.moduleSpecifier)) {
           result.push({
             itemType: 'importPath',
+            itemText: node.moduleSpecifier.text,
+            location: {
+              start: node.moduleSpecifier.getStart(file),
+              end: node.moduleSpecifier.getEnd(),
+            },
+          });
+        }
+      } else if (ts.isExportDeclaration(node)) {
+        if (node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier)) {
+          result.push({
+            itemType: 'exportPath',
             itemText: node.moduleSpecifier.text,
             location: {
               start: node.moduleSpecifier.getStart(file),

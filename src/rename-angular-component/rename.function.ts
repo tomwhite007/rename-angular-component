@@ -22,6 +22,7 @@ import {
   SelectorTransfer,
 } from './in-file-edits/custom-edits';
 import { checkForOpenUnsavedEditors } from './window/check-for-open-unsaved-editors.funtion';
+import * as path from 'path';
 
 export async function rename(
   construct: AngularConstruct,
@@ -106,8 +107,10 @@ export async function rename(
 
         const fileMoveJobs = filesToMove.map((f) => {
           const additionalEdits = {
-            importsEdits: (() =>
-              getClassNameEdits(oldClassName, newClassName))(),
+            importsEdits:
+              path.extname(f.filePath) === '.ts'
+                ? (() => getClassNameEdits(oldClassName, newClassName))()
+                : undefined,
             movedFileEdits: f.isCoreConstruct
               ? (() =>
                   getCoreClassEdits(
@@ -165,6 +168,8 @@ export async function rename(
 
         look at supporting custom paths within app - indexer issue
 
+        spec  - maybe replace selector references in them too
+
 
 
         Prep for publish:
@@ -181,7 +186,7 @@ export async function rename(
 
         handle open editors
           looks like reference indexer, replaceReferences() already can - need same for core class file
-            close affected open tabs except if unsaved - then warn and stop?
+            apply edits in dirty editor?
 
         fix up / remove tsmove conf() configuration
 

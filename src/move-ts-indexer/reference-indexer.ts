@@ -500,6 +500,14 @@ export class ReferenceIndexer {
     additionalEdits?: GenericEditsCallback
   ): Promise<any> {
     const affectedFiles = this.index.getReferences(from);
+
+    if (
+      additionalEdits &&
+      !affectedFiles.find((filePath) => filePath.path === from)
+    ) {
+      affectedFiles.push({ path: from });
+    }
+
     const promises = affectedFiles.map((filePath) => {
       const replacements = (text: string): Replacement[] => {
         let relative = this.getRelativePath(filePath.path, from);

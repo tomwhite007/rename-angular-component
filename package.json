@@ -6,13 +6,22 @@
   "version": "0.2.0-alpha10",
   "license": "MIT",
   "repository": {
-    "url": "https://github.com/tomwhite007/rename-angular-component"
+    "type": "git",
+    "url": "https://github.com/tomwhite007/rename-angular-component.git"
   },
+  "homepage": "https://github.com/tomwhite007/rename-angular-component#readme",
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.58.0"
   },
   "categories": [
     "Other"
+  ],
+  "keywords": [
+    "angular",
+    "rename",
+    "refactor",
+    "relative"
   ],
   "activationEvents": [
     "onCommand:rename-angular-component.renameComponent",

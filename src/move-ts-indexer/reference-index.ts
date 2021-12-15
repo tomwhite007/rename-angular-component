@@ -2,10 +2,22 @@ import * as path from 'path';
 
 export interface Reference {
   path: string;
+  specifiers: string[];
+  isExport?: boolean;
 }
 
 export function isPathToAnotherDir(path: string) {
   return path.startsWith('../') || path.startsWith('..\\');
+}
+
+function mergeSpecifiers(ref1: Reference, newSpecifiers: string[]): string[] {
+  return [...new Set([...ref1.specifiers, ...newSpecifiers])];
+}
+
+function compareSpecifiers(ref1: Reference, newSpecifiers: string[]): boolean {
+  const array1 = ref1.specifiers.sort();
+  const array2 = newSpecifiers.sort();
+  return JSON.stringify(array1) === JSON.stringify(array2);
 }
 
 export class ReferenceIndex {
@@ -18,7 +30,12 @@ export class ReferenceIndex {
   }
 
   // path references the reference
-  public addReference(reference: string, path: string) {
+  public addReference(
+    reference: string,
+    path: string,
+    specifiers: string[],
+    isExport?: boolean
+  ) {
     if (!this.referencedBy.hasOwnProperty(reference)) {
       this.referencedBy[reference] = [];
     }
@@ -26,14 +43,21 @@ export class ReferenceIndex {
       this.references[path] = [];
     }
 
-    if (
-      !this.references[path].some((ref) => {
-        return ref.path === reference;
-      })
-    ) {
-      this.references[path].push({ path: reference });
+    const existingReference = this.references[path].find((ref) => {
+      return ref.path === reference;
+    });
+    if (!existingReference) {
+      this.references[path].push({ path: reference, specifiers, isExport });
+    } else {
+      existingReference.specifiers = mergeSpecifiers(
+        existingReference,
+        specifiers
+      );
     }
 
+    const existingRefBy = this.referencedBy[reference].find((reference) => {
+      return reference.path === path;
+    });
     if (
       !this.referencedBy[reference].some((reference) => {
         return reference.path === path;
@@ -41,7 +65,17 @@ export class ReferenceIndex {
     ) {
       this.referencedBy[reference].push({
         path,
+        specifiers,
+        isExport,
       });
+    } else if (existingRefBy && compareSpecifiers(existingRefBy, specifiers)) {
+      console.log('found existingRefBy is equal');
+    } else {
+      console.error(
+        'existingRefBy is not equal',
+        existingRefBy?.specifiers,
+        specifiers
+      );
     }
   }
 

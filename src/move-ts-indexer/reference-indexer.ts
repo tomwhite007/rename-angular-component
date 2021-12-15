@@ -3,7 +3,11 @@ import * as path from 'path';
 import * as ts from 'typescript';
 import * as vscode from 'vscode';
 import { FileItem } from './file-item';
-import { isPathToAnotherDir, ReferenceIndex } from './reference-index';
+import {
+  isPathToAnotherDir,
+  Reference,
+  ReferenceIndex,
+} from './reference-index';
 import {
   applyGenericEdits,
   GenericEdit,
@@ -24,6 +28,7 @@ interface FoundItem {
     | 'templateUrl'
     | 'styleUrls';
   itemText: string;
+  specifiers?: string[];
   location: { start: number; end: number };
 }
 
@@ -341,9 +346,12 @@ export class ReferenceIndexer {
       );
 
       return references.map((reference): [string, string] => {
-        const absReference = this.resolveRelativeReference(from, reference);
+        const absReference = this.resolveRelativeReference(
+          from,
+          reference.path
+        );
         const newReference = this.getRelativePath(to, absReference);
-        return [reference, newReference];
+        return [reference.path, newReference];
       });
     };
 
@@ -392,7 +400,10 @@ export class ReferenceIndexer {
               );
               const change = references
                 .filter((p) => {
-                  const abs = this.resolveRelativeReference(originalPath, p);
+                  const abs = this.resolveRelativeReference(
+                    originalPath,
+                    p.path
+                  );
                   if (whiteList.size > 0) {
                     const name = path.relative(from, abs).split(path.sep)[0];
                     if (whiteList.has(name)) {
@@ -408,9 +419,12 @@ export class ReferenceIndexer {
                   return isPathToAnotherDir(path.relative(from, abs));
                 })
                 .map((p): Replacement => {
-                  const abs = this.resolveRelativeReference(originalPath, p);
+                  const abs = this.resolveRelativeReference(
+                    originalPath,
+                    p.path
+                  );
                   const relative = this.getRelativePath(file.fsPath, abs);
-                  return [p, relative];
+                  return [p.path, relative];
                 });
               return change;
             };
@@ -443,7 +457,7 @@ export class ReferenceIndexer {
         const imports = this.getRelativeImportSpecifiers(text, reference.path);
         const change = imports
           .filter((p) => {
-            const abs = this.resolveRelativeReference(reference.path, p);
+            const abs = this.resolveRelativeReference(reference.path, p.path);
             if (fileNames.length > 0) {
               const name = path.relative(from, abs).split(path.sep)[0];
               if (whiteList.has(name)) {
@@ -459,11 +473,11 @@ export class ReferenceIndexer {
             return !isPathToAnotherDir(path.relative(from, abs));
           })
           .map((p): [string, string] => {
-            const abs = this.resolveRelativeReference(reference.path, p);
+            const abs = this.resolveRelativeReference(reference.path, p.path);
             const relative = path.relative(from, abs);
             const newabs = path.resolve(to, relative);
             const changeTo = this.getRelativePath(reference.path, newabs);
-            return [p, changeTo];
+            return [p.path, changeTo];
           });
         return change;
       };
@@ -504,11 +518,9 @@ export class ReferenceIndexer {
   ): Promise<any> {
     const affectedFiles = this.index.getReferences(from);
 
-    if (
-      additionalEdits &&
-      !affectedFiles.find((filePath) => filePath.path === from)
-    ) {
-      affectedFiles.push({ path: from });
+    if (additionalEdits && !affectedFiles.find((ref) => ref.path === from)) {
+      // TODO: specifiers and isExport might help identify barrels here
+      affectedFiles.push({ path: from, specifiers: [] });
     }
 
     const promises = affectedFiles.map((filePath) => {
@@ -765,10 +777,12 @@ export class ReferenceIndexer {
   private getRelativeImportSpecifiers(
     data: string,
     filePath: string
-  ): string[] {
-    return this.getRelativeReferences(data, filePath).map(
-      (ref) => ref.itemText
-    );
+  ): Reference[] {
+    return this.getRelativeReferences(data, filePath).map((ref) => ({
+      path: ref.itemText,
+      specifiers: ref.specifiers ?? [],
+      isExport: ref.itemType === 'exportPath',
+    }));
   }
 
   private getReferences(fileName: string, data: string): FoundItem[] {
@@ -778,9 +792,15 @@ export class ReferenceIndexer {
     file.statements.forEach((node: ts.Node) => {
       if (ts.isImportDeclaration(node)) {
         if (ts.isStringLiteral(node.moduleSpecifier)) {
+          const bindings = node.importClause?.namedBindings;
+          const specifiers =
+            bindings && ts.isNamedImports(bindings)
+              ? bindings.elements.map((elem) => elem.name.text)
+              : [];
           result.push({
             itemType: 'importPath',
             itemText: node.moduleSpecifier.text,
+            specifiers,
             location: {
               start: node.moduleSpecifier.getStart(file),
               end: node.moduleSpecifier.getEnd(),
@@ -842,14 +862,22 @@ export class ReferenceIndexer {
     const references = this.getRelativeImportSpecifiers(data, fsPath);
 
     for (let i = 0; i < references.length; i++) {
-      let referenced = this.resolveRelativeReference(filePath, references[i]);
+      let referenced = this.resolveRelativeReference(
+        filePath,
+        references[i].path
+      );
       for (let j = 0; j < this.extensions.length; j++) {
         const ext = this.extensions[j];
         if (!referenced.endsWith(ext) && fs.existsSync(referenced + ext)) {
           referenced += ext;
         }
       }
-      this.index.addReference(referenced, filePath);
+      this.index.addReference(
+        referenced,
+        filePath,
+        references[i].specifiers,
+        references[i].isExport
+      );
     }
   }
 }

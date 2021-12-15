@@ -716,6 +716,7 @@ export class ReferenceIndexer {
             config.compilerOptions.baseUrl
           );
           for (let p in config.compilerOptions.paths) {
+            // wildcard path mappings
             if (p.endsWith('*') && reference.startsWith(p.slice(0, -1))) {
               const paths = config.compilerOptions.paths[p];
               for (let i = 0; i < paths.length; i++) {
@@ -741,6 +742,7 @@ export class ReferenceIndexer {
                 );
               }
             } else {
+              // fixed path mappings
               if (p === reference) {
                 const paths = config.compilerOptions.paths[p];
                 for (let i = 0; i < paths.length; i++) {
@@ -751,6 +753,12 @@ export class ReferenceIndexer {
                 }
               }
             }
+          }
+
+          // non-relative base url paths
+          const potential = path.resolve(baseUrl, reference);
+          if (this.doesFileExist(potential)) {
+            return potential;
           }
         }
         for (let packageName in this.packageNames) {

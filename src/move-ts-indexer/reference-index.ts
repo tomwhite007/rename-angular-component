@@ -1,3 +1,4 @@
+import { is } from 'bluebird';
 import * as path from 'path';
 
 export interface Reference {
@@ -58,24 +59,14 @@ export class ReferenceIndex {
     const existingRefBy = this.referencedBy[reference].find((reference) => {
       return reference.path === path;
     });
-    if (
-      !this.referencedBy[reference].some((reference) => {
-        return reference.path === path;
-      })
-    ) {
+    if (!existingRefBy) {
       this.referencedBy[reference].push({
         path,
         specifiers,
         isExport,
       });
-    } else if (existingRefBy && compareSpecifiers(existingRefBy, specifiers)) {
-      console.log('found existingRefBy is equal');
     } else {
-      console.error(
-        'existingRefBy is not equal',
-        existingRefBy?.specifiers,
-        specifiers
-      );
+      existingRefBy.specifiers = mergeSpecifiers(existingRefBy, specifiers);
     }
   }
 

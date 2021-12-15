@@ -518,6 +518,12 @@ export class ReferenceIndexer {
   ): Promise<any> {
     const affectedFiles = this.index.getReferences(from);
 
+    const barrels = affectedFiles.filter((ref) => ref.isExport);
+    const affectedFromBarrel = barrels.map((ref) =>
+      this.index.getReferences(ref.path)
+    );
+    console.log('affectedFromBarrel', barrels, affectedFromBarrel);
+
     if (additionalEdits && !affectedFiles.find((ref) => ref.path === from)) {
       // TODO: specifiers and isExport might help identify barrels here
       affectedFiles.push({ path: from, specifiers: [] });
@@ -734,19 +740,30 @@ export class ReferenceIndexer {
                   reference.substr(p.slice(0, -1).length)
                 );
               }
+            } else {
+              if (p === reference) {
+                const paths = config.compilerOptions.paths[p];
+                for (let i = 0; i < paths.length; i++) {
+                  const potential = path.resolve(baseUrl, paths[i]);
+                  if (this.doesFileExist(potential)) {
+                    return potential;
+                  }
+                }
+              }
             }
           }
         }
-      }
-      for (let packageName in this.packageNames) {
-        if (reference.startsWith(packageName + '/')) {
-          return path.resolve(
-            this.packageNames[packageName],
-            reference.substr(packageName.length + 1)
-          );
+        for (let packageName in this.packageNames) {
+          if (reference.startsWith(packageName + '/')) {
+            return path.resolve(
+              this.packageNames[packageName],
+              reference.substr(packageName.length + 1)
+            );
+          }
         }
       }
     }
+
     return '';
   }
 

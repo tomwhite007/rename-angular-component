@@ -15,10 +15,14 @@ function mergeSpecifiers(ref1: Reference, newSpecifiers: string[]): string[] {
   return [...new Set([...ref1.specifiers, ...newSpecifiers])];
 }
 
-function compareSpecifiers(ref1: Reference, newSpecifiers: string[]): boolean {
-  const array1 = ref1.specifiers.sort();
-  const array2 = newSpecifiers.sort();
-  return JSON.stringify(array1) === JSON.stringify(array2);
+export function mergeReferenceArrays(
+  arr1: Reference[],
+  arr2: Reference[]
+): Reference[] {
+  return [
+    ...arr1,
+    ...arr2.filter((r2) => !arr1.find((r1) => r1.path === r2.path)),
+  ];
 }
 
 export class ReferenceIndex {

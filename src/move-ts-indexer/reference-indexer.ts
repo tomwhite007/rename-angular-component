@@ -5,6 +5,7 @@ import * as vscode from 'vscode';
 import { FileItem } from './file-item';
 import {
   isPathToAnotherDir,
+  mergeReferenceArrays,
   Reference,
   ReferenceIndex,
 } from './reference-index';
@@ -516,13 +517,17 @@ export class ReferenceIndexer {
     to: string,
     additionalEdits?: GenericEditsCallback
   ): Promise<any> {
-    const affectedFiles = this.index.getReferences(from);
+    let affectedFiles = this.index.getReferences(from);
 
     const barrels = affectedFiles.filter((ref) => ref.isExport);
-    const affectedFromBarrel = barrels.map((ref) =>
+    const affectedFromBarrelArrays = barrels.map((ref) =>
       this.index.getReferences(ref.path)
     );
-    console.log('affectedFromBarrel', barrels, affectedFromBarrel);
+    const affectedFromBarrel = affectedFromBarrelArrays.reduce(
+      (acc, val) => acc.concat(val),
+      []
+    );
+    //affectedFiles = mergeReferenceArrays(affectedFiles, affectedFromBarrel);
 
     if (additionalEdits && !affectedFiles.find((ref) => ref.path === from)) {
       // TODO: specifiers and isExport might help identify barrels here

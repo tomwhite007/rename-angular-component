@@ -34,6 +34,10 @@ export async function rename(
     getOriginalFileDetails(uri.path);
   const projectRoot = windowsFilePathFix(getProjectRoot(uri) as string);
   const title = `Rename Angular ${pascalCase(construct)}`;
+  const haveSelectors: Readonly<AngularConstruct[]> = [
+    'component',
+    'directive',
+  ];
 
   if (checkForOpenUnsavedEditors()) {
     popupMessage(`Please save any edits before using ${title}`);
@@ -156,19 +160,26 @@ export async function rename(
           await item.move(importer);
         }
 
-        if (selectorTransfer.oldSelector && selectorTransfer.newSelector) {
-          await findReplaceSelectorsInTemplateFiles(
-            selectorTransfer.oldSelector,
-            selectorTransfer.newSelector,
-            output
-          );
-        } else {
-          throw new Error('selectorTransfer not set');
+        // update selectors for components and directives
+        if (haveSelectors.includes(construct)) {
+          if (selectorTransfer.oldSelector && selectorTransfer.newSelector) {
+            await findReplaceSelectorsInTemplateFiles(
+              selectorTransfer.oldSelector,
+              selectorTransfer.newSelector,
+              output
+            );
+          } else {
+            throw new Error('selectorTransfer not set');
+          }
         }
 
         /* TODO - big steps left...
 
-        look at supporting custom paths within app - indexer issue
+        fix rename service in same name and different name folder
+        fix rename component in different folder
+        check rename directive in same name and different name folder
+
+
 
         spec  - maybe replace selector references in them too
 

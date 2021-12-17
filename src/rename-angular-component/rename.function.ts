@@ -13,9 +13,6 @@ import { getOriginalFileDetails } from './in-file-edits/get-original-file-detail
 import { windowsFilePathFix } from './file-manipulation/windows-file-path-fix.function';
 import { FilesRelatedToStub } from './file-manipulation/files-related-to-stub.class';
 import { findReplaceSelectorsInTemplateFiles } from './file-manipulation/find-replace-selectors-in-template-files.function';
-import { createOutputChannel } from './logging/create-output-channel.function';
-import { logInfo } from './logging/log-info.function';
-import { popupMessage } from './logging/popup-message.function';
 import {
   getClassNameEdits,
   getCoreClassEdits,
@@ -23,12 +20,14 @@ import {
 } from './in-file-edits/custom-edits';
 import { checkForOpenUnsavedEditors } from './window/check-for-open-unsaved-editors.funtion';
 import * as path from 'path';
+import { UserMessage } from './logging/user-message.class';
 
 export async function rename(
   construct: AngularConstruct,
   uri: vscode.Uri,
   importer: ReferenceIndexer,
-  indexerInitialisePromise: Thenable<any>
+  indexerInitialisePromise: Thenable<any>,
+  userMessage: UserMessage
 ) {
   const originalFileDetails: Readonly<OriginalFileDetails> =
     getOriginalFileDetails(uri.path);
@@ -40,7 +39,7 @@ export async function rename(
   ];
 
   if (checkForOpenUnsavedEditors()) {
-    popupMessage(`Please save any edits before using ${title}`);
+    userMessage.popupMessage(`Please save any edits before using ${title}`);
     return;
   }
 
@@ -51,17 +50,19 @@ export async function rename(
   });
   const start = Date.now();
 
-  const output = createOutputChannel(title);
+  userMessage.setOperationTitle(title);
   if (!inputResult) {
-    popupMessage(`New ${construct} name not entered. Stopped.`);
+    userMessage.popupMessage(`New ${construct} name not entered. Stopped.`);
     return;
   }
   if (originalFileDetails.stub === inputResult) {
-    popupMessage(`${pascalCase(construct)} name same as original. Stopped.`);
+    userMessage.popupMessage(
+      `${pascalCase(construct)} name same as original. Stopped.`
+    );
     return;
   }
   if (!inputResult.match(/^[a-z0-9-_]*$/i)) {
-    popupMessage(
+    userMessage.popupMessage(
       `Currently only supports letters, numbers, dashes and underscore in the new name. (To be improved in next release)`
     );
     return;
@@ -76,11 +77,13 @@ export async function rename(
 
   // wait for indexer initialise to complete
   const indexTime = await indexerInitialisePromise;
-  logInfo(output, [
-    `Index files completed in ${Math.round(indexTime * 100) / 100} seconds`,
-    '',
-  ]);
-  importer.setOutputChannel(output);
+  userMessage.logInfoToChannel(
+    [
+      `Index files completed in ${Math.round(indexTime * 100) / 100} seconds`,
+      '',
+    ],
+    false
+  );
 
   await vscode.window.withProgress(
     {
@@ -165,7 +168,7 @@ export async function rename(
             await findReplaceSelectorsInTemplateFiles(
               selectorTransfer.oldSelector,
               selectorTransfer.newSelector,
-              output
+              userMessage.outputChannel
             );
           } else {
             throw new Error('selectorTransfer not set');
@@ -218,7 +221,10 @@ export async function rename(
 
         progress.report({ increment: 100 });
         const renameTime = Math.round((Date.now() - start) / 10) / 100;
-        logInfo(output, ['', `${title} completed in ${renameTime} seconds`]);
+        userMessage.logInfoToChannel([
+          '',
+          `${title} completed in ${renameTime} seconds`,
+        ]);
         await timeoutPause(50);
       } catch (e) {
         console.log('error in extension.ts', e);

@@ -43,21 +43,19 @@ export function asUnix(fsPath: string) {
 }
 
 export class ReferenceIndexer {
-  changeDocumentEvent!: vscode.Disposable;
-  private tsconfigs!: { [key: string]: any };
   index: ReferenceIndex = new ReferenceIndex();
+  isinitialised: boolean = false;
+  changeDocumentEvent!: vscode.Disposable;
 
+  private tsconfigs!: { [key: string]: any };
   private output!: vscode.OutputChannel;
-
   private packageNames: { [key: string]: string } = {};
-
   private extensions: string[] = ['.ts'];
-
-  private paths: string[] = [];
-  private filesToExclude: string[] = [];
   private fileWatcher!: vscode.FileSystemWatcher;
 
-  isinitialised: boolean = false;
+  constructor(output: vscode.OutputChannel) {
+    this.output = output;
+  }
 
   init(progress?: vscode.Progress<{ message: string }>): Thenable<any> {
     this.index = new ReferenceIndex();
@@ -72,10 +70,6 @@ export class ReferenceIndexer {
           this.isinitialised = true;
         });
     });
-  }
-
-  setOutputChannel(output: vscode.OutputChannel) {
-    this.output = output;
   }
 
   conf<T>(property: string, defaultValue: T): T {

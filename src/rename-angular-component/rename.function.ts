@@ -168,7 +168,7 @@ export async function rename(
             await findReplaceSelectorsInTemplateFiles(
               selectorTransfer.oldSelector,
               selectorTransfer.newSelector,
-              userMessage.outputChannel
+              userMessage
             );
           } else {
             throw new Error('selectorTransfer not set');

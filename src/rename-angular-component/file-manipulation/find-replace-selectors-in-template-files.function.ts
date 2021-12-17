@@ -1,12 +1,12 @@
 import { OutputChannel, workspace } from 'vscode';
 import * as fs from 'fs-extra-promise';
 import { renameSelectorInTemplate } from '../in-file-edits/rename-selector-in-template.function';
-import { logInfo } from '../logging/log-info.function';
+import { UserMessage } from '../logging/user-message.class';
 
 export async function findReplaceSelectorsInTemplateFiles(
   originalSelector: string,
   newSelector: string,
-  output: OutputChannel
+  userMessage: UserMessage
 ) {
   const uris = await workspace.findFiles(
     '**/*.html',
@@ -24,7 +24,7 @@ export async function findReplaceSelectorsInTemplateFiles(
     }
     if (html) {
       await fs.writeFileAsync(uri.fsPath, html, 'utf-8');
-      logInfo(output, [uri.fsPath]);
+      userMessage.logInfoToChannel([uri.fsPath], false);
       changed++;
     }
   }

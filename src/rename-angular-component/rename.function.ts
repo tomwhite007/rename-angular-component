@@ -50,7 +50,6 @@ export async function rename(
   });
   const start = Date.now();
 
-  userMessage.setOperationTitle(title);
   if (!inputResult) {
     userMessage.popupMessage(`New ${construct} name not entered. Stopped.`);
     return;
@@ -74,6 +73,8 @@ export async function rename(
     await new Promise((res) => setTimeout(res, wait));
     return;
   };
+
+  userMessage.setOperationTitle(title);
 
   // wait for indexer initialise to complete
   const indexTime = await indexerInitialisePromise;

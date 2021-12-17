@@ -8,13 +8,11 @@ export class UserMessage {
   }
 
   setOperationTitle(title: string) {
-    const output = window.createOutputChannel(title);
     const line = new Array(title.length + 1).join('-');
-    output.clear();
-    output.appendLine(line);
-    output.appendLine(title);
-    output.appendLine(line);
-    return output;
+    this.outputChannel.clear();
+    this.outputChannel.appendLine(line);
+    this.outputChannel.appendLine(title);
+    this.outputChannel.appendLine(line);
   }
 
   logInfoToChannel(textLines?: string[], setFocus = true) {

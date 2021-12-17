@@ -515,22 +515,16 @@ export class ReferenceIndexer {
   updateImports(
     from: string,
     to: string,
+    exportedNameToChange?: string,
     additionalEdits?: GenericEditsCallback
   ): Promise<any> {
     let affectedFiles = this.index.getReferences(from);
-
-    const barrels = affectedFiles.filter((ref) => ref.isExport);
-    const affectedFromBarrelArrays = barrels.map((ref) =>
-      this.index.getReferences(ref.path)
+    affectedFiles = this.addAffectedByBarrels(
+      affectedFiles,
+      exportedNameToChange
     );
-    const affectedFromBarrel = affectedFromBarrelArrays.reduce(
-      (acc, val) => acc.concat(val),
-      []
-    );
-    //affectedFiles = mergeReferenceArrays(affectedFiles, affectedFromBarrel);
 
     if (additionalEdits && !affectedFiles.find((ref) => ref.path === from)) {
-      // TODO: specifiers and isExport might help identify barrels here
       affectedFiles.push({ path: from, specifiers: [] });
     }
 
@@ -557,6 +551,30 @@ export class ReferenceIndexer {
     return Promise.all(promises).catch((e) => {
       console.log(e);
     });
+  }
+
+  private addAffectedByBarrels(
+    affectedFiles: Reference[],
+    exportedNameToChange?: string
+  ) {
+    // WHY IS exportedNameToChange EMPTY!!!???
+    if (!exportedNameToChange) {
+      return affectedFiles;
+    }
+    const barrels = affectedFiles.filter((ref) => ref.isExport);
+    const affectedFromBarrelArrays = barrels.map((ref) =>
+      this.index
+        .getReferences(ref.path)
+        .filter((barrelRef) =>
+          barrelRef.specifiers.includes(exportedNameToChange)
+        )
+    );
+    const affectedFromBarrel = affectedFromBarrelArrays.reduce(
+      (acc, val) => acc.concat(val),
+      []
+    );
+    affectedFiles = mergeReferenceArrays(affectedFiles, affectedFromBarrel);
+    return affectedFiles;
   }
 
   private processWorkspaceFiles(

@@ -82,8 +82,6 @@ export async function rename(
   ]);
   importer.setOutputChannel(output);
 
-  console.log(importer);
-
   await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
@@ -100,6 +98,7 @@ export async function rename(
           projectRoot,
           construct
         );
+        const renameFolder = filesRelatedToStub.folderNameSameAsStub;
 
         const filesToMove = filesRelatedToStub.getFilesToMove(
           newStub as string
@@ -180,6 +179,8 @@ export async function rename(
         check rename directive in same name and different name folder
 
 
+        use same output channel if exists
+
 
         spec  - maybe replace selector references in them too
 
@@ -211,7 +212,9 @@ export async function rename(
         */
 
         // delete original folder
-        fs.remove(originalFileDetails.path);
+        if (renameFolder) {
+          fs.remove(originalFileDetails.path);
+        }
 
         progress.report({ increment: 100 });
         const renameTime = Math.round((Date.now() - start) / 10) / 100;

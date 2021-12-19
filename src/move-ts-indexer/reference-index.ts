@@ -1,11 +1,28 @@
+import { is } from 'bluebird';
 import * as path from 'path';
 
 export interface Reference {
   path: string;
+  specifiers: string[];
+  isExport?: boolean;
 }
 
 export function isPathToAnotherDir(path: string) {
   return path.startsWith('../') || path.startsWith('..\\');
+}
+
+function mergeSpecifiers(ref1: Reference, newSpecifiers: string[]): string[] {
+  return [...new Set([...ref1.specifiers, ...newSpecifiers])];
+}
+
+export function mergeReferenceArrays(
+  arr1: Reference[],
+  arr2: Reference[]
+): Reference[] {
+  return [
+    ...arr1,
+    ...arr2.filter((r2) => !arr1.find((r1) => r1.path === r2.path)),
+  ];
 }
 
 export class ReferenceIndex {
@@ -18,7 +35,12 @@ export class ReferenceIndex {
   }
 
   // path references the reference
-  public addReference(reference: string, path: string) {
+  public addReference(
+    reference: string,
+    path: string,
+    specifiers: string[],
+    isExport?: boolean
+  ) {
     if (!this.referencedBy.hasOwnProperty(reference)) {
       this.referencedBy[reference] = [];
     }
@@ -26,22 +48,29 @@ export class ReferenceIndex {
       this.references[path] = [];
     }
 
-    if (
-      !this.references[path].some((ref) => {
-        return ref.path === reference;
-      })
-    ) {
-      this.references[path].push({ path: reference });
+    const existingReference = this.references[path].find((ref) => {
+      return ref.path === reference;
+    });
+    if (!existingReference) {
+      this.references[path].push({ path: reference, specifiers, isExport });
+    } else {
+      existingReference.specifiers = mergeSpecifiers(
+        existingReference,
+        specifiers
+      );
     }
 
-    if (
-      !this.referencedBy[reference].some((reference) => {
-        return reference.path === path;
-      })
-    ) {
+    const existingRefBy = this.referencedBy[reference].find((reference) => {
+      return reference.path === path;
+    });
+    if (!existingRefBy) {
       this.referencedBy[reference].push({
         path,
+        specifiers,
+        isExport,
       });
+    } else {
+      existingRefBy.specifiers = mergeSpecifiers(existingRefBy, specifiers);
     }
   }
 

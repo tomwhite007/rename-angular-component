@@ -29,7 +29,11 @@ This extension contributes the following settings:
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+1. Doesn't support changing element, attribute or class selectors inside:
+   - component inline templates
+   - test spec files
+   - Storybook files
+     (but will do soon as a config option)
 
 ## Release Notes
 

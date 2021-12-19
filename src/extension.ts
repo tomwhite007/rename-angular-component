@@ -4,25 +4,31 @@ import { FileHandle } from 'fs/promises';
 import * as vscode from 'vscode';
 import { rename } from './rename-angular-component/rename.function';
 import { ReferenceIndexer } from './move-ts-indexer/reference-indexer';
+import { UserMessage } from './rename-angular-component/logging/user-message.class';
+
+const EXTENSION_NAME = 'Rename Angular Component';
 
 export function activate(context: vscode.ExtensionContext) {
   const indexStart = Date.now();
-  const importer: ReferenceIndexer = new ReferenceIndexer();
+  const userMessage = new UserMessage(EXTENSION_NAME);
+  const indexer: ReferenceIndexer = new ReferenceIndexer(
+    userMessage.outputChannel
+  );
 
   const initWithProgress = () => {
     return vscode.window.withProgress(
       {
         location: vscode.ProgressLocation.Notification,
-        title: 'Rename Angular Component is indexing',
+        title: '${EXTENSION_NAME} is indexing',
       },
       async (progress) => {
-        return importer.init(progress);
+        return indexer.init(progress);
       }
     );
   };
 
   const initialise = async () => {
-    if (importer.isinitialised) {
+    if (indexer.isinitialised) {
       return Promise.resolve();
     }
     await initWithProgress();
@@ -43,19 +49,21 @@ export function activate(context: vscode.ExtensionContext) {
 
       //   getClassNameEdits(filePath, testText);
       // }
-      rename('component', uri, importer, initialisePromise)
+      rename('component', uri, indexer, initialisePromise, userMessage)
   );
   context.subscriptions.push(renameComponent);
 
   let renameDirective = vscode.commands.registerCommand(
     'rename-angular-component.renameDirective',
-    (uri: vscode.Uri) => rename('directive', uri, importer, initialisePromise)
+    (uri: vscode.Uri) =>
+      rename('directive', uri, indexer, initialisePromise, userMessage)
   );
   context.subscriptions.push(renameDirective);
 
   let renameService = vscode.commands.registerCommand(
     'rename-angular-component.renameService',
-    (uri: vscode.Uri) => rename('service', uri, importer, initialisePromise)
+    (uri: vscode.Uri) =>
+      rename('service', uri, indexer, initialisePromise, userMessage)
   );
   context.subscriptions.push(renameService);
 }

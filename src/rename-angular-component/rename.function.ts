@@ -13,9 +13,6 @@ import { getOriginalFileDetails } from './in-file-edits/get-original-file-detail
 import { windowsFilePathFix } from './file-manipulation/windows-file-path-fix.function';
 import { FilesRelatedToStub } from './file-manipulation/files-related-to-stub.class';
 import { findReplaceSelectorsInTemplateFiles } from './file-manipulation/find-replace-selectors-in-template-files.function';
-import { createOutputChannel } from './logging/create-output-channel.function';
-import { logInfo } from './logging/log-info.function';
-import { popupMessage } from './logging/popup-message.function';
 import {
   getClassNameEdits,
   getCoreClassEdits,
@@ -23,20 +20,26 @@ import {
 } from './in-file-edits/custom-edits';
 import { checkForOpenUnsavedEditors } from './window/check-for-open-unsaved-editors.funtion';
 import * as path from 'path';
+import { UserMessage } from './logging/user-message.class';
 
 export async function rename(
   construct: AngularConstruct,
   uri: vscode.Uri,
   importer: ReferenceIndexer,
-  indexerInitialisePromise: Thenable<any>
+  indexerInitialisePromise: Thenable<any>,
+  userMessage: UserMessage
 ) {
   const originalFileDetails: Readonly<OriginalFileDetails> =
     getOriginalFileDetails(uri.path);
   const projectRoot = windowsFilePathFix(getProjectRoot(uri) as string);
   const title = `Rename Angular ${pascalCase(construct)}`;
+  const haveSelectors: Readonly<AngularConstruct[]> = [
+    'component',
+    'directive',
+  ];
 
   if (checkForOpenUnsavedEditors()) {
-    popupMessage(`Please save any edits before using ${title}`);
+    userMessage.popupMessage(`Please save any edits before using ${title}`);
     return;
   }
 
@@ -47,17 +50,18 @@ export async function rename(
   });
   const start = Date.now();
 
-  const output = createOutputChannel(title);
   if (!inputResult) {
-    popupMessage(`New ${construct} name not entered. Stopped.`);
+    userMessage.popupMessage(`New ${construct} name not entered. Stopped.`);
     return;
   }
   if (originalFileDetails.stub === inputResult) {
-    popupMessage(`${pascalCase(construct)} name same as original. Stopped.`);
+    userMessage.popupMessage(
+      `${pascalCase(construct)} name same as original. Stopped.`
+    );
     return;
   }
   if (!inputResult.match(/^[a-z0-9-_]*$/i)) {
-    popupMessage(
+    userMessage.popupMessage(
       `Currently only supports letters, numbers, dashes and underscore in the new name. (To be improved in next release)`
     );
     return;
@@ -70,13 +74,17 @@ export async function rename(
     return;
   };
 
+  userMessage.setOperationTitle(title);
+
   // wait for indexer initialise to complete
   const indexTime = await indexerInitialisePromise;
-  logInfo(output, [
-    `Index files completed in ${Math.round(indexTime * 100) / 100} seconds`,
-    '',
-  ]);
-  importer.setOutputChannel(output);
+  userMessage.logInfoToChannel(
+    [
+      `Index files completed in ${Math.round(indexTime * 100) / 100} seconds`,
+      '',
+    ],
+    false
+  );
 
   await vscode.window.withProgress(
     {
@@ -94,10 +102,18 @@ export async function rename(
           projectRoot,
           construct
         );
+        const renameFolder = filesRelatedToStub.folderNameSameAsStub;
 
         const filesToMove = filesRelatedToStub.getFilesToMove(
           newStub as string
         );
+        if (!filesToMove.find((f) => f.isCoreConstruct)) {
+          userMessage.popupMessage(
+            `The ${construct} class file must use the same file naming convention as '${originalFileDetails.file}' for this process to run.`
+          );
+          return;
+        }
+
         const oldClassName = `${pascalCase(
           originalFileDetails.stub
         )}${pascalCase(construct)}`;
@@ -154,21 +170,23 @@ export async function rename(
           await item.move(importer);
         }
 
-        if (selectorTransfer.oldSelector && selectorTransfer.newSelector) {
-          await findReplaceSelectorsInTemplateFiles(
-            selectorTransfer.oldSelector,
-            selectorTransfer.newSelector,
-            output
-          );
-        } else {
-          throw new Error('selectorTransfer not set');
+        // update selectors for components and directives
+        if (haveSelectors.includes(construct)) {
+          if (selectorTransfer.oldSelector && selectorTransfer.newSelector) {
+            await findReplaceSelectorsInTemplateFiles(
+              selectorTransfer.oldSelector,
+              selectorTransfer.newSelector,
+              userMessage
+            );
+          } else {
+            throw new Error('selectorTransfer not set');
+          }
         }
 
         /* TODO - big steps left...
 
-        look at supporting custom paths within app - indexer issue
 
-        spec  - maybe replace selector references in them too
+        check open unsaved edits still gives a warning - might fail only on windows
 
 
 
@@ -184,6 +202,13 @@ export async function rename(
 
         ---- v2 -----
 
+
+
+        replace selector references in (make config option):
+          spec
+          story and stories files
+
+
         handle open editors
           looks like reference indexer, replaceReferences() already can - need same for core class file
             apply edits in dirty editor?
@@ -198,11 +223,16 @@ export async function rename(
         */
 
         // delete original folder
-        fs.remove(originalFileDetails.path);
+        if (renameFolder) {
+          fs.remove(originalFileDetails.path);
+        }
 
         progress.report({ increment: 100 });
         const renameTime = Math.round((Date.now() - start) / 10) / 100;
-        logInfo(output, ['', `${title} completed in ${renameTime} seconds`]);
+        userMessage.logInfoToChannel([
+          '',
+          `${title} completed in ${renameTime} seconds`,
+        ]);
         await timeoutPause(50);
       } catch (e) {
         console.log('error in extension.ts', e);

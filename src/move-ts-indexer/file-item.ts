@@ -42,6 +42,7 @@ export class FileItem {
             .updateImports(
               this.sourcePath,
               this.targetPath,
+              this.originalClassName,
               this.additionalEdits?.importsEdits
             )
             .then(() => {

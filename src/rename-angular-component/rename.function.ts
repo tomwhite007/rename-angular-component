@@ -107,6 +107,13 @@ export async function rename(
         const filesToMove = filesRelatedToStub.getFilesToMove(
           newStub as string
         );
+        if (!filesToMove.find((f) => f.isCoreConstruct)) {
+          userMessage.popupMessage(
+            `The ${construct} class file must use the same file naming convention as '${originalFileDetails.file}' for this process to run.`
+          );
+          return;
+        }
+
         const oldClassName = `${pascalCase(
           originalFileDetails.stub
         )}${pascalCase(construct)}`;
@@ -178,15 +185,8 @@ export async function rename(
 
         /* TODO - big steps left...
 
-        fix rename service in same name and different name folder
-        fix rename component in different folder
-        check rename directive in same name and different name folder
 
-
-        use same output channel if exists
-
-
-        spec  - maybe replace selector references in them too
+        check open unsaved edits still gives a warning - might fail only on windows
 
 
 
@@ -201,6 +201,13 @@ export async function rename(
         add additional stuff in package json - keywords etc
 
         ---- v2 -----
+
+
+
+        replace selector references in (make config option):
+          spec
+          story and stories files
+
 
         handle open editors
           looks like reference indexer, replaceReferences() already can - need same for core class file

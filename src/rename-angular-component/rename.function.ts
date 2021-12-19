@@ -21,6 +21,7 @@ import {
 import { checkForOpenUnsavedEditors } from './window/check-for-open-unsaved-editors.funtion';
 import * as path from 'path';
 import { UserMessage } from './logging/user-message.class';
+import { EXTENSION_NAME } from './definitions/extension-name';
 
 export async function rename(
   construct: AngularConstruct,
@@ -186,8 +187,6 @@ export async function rename(
         /* TODO - big steps left...
 
 
-        check open unsaved edits still gives a warning - might fail only on windows
-
 
 
         Prep for publish:
@@ -236,6 +235,11 @@ export async function rename(
         await timeoutPause(50);
       } catch (e) {
         console.log('error in extension.ts', e);
+        userMessage.logInfoToChannel([
+          `Sorry, an error occured during the ${title} process`,
+          `I recommend reverting the changes made if there are any`,
+          `If it looks like a new issue, I'd welcome you raising it here: [${EXTENSION_NAME} Issues](https://github.com/tomwhite007/rename-angular-component/issues)`,
+        ]);
       }
     }
   );

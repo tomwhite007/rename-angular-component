@@ -1,12 +1,8 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import { FileHandle } from 'fs/promises';
 import * as vscode from 'vscode';
 import { rename } from './rename-angular-component/rename.function';
 import { ReferenceIndexer } from './move-ts-indexer/reference-indexer';
 import { UserMessage } from './rename-angular-component/logging/user-message.class';
-
-const EXTENSION_NAME = 'Rename Angular Component';
+import { EXTENSION_NAME } from './rename-angular-component/definitions/extension-name';
 
 export function activate(context: vscode.ExtensionContext) {
   const indexStart = Date.now();

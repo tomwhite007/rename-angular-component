@@ -1,4 +1,5 @@
 import { pascalCase } from 'change-case';
+import escapeStringRegexp from 'escape-string-regexp';
 import * as ts from 'typescript';
 import {
   GenericEditsCallback,
@@ -52,12 +53,15 @@ export function getCoreClassEdits(
               newFileStub
             );
             replacement = `'${selectorTransfer.newSelector}'`;
-            // TODO: fix selector replacement for Directives [] .[a-z] etc.
             break;
           case 'templateUrl':
           case 'styleUrls':
             replacement = `'${foundItem.itemText.replace(
-              originalFileStub,
+              new RegExp(
+                `(?<=\\/|^)${escapeStringRegexp(
+                  originalFileStub
+                )}(?=.${construct}.(html|scss|css)$)`
+              ),
               newFileStub
             )}'`;
             break;

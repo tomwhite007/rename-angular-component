@@ -29,7 +29,11 @@ This extension contributes the following settings:
 
 ## Known Issues
 
-1. Doesn't support changing element selectors inside component inline templates or inside test spec files. This will be added soon.
+1. Doesn't support changing element, attribute or class selectors inside:
+   - component inline templates
+   - test spec files
+   - Storybook files
+     (but will do soon as a config option)
 
 ## Release Notes
 

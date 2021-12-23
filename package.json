@@ -2,14 +2,19 @@
   "name": "rename-angular-component",
   "displayName": "Rename Angular Component",
   "description": "Rename Angular Components, Directives and Services",
-  "publisher": "tom",
-  "version": "0.2.0-alpha11",
+  "publisher": "tomwhite007",
+  "version": "0.2.0-alpha12",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/tomwhite007/rename-angular-component.git"
   },
   "homepage": "https://github.com/tomwhite007/rename-angular-component#readme",
+  "icon": "assets/rename-angular-component-icon.png",
+  "galleryBanner": {
+    "color": "#373436",
+    "theme": "dark"
+  },
   "engines": {
     "vscode": "^1.58.0"
   },
@@ -20,12 +25,21 @@
     "angular",
     "rename",
     "refactor",
-    "relative"
+    "component",
+    "directive",
+    "service",
+    "relative",
+    "paths",
+    "selector"
   ],
   "activationEvents": [
     "onCommand:rename-angular-component.renameComponent",
     "onCommand:rename-angular-component.renameDirective",
     "onCommand:rename-angular-component.renameService"
+  ],
+  "extensionKind": [
+    "ui",
+    "workspace"
   ],
   "main": "./dist/extension.js",
   "contributes": {

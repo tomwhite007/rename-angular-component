@@ -1,77 +1,49 @@
-# rename-angular-component README
+<h1>
+  <sub><img src="./assets/rename-angular-component-icon.png" height="40"></sub>
+  Rename Angular Component
+</h1>
 
-Rename Angular components, directives and services
+Rename Angular components, directives and services - including their filenames, class names and selectors all in one go
+
+## How to use
+
+Right-click the Angular file or its associated sibling file (.html, .scss, .spec.ts).
+
+Click 'Rename Angular Component' and then enter a new name.
+
+The extension converts the text you enter into kebab case for the filename, capital case for the class name and camel case for the selector, and adds all the existing pre and postfixes back on.
+
+![Rename Angular Component in action](./assets/rename-angular-component-demo.gif)
 
 ## Features
 
-test
+Based on the same naming convention in the [Angular Style Guide](https://angular.io/guide/styleguide#style-02-01) and following the file pattern created by the Angular CLI, this extension will:
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
-
-## Requirements
-
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+- Rename the files files associated with the component, directive or service whilst retaining their original postfixes
+- Rename the containing folder if it has the same name as the original file selected
+- Rename the class name of the component, directive or service to match the new file name - provided the class name matches the same naming convention as the filename
+- Rename the element, attribute or class selectors inside the class decorator meta data, and in all html templates in the repo (provided the selector follows the same naming convention)
+- Fix all import paths and their class names
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-- `myExtension.enable`: enable/disable this extension
-- `myExtension.thing`: set to `blah` to do something
+Currently, there are no config options for this first release. But there are plenty coming soon.
 
 ## Known Issues
 
-1. Doesn't support changing element, attribute or class selectors inside:
-   - component inline templates
+1. Doesn't support (but will do soon) changing element, attribute or class selectors inside:
+   - component _inline_ templates
    - test spec files
    - Storybook files
-     (but will do soon as a config option)
+2. Currently, doesn't rename other files in the same folder with the same stub / prefix, unless they are directly associated: e.g. \*.component.ts, \*.component.scss, \*.component.html, and \*.component.spec.ts (are directly associated). But this option will be added as a config item soon.
+3. If you have two components or directives in your repo that have the same selector, this process will currently rename those instances in the html templates as well. This will be addressed in a future version.
+4. It won't fix a broken naming convention. If your sibling files don't match the Angular Style guide filename convention, or your class name or selector don't match the original filename, they won't be changed. This will be addressed in a future version as an option.
+5. Currently doesn't support renaming import paths in [Lazy Loaded Routes](https://angular.io/guide/lazy-loading-ngmodules). This will be added in the next version.
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+### 0.1.0
 
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
+Initial release of extension
 
 ---
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-- [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-- Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-- Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-- Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-- [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-- [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**

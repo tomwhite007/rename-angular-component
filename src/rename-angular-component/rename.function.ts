@@ -188,6 +188,11 @@ export async function rename(
 
 
 
+        add icon + design
+
+        probably need assets path config for webpack
+
+
 
         Prep for publish:
 

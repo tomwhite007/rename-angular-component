@@ -15,7 +15,7 @@ export function activate(context: vscode.ExtensionContext) {
     return vscode.window.withProgress(
       {
         location: vscode.ProgressLocation.Notification,
-        title: '${EXTENSION_NAME} is indexing',
+        title: `${EXTENSION_NAME} is indexing`,
       },
       async (progress) => {
         return indexer.init(progress);

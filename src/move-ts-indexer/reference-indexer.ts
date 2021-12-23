@@ -15,6 +15,7 @@ import {
   GenericEditsCallback,
 } from './apply-generic-edits';
 import * as minimatch from 'minimatch';
+import { config } from 'bluebird';
 
 const BATCH_SIZE = 50;
 
@@ -31,6 +32,23 @@ interface FoundItem {
   itemText: string;
   specifiers?: string[];
   location: { start: number; end: number };
+}
+
+type ConfigProp = object | string | undefined;
+
+interface ConfigInfo {
+  config: {
+    extends?: string;
+    compilerOptions: {
+      baseUrl: string;
+      paths: {
+        [key: string]: string[];
+      };
+      [key: string]: ConfigProp;
+    };
+    [key: string]: ConfigProp;
+  };
+  configPath: string;
 }
 
 export function isInDir(dir: string, p: string) {
@@ -103,7 +121,11 @@ export class ReferenceIndexer {
         return Promise.all(promises);
       });
     const tsConfigPromise = vscode.workspace
-      .findFiles('**/tsconfig{.json,.build.json}', '**/node_modules/**', 1000)
+      .findFiles(
+        '**/tsconfig{.json,.build.json,.base.json}',
+        '**/node_modules/**',
+        1000
+      )
       .then((files) => {
         const promises = files.map((file) => {
           return fs.readFileAsync(file.fsPath, 'utf-8').then((content) => {
@@ -792,28 +814,79 @@ export class ReferenceIndexer {
     return '';
   }
 
-  private getTsConfig(filePath: string): any {
+  private getTsConfig(filePath: string): ConfigInfo | null {
     let prevDir = filePath;
     let dir = path.dirname(filePath);
     while (dir !== prevDir) {
       const tsConfigPaths = [
         path.join(dir, 'tsconfig.json'),
         path.join(dir, 'tsconfig.build.json'),
+        path.join(dir, 'tsconfig.base.json'),
       ];
       const tsConfigPath = tsConfigPaths.find((p) =>
         this.tsconfigs.hasOwnProperty(p)
       );
 
       if (tsConfigPath) {
-        return {
+        const configInfo = {
           config: this.tsconfigs[tsConfigPath],
           configPath: tsConfigPath,
         };
+
+        if (configInfo.config.extends) {
+          return this.extendedConfigInfo(configInfo);
+        }
+
+        return configInfo;
       }
       prevDir = dir;
       dir = path.dirname(dir);
     }
     return null;
+  }
+
+  private extendedConfigInfo(extenderConfigInfo: ConfigInfo): ConfigInfo {
+    const configDir = path.dirname(extenderConfigInfo.configPath);
+    const baseConfigPath = path.join(
+      configDir,
+      extenderConfigInfo.config.extends as string
+    );
+
+    if (this.tsconfigs.hasOwnProperty(baseConfigPath)) {
+      const baseConfigInfo: ConfigInfo = {
+        config: this.tsconfigs[baseConfigPath],
+        configPath: baseConfigPath,
+      };
+      const merged = this.mergeConfigs(extenderConfigInfo, baseConfigInfo);
+      if (baseConfigInfo.config.extends) {
+        // recurse next level of extension
+        return this.extendedConfigInfo(merged);
+      }
+      return merged;
+    } else {
+      return extenderConfigInfo;
+    }
+  }
+
+  private mergeConfigs(
+    extenderConfigInfo: ConfigInfo,
+    baseConfigInfo: ConfigInfo
+  ): ConfigInfo {
+    return {
+      config: {
+        ...extenderConfigInfo.config,
+        compilerOptions: {
+          ...baseConfigInfo.config?.compilerOptions,
+          ...extenderConfigInfo.config.compilerOptions,
+          // TODO: work out if paths needs to merge and how extender's need to adapt
+          paths: baseConfigInfo.config?.compilerOptions.paths,
+          // TODO: work out what happens with two base urls and base's paths
+          baseUrl: baseConfigInfo.config?.compilerOptions.baseUrl,
+        },
+        extends: undefined,
+      },
+      configPath: baseConfigInfo.configPath,
+    };
   }
 
   private getRelativeImportSpecifiers(

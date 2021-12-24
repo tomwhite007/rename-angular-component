@@ -1,5 +1,5 @@
 <h1>
-  <sub><img src="./assets/rename-angular-component-icon.png" height="40"></sub>
+  <sub><img src="https://cdn.jsdelivr.net/gh/tomwhite007/simple-reactive-viewmodel-example@master/src/assets/rename-angular-component-icon.png" height="40"></sub>
   Rename Angular Component
 </h1>
 
@@ -13,7 +13,7 @@ Click 'Rename Angular Component' and then enter a new name.
 
 The extension converts the text you enter into kebab case for the filename, capital case for the class name and camel case for the selector, and adds all the existing pre and postfixes back on.
 
-![Rename Angular Component in action](./assets/rename-angular-component-demo.gif)
+![Rename Angular Component in action](https://cdn.jsdelivr.net/gh/tomwhite007/simple-reactive-viewmodel-example@master/src/assets/rename-angular-component-demo.gif)
 
 ## Features
 
@@ -24,6 +24,14 @@ Based on the same naming convention in the [Angular Style Guide](https://angular
 - Rename the class name of the component, directive or service to match the new file name - provided the class name matches the same naming convention as the filename
 - Rename the element, attribute or class selectors inside the class decorator meta data, and in all html templates in the repo (provided the selector follows the same naming convention)
 - Fix all import paths and their class names
+
+_Example - Changes to Component file after rename:_
+
+![Changes to Component file after rename](https://cdn.jsdelivr.net/gh/tomwhite007/simple-reactive-viewmodel-example@master/src/assets/diff-component-decorator-meta-changes.png)
+
+_Example - Changes to an element selector in a parent template:_
+
+![Changes to Component file after rename](https://cdn.jsdelivr.net/gh/tomwhite007/simple-reactive-viewmodel-example@master/src/assets/diff-template-selector-changed.png)
 
 ## Extension Settings
 

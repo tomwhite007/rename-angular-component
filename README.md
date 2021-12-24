@@ -11,7 +11,7 @@ Right-click the Angular file or its associated sibling file (.html, .scss, .spec
 
 Click 'Rename Angular Component' and then enter a new name.
 
-The extension converts the text you enter into kebab case for the filename, capital case for the class name and camel case for the selector, and adds all the existing pre and postfixes back on.
+The extension converts the text you enter into kebab case for the filename, capital case for the class name and the correct case for the type of selector, and adds all the existing pre and postfixes back on.
 
 ![Rename Angular Component in action](https://cdn.jsdelivr.net/gh/tomwhite007/simple-reactive-viewmodel-example@master/src/assets/rename-angular-component-demo.gif)
 

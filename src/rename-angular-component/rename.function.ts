@@ -241,9 +241,10 @@ export async function rename(
       } catch (e) {
         console.log('error in extension.ts', e);
         userMessage.logInfoToChannel([
-          `Sorry, an error occured during the ${title} process`,
+          `Sorry, an error occurred during the ${title} process`,
           `I recommend reverting the changes made if there are any`,
           `If it looks like a new issue, I'd welcome you raising it here: [${EXTENSION_NAME} Issues](https://github.com/tomwhite007/rename-angular-component/issues)`,
+          `If it looks like an existing issue, I'd appreciate it if you'd +1 it on Github to chivvy me along`,
         ]);
       }
     }

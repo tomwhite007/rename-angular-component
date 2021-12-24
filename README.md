@@ -50,7 +50,7 @@ Currently, there are no config options for this first release. But there are ple
 
 ## Release Notes
 
-### 0.1.0
+### 1.0.0
 
 Initial release of extension
 

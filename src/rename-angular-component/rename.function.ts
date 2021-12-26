@@ -22,6 +22,7 @@ import { checkForOpenUnsavedEditors } from './window/check-for-open-unsaved-edit
 import * as path from 'path';
 import { UserMessage } from './logging/user-message.class';
 import { EXTENSION_NAME } from './definitions/extension-name';
+import { noSelectedFileHandler } from './no-selected-file-handler/no-selected-file-handler.function';
 
 export async function rename(
   construct: AngularConstruct,
@@ -30,10 +31,25 @@ export async function rename(
   indexerInitialisePromise: Thenable<any>,
   userMessage: UserMessage
 ) {
+  const title = `Rename Angular ${pascalCase(construct)}`;
+
+  // Handle if called from command menu
+  if (!uri) {
+    const userEntered = await noSelectedFileHandler(
+      construct,
+      title,
+      userMessage
+    );
+    if (userEntered) {
+      uri = userEntered;
+    } else {
+      return;
+    }
+  }
+
   const originalFileDetails: Readonly<OriginalFileDetails> =
     getOriginalFileDetails(uri.path);
   const projectRoot = windowsFilePathFix(getProjectRoot(uri) as string);
-  const title = `Rename Angular ${pascalCase(construct)}`;
   const haveSelectors: Readonly<AngularConstruct[]> = [
     'component',
     'directive',

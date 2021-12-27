@@ -11,7 +11,7 @@ Right-click the Angular file or its associated sibling file (.html, .scss, .spec
 
 Click 'Rename Angular Component' and then enter a new name.
 
-The extension converts the text you enter into kebab case for the filename, capital case for the class name and the correct case for the type of selector, and adds all the existing pre and postfixes back on.
+The extension converts the text you enter into kebab case for the filename, capital case for the class name, the correct case for the type of selector, and then adds all the existing pre and postfixes back on.
 
 ![Rename Angular Component in action](https://cdn.jsdelivr.net/gh/tomwhite007/simple-reactive-viewmodel-example@master/src/assets/rename-angular-component-demo.gif)
 
@@ -21,8 +21,8 @@ Based on the same naming convention in the [Angular Style Guide](https://angular
 
 - Rename the files files associated with the component, directive or service whilst retaining their original postfixes
 - Rename the containing folder if it has the same name as the original file selected
-- Rename the class name of the component, directive or service to match the new file name - provided the class name matches the same naming convention as the filename
-- Rename the element, attribute or class selectors inside the class decorator meta data, and in all html templates in the repo (provided the selector follows the same naming convention)
+- Rename the class name of the component, directive or service to match the new file name (provided the class name follows the same naming convention)
+- Rename the element, attribute or class selectors inside the class decorator meta data, and in all html templates in the repo (provided the selector follows the correct naming convention)
 - Fix all import paths and their class names
 
 _Example - Changes to Component file after rename:_
@@ -39,14 +39,14 @@ Currently, there are no config options for this first release. But there are ple
 
 ## Known Issues
 
-1. Doesn't support (but will do soon) changing element, attribute or class selectors inside:
-   - component _inline_ templates
-   - test spec files
+1. [Doesn't support (but will do soon) selector changes inside Inline Templates](https://github.com/tomwhite007/rename-angular-component/issues/5) in:
+   - Component class files
+   - Test spec files
    - Storybook files
-2. Currently, doesn't rename other files in the same folder with the same stub / prefix, unless they are directly associated: e.g. \*.component.ts, \*.component.scss, \*.component.html, and \*.component.spec.ts (are directly associated). But this option will be added as a config item soon.
-3. If you have two components or directives in your repo that have the same selector, this process will currently rename those instances in the html templates as well. This will be addressed in a future version.
-4. It won't fix a broken naming convention. If your sibling files don't match the Angular Style guide filename convention, or your class name or selector don't match the original filename, they won't be changed. This will be addressed in a future version as an option.
-5. Currently doesn't support renaming import paths in [Lazy Loaded Routes](https://angular.io/guide/lazy-loading-ngmodules). This will be added in the next version.
+2. [Doesn't rename other files in the same folder with the same stub / prefix unless they are a sibling](https://github.com/tomwhite007/rename-angular-component/issues/6). Currently, the 2-4 directly associated sibling files do get changed, e.g. \*.component.ts, \*.component.scss, \*.component.html, and \*.component.spec.ts (are directly associated). But this option will be added as a config item soon.
+3. [If you have two components or directives in your repo that have the same selector, this process will currently rename those instances in the html templates as well](https://github.com/tomwhite007/rename-angular-component/issues/7). This will be addressed in a future version.
+4. It won't fix a broken naming convention. [If your sibling files don't match the Angular Style guide filename convention, or your class name or selector don't match the original filename, they won't be changed](https://github.com/tomwhite007/rename-angular-component/issues/8). This will be addressed in a future version as an option.
+5. [Currently doesn't support renaming import paths](https://github.com/tomwhite007/rename-angular-component/issues/9) in [Lazy Loaded Routes](https://angular.io/guide/lazy-loading-ngmodules). This will be added in the next version.
 
 ## Release Notes
 

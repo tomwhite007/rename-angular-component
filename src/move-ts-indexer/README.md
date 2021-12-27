@@ -4,4 +4,4 @@ The code in this folder is an adapted, refactored version of `Indexer` class and
 
 The original code by Ryan Stringham can be found here: https://github.com/stringham/move-ts
 
-His method for finding files and their dependencies within a repo was way faster than my original effort, and his code taught me a lot about using the TypeScript AST to navigate code in a file.
+His method for finding files and their dependencies within a repo was way faster than my original effort.

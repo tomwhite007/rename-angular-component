@@ -202,27 +202,20 @@ export async function rename(
 
         /* TODO - big steps left...
 
-
-
-        add icon + design
-
-        probably need assets path config for webpack
-
-
-
         Prep for publish:
 
-        update main readme
+          update main readme...
+            add issues and link to them
 
-        add icon / images / animation
+          make repo public & submit extension
 
-        update changelog
+          update changelog
 
-        add additional stuff in package json - keywords etc
+
 
         ---- v2 -----
 
-
+        refactor into classes
 
         replace selector references in (make config option):
           spec

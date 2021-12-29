@@ -8,6 +8,9 @@ export async function findReplaceSelectorsInTemplateFiles(
   newSelector: string,
   userMessage: UserMessage
 ) {
+  if (originalSelector === newSelector) {
+    return;
+  }
   const uris = await workspace.findFiles(
     '**/*.html',
     '**/node_modules/**',

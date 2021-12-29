@@ -202,7 +202,9 @@ export async function rename(
               userMessage
             );
           } else {
-            throw new Error('selectorTransfer not set');
+            throw new Error(
+              "Selector edit not found. Couldn't amend selector."
+            );
           }
         }
 
@@ -253,13 +255,23 @@ export async function rename(
           `${title} completed in ${renameTime} seconds`,
         ]);
         await timeoutPause(50);
-      } catch (e) {
+      } catch (e: any) {
+        const raiseIssueMsgs = [
+          `If it looks like a new issue, I'd welcome you raising it here: [${EXTENSION_NAME} Issues](https://github.com/tomwhite007/rename-angular-component/issues)`,
+          `If it looks like an existing issue, I'd appreciate it if you'd +1 it on Github to chivvy me along`,
+        ];
+
+        const msg: string = e.message;
+        if (msg.startsWith('Class Name') || msg.startsWith('Selector')) {
+          userMessage.logInfoToChannel(['', msg, ...raiseIssueMsgs]);
+          return;
+        }
+
         console.log('error in extension.ts', e);
         userMessage.logInfoToChannel([
           `Sorry, an error occurred during the ${title} process`,
           `I recommend reverting the changes made if there are any`,
-          `If it looks like a new issue, I'd welcome you raising it here: [${EXTENSION_NAME} Issues](https://github.com/tomwhite007/rename-angular-component/issues)`,
-          `If it looks like an existing issue, I'd appreciate it if you'd +1 it on Github to chivvy me along`,
+          ...raiseIssueMsgs,
         ]);
       }
     }

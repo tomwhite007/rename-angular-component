@@ -23,6 +23,7 @@ import * as path from 'path';
 import { UserMessage } from './logging/user-message.class';
 import { EXTENSION_NAME } from './definitions/extension-name';
 import { noSelectedFileHandler } from './no-selected-file-handler/no-selected-file-handler.function';
+import { getOriginalClassName } from './in-file-edits/get-original-class-name.function';
 
 export async function rename(
   construct: AngularConstruct,
@@ -131,9 +132,14 @@ export async function rename(
           return;
         }
 
-        const oldClassName = `${pascalCase(
-          originalFileDetails.stub
-        )}${pascalCase(construct)}`;
+        const coreFilePath = filesToMove.find(
+          (f) => f.isCoreConstruct
+        )?.filePath;
+        const oldClassName = await getOriginalClassName(
+          originalFileDetails.stub,
+          coreFilePath as string,
+          construct
+        );
         const newClassName = `${pascalCase(newStub)}${pascalCase(construct)}`;
 
         const selectorTransfer = new SelectorTransfer();

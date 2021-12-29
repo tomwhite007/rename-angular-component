@@ -54,4 +54,6 @@ Currently, there are no config options for this first release. But there are ple
 
 Initial release of extension
 
----
+### 1.0.1
+
+Bug fix: Discover original Class Name rather than predict it

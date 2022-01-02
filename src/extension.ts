@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
-import { rename } from './rename-angular-component/rename.function';
+
 import { ReferenceIndexer } from './move-ts-indexer/reference-indexer';
 import { UserMessage } from './rename-angular-component/logging/user-message.class';
 import { EXTENSION_NAME } from './rename-angular-component/definitions/extension-name';
+import { Renamer } from './rename-angular-component/renamer.class';
 
 export function activate(context: vscode.ExtensionContext) {
   const indexStart = Date.now();
@@ -32,34 +33,23 @@ export function activate(context: vscode.ExtensionContext) {
   };
 
   const initialisePromise = initialise();
+  const renamer = new Renamer(indexer, initialisePromise, userMessage);
 
   let renameComponent = vscode.commands.registerCommand(
     'rename-angular-component.renameComponent',
-    async (uri: vscode.Uri) =>
-      // TODO: remove when no direct debug process is needed
-      // {
-      //   const filePath =
-      //     '/Users/tom/Development/dng/dgx-sales-spa-dev2/libs/sales/feature-appliance-details/src/lib/appliance-details/appliance-details.component.spec.ts';
-
-      //   const testText = await fs.readFileAsync(filePath, 'utf8');
-
-      //   getClassNameEdits(filePath, testText);
-      // }
-      rename('component', uri, indexer, initialisePromise, userMessage)
+    async (uri: vscode.Uri) => renamer.rename('component', uri)
   );
   context.subscriptions.push(renameComponent);
 
   let renameDirective = vscode.commands.registerCommand(
     'rename-angular-component.renameDirective',
-    (uri: vscode.Uri) =>
-      rename('directive', uri, indexer, initialisePromise, userMessage)
+    (uri: vscode.Uri) => renamer.rename('directive', uri)
   );
   context.subscriptions.push(renameDirective);
 
   let renameService = vscode.commands.registerCommand(
     'rename-angular-component.renameService',
-    (uri: vscode.Uri) =>
-      rename('service', uri, indexer, initialisePromise, userMessage)
+    (uri: vscode.Uri) => renamer.rename('service', uri)
   );
   context.subscriptions.push(renameService);
 }

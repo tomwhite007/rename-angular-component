@@ -75,7 +75,7 @@ export class Renamer {
 
           await this.indexerMoveJobs(progress);
 
-          this.updateSelectorsInTemplates();
+          await this.updateSelectorsInTemplates();
 
           /* TODO 
  

@@ -57,3 +57,7 @@ Initial release of extension
 ### 1.0.1
 
 Bug fix: Discover original Class Name rather than predict it
+
+### 1.0.2
+
+Feature: Add optional debug log to file for issue creation

@@ -301,6 +301,7 @@ export class Renamer {
     );
     if (getConfig('debugLog', false)) {
       this.debugLogToFile = debugLogger(this.projectRoot);
+      this.debugLogToFile('## Debug Process Start ##');
     }
 
     if (checkForOpenUnsavedEditors()) {

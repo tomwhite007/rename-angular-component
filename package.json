@@ -82,7 +82,7 @@
       "properties": {
         "renameAngularComponent.debugLog": {
           "type": "boolean",
-          "default": true,
+          "default": false,
           "description": "Create debug log file to submit with new issue post"
         }
       }

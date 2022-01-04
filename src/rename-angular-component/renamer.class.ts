@@ -52,7 +52,10 @@ export class Renamer {
   ) {}
 
   async rename(_construct: AngularConstruct, selectedUri: vscode.Uri) {
-    await this.setRenameDetails(_construct, selectedUri);
+    const detailsLoaded = await this.setRenameDetails(_construct, selectedUri);
+    if (!detailsLoaded) {
+      return;
+    }
 
     await vscode.window.withProgress(
       {
@@ -120,6 +123,9 @@ export class Renamer {
             '',
             `${this.title} completed in ${renameTime} seconds`,
           ]);
+          if (this.debugLogToFile) {
+            this.debugLogToFile('## Debug Process Completed ##');
+          }
           await timeoutPause(50);
         } catch (e: any) {
           this.reportErrors(e);

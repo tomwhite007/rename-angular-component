@@ -6,7 +6,7 @@ import {
   GenericEdit,
 } from '../../move-ts-indexer/apply-generic-edits';
 import { AngularConstruct } from '../definitions/file.interfaces';
-import { generateNewSelector } from './generate-new-selector.funtion';
+import { generateNewSelector } from './generate-new-selector.function';
 
 interface FoundItem {
   itemType: 'class' | 'selector' | 'templateUrl' | 'styleUrls';
@@ -27,7 +27,8 @@ export function getCoreClassEdits(
   originalFileStub: string,
   newFileStub: string,
   construct: AngularConstruct,
-  selectorTransfer: SelectorTransfer
+  selectorTransfer: SelectorTransfer,
+  debugLogToFile?: (...args: string[]) => void
 ): GenericEditsCallback {
   return (fileName: string, sourceText: string) => {
     const foundItems = getCoreClassFoundItems(
@@ -37,6 +38,15 @@ export function getCoreClassEdits(
       newClassName,
       construct
     );
+
+    if (debugLogToFile) {
+      debugLogToFile(
+        '',
+        'getCoreClassFoundItems:',
+        JSON.stringify(foundItems),
+        ''
+      );
+    }
 
     return foundItems
       .map((foundItem) => {
@@ -69,6 +79,10 @@ export function getCoreClassEdits(
 
         if (replacement === foundItem.itemText) {
           return null;
+        }
+
+        if (debugLogToFile) {
+          debugLogToFile('replacement: ' + replacement);
         }
 
         return {

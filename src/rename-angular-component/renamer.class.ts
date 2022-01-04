@@ -76,30 +76,32 @@ export class Renamer {
 
           /* TODO 
  
+          logger:
+          add new line and confirm no overwrite
+          test in windows
  
- 
-        ---- v2 -----
- 
-        fix numbers in string to camel case; remove underscore?
- 
-        refactor into classes
- 
-        replace selector references in (make config option):
-          spec
-          story and stories files
- 
- 
-        handle open editors
-          looks like reference indexer, replaceReferences() already can - need same for core class file
-            apply edits in dirty editor?
- 
-        fix up / remove tsmove conf() configuration
- 
-        make sure input newStub matches constraints and formatting allowed by CLI
- 
-        refactor for clean classes, functions and pure async await
- 
-        ---- v3 -----
+          ---- v2 -----
+  
+          fix numbers in string to camel case; remove underscore?
+  
+          refactor into classes
+  
+          replace selector references in (make config option):
+            spec
+            story and stories files
+  
+  
+          handle open editors
+            looks like reference indexer, replaceReferences() already can - need same for core class file
+              apply edits in dirty editor?
+  
+          fix up / remove tsmove conf() configuration
+  
+          make sure input newStub matches constraints and formatting allowed by CLI
+  
+          refactor for clean classes, functions and pure async await
+  
+          ---- v3 -----
         */
 
           // delete original folder
@@ -157,7 +159,6 @@ export class Renamer {
 
         if (this.debugLogToFile) {
           this.debugLogToFile(
-            '',
             'oldSelector: ' + this.selectorTransfer.oldSelector,
             'newSelector: ' + this.selectorTransfer.newSelector
           );
@@ -230,7 +231,6 @@ export class Renamer {
 
     if (this.debugLogToFile) {
       this.debugLogToFile(
-        '',
         'renameFolder: ' + this.renameFolder,
         '',
         'filesToMove: ',
@@ -246,7 +246,6 @@ export class Renamer {
 
       if (this.debugLogToFile) {
         this.debugLogToFile(
-          '',
           'l.exists(): Not allowed to overwrite existing files'
         );
       }

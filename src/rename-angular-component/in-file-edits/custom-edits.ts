@@ -40,12 +40,7 @@ export function getCoreClassEdits(
     );
 
     if (debugLogToFile) {
-      debugLogToFile(
-        '',
-        'getCoreClassFoundItems:',
-        JSON.stringify(foundItems),
-        ''
-      );
+      debugLogToFile('getCoreClassFoundItems:', JSON.stringify(foundItems), '');
     }
 
     return foundItems

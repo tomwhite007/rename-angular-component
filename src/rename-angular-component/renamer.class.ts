@@ -79,6 +79,9 @@ export class Renamer {
           logger:
           add new line and confirm no overwrite
           test in windows
+
+          click away from enter new stub causes error message in Output
+          Also reuses state from last Rename process!
  
           ---- v2 -----
   

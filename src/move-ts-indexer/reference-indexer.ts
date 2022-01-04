@@ -64,6 +64,7 @@ export class ReferenceIndexer {
   index: ReferenceIndex = new ReferenceIndex();
   isinitialised: boolean = false;
   changeDocumentEvent!: vscode.Disposable;
+  debugLogToFile?: (...args: string[]) => void;
 
   private tsconfigs!: { [key: string]: any };
   private output!: vscode.OutputChannel;
@@ -143,30 +144,6 @@ export class ReferenceIndexer {
   }
 
   startNewMoves(moves: FileItem[]) {
-    // this.output.appendLine(
-    //   '--------------------------------------------------'
-    // );
-    // this.output.appendLine(`Moving:`);
-    // for (let i = 0; i < moves.length; i++) {
-    //   this.output.appendLine(
-    //     `           ${moves[i].sourcePath} -> ${moves[i].targetPath}`
-    //   );
-    // }
-    // this.output.appendLine(
-    //   '--------------------------------------------------'
-    // );
-
-    this.output.appendLine('Files changed:');
-  }
-
-  startNewMove(from: string, to: string) {
-    this.output.appendLine(
-      '--------------------------------------------------'
-    );
-    this.output.appendLine(`Moving ${from} -> ${to}`);
-    this.output.appendLine(
-      '--------------------------------------------------'
-    );
     this.output.appendLine('Files changed:');
   }
 
@@ -565,6 +542,13 @@ export class ReferenceIndexer {
       );
     });
     return Promise.all(promises).catch((e) => {
+      if (this.debugLogToFile) {
+        this.debugLogToFile(
+          '',
+          'updateImports error',
+          JSON.stringify(e, Object.getOwnPropertyNames(e))
+        );
+      }
       console.log(e);
     });
   }

@@ -66,7 +66,7 @@ export class ReferenceIndexer {
   changeDocumentEvent!: vscode.Disposable;
   debugLogToFile?: (...args: string[]) => void;
 
-  private tsconfigs!: { [key: string]: any };
+  private tsConfigs!: { [key: string]: ConfigInfo };
   private output!: vscode.OutputChannel;
   private packageNames: { [key: string]: string } = {};
   private extensions: string[] = ['.ts'];
@@ -80,13 +80,19 @@ export class ReferenceIndexer {
     this.index = new ReferenceIndex();
 
     return this.readPackageNames().then(() => {
-      console.log('tsconfigs:', this.tsconfigs);
+      if (this.debugLogToFile) {
+        this.debugLogToFile('tsConfigs: ', JSON.stringify(this.tsConfigs));
+      }
+
       return this.scanAll(progress)
         .then(() => {
           return this.attachFileWatcher();
         })
         .then(() => {
           console.log('indexer initialised');
+          if (this.debugLogToFile) {
+            this.debugLogToFile('indexer initialised');
+          }
           this.isinitialised = true;
         });
     });
@@ -98,61 +104,78 @@ export class ReferenceIndexer {
       .get<T>(property, defaultValue);
   }
 
-  private readPackageNames(): Thenable<any> {
+  private async readPackageNames() {
     this.packageNames = {};
-    this.tsconfigs = {};
+    this.tsConfigs = {};
     let seenPackageNames: { [key: string]: boolean } = {};
-    const packagePromise = vscode.workspace
-      .findFiles('**/package.json', '**/node_modules/**', 1000)
-      .then((files) => {
-        const promises = files.map((file) => {
-          return fs.readFileAsync(file.fsPath, 'utf-8').then((content) => {
-            try {
-              let json = JSON.parse(content);
-              if (json.name) {
-                if (seenPackageNames[json.name]) {
-                  delete this.packageNames[json.name];
-                  return;
-                }
-                seenPackageNames[json.name] = true;
-                this.packageNames[json.name] = path.dirname(file.fsPath);
-              }
-            } catch (e) {}
-          });
-        });
-        return Promise.all(promises);
-      });
-    const tsConfigPromise = vscode.workspace
-      .findFiles('**/tsconfig{.json,.build.json}', '**/node_modules/**', 1000)
-      .then((files) => {
-        console.log(files);
-        const promises = files.map((file) => {
-          return fs
-            .readFileAsync(file.fsPath, 'utf-8')
-            .then(async (content) => {
-              try {
-                const config = await this.parseExtendedTsConfigToJson(
-                  file.fsPath,
-                  content
-                );
-                if (config.config) {
-                  this.tsconfigs[file.fsPath] = config.config;
-                  console.log('add to tsconfigs', file.fsPath);
-                }
-              } catch (e) {}
-            });
-        });
-        return Promise.all(promises);
-      });
-    return Promise.all([packagePromise, tsConfigPromise]);
+
+    const packageFiles = await vscode.workspace.findFiles(
+      '**/package.json',
+      '**/node_modules/**',
+      1000
+    );
+
+    for (const packageFile of packageFiles) {
+      const content = await fs.readFileAsync(packageFile.fsPath, 'utf-8');
+      try {
+        let json = JSON.parse(content);
+        if (json.name) {
+          if (seenPackageNames[json.name]) {
+            delete this.packageNames[json.name];
+            return;
+          }
+          seenPackageNames[json.name] = true;
+          this.packageNames[json.name] = path.dirname(packageFile.fsPath);
+        }
+      } catch (e) {}
+    }
+
+    const configFiles = await vscode.workspace.findFiles(
+      '**/tsconfig{.json,.build.json}',
+      '**/node_modules/**',
+      1000
+    );
+
+    if (this.debugLogToFile) {
+      this.debugLogToFile(
+        'tsConfig files found: ',
+        JSON.stringify(configFiles)
+      );
+    }
+
+    for (const configFile of configFiles) {
+      const content = await fs.readFileAsync(configFile.fsPath, 'utf-8');
+
+      try {
+        const config = await this.parseExtendedTsConfigToJson(
+          configFile.fsPath,
+          content
+        );
+
+        if (config.config) {
+          this.tsConfigs[configFile.fsPath] = config;
+        }
+      } catch (e: any) {
+        console.warn('Load config files error: ', e);
+        if (this.debugLogToFile) {
+          this.debugLogToFile('Load config files error: ', e.message);
+        }
+      }
+    }
   }
 
   startNewMoves(moves: FileItem[]) {
     this.output.appendLine('Files changed:');
   }
 
-  private async parseExtendedTsConfigToJson(filePath: string, content: string) {
-    let config = ts.parseConfigFileTextToJson(filePath, content);
+  private async parseExtendedTsConfigToJson(
+    filePath: string,
+    content: string
+  ): Promise<ConfigInfo> {
+    let config: ConfigInfo = {
+      config: ts.parseConfigFileTextToJson(filePath, content).config,
+      configPath: filePath,
+    };
     if (config.config.extends) {
       config = await this.extendedConfigInfo({
         config: config.config,
@@ -179,6 +202,7 @@ export class ReferenceIndexer {
 
     const merged = this.mergeConfigs(extenderConfigInfo, baseConfigInfo);
     if (baseConfigInfo.config.extends) {
+      merged.config.extends = baseConfigInfo.config.extends;
       if (this.debugLogToFile) {
         this.debugLogToFile(
           'recurse next level of extension:',
@@ -865,7 +889,6 @@ export class ReferenceIndexer {
   }
 
   private getTsConfig(filePath: string): ConfigInfo | null {
-    console.log('## getTsConfig ##');
     let prevDir = filePath;
     let dir = path.dirname(filePath);
     while (dir !== prevDir) {
@@ -874,14 +897,11 @@ export class ReferenceIndexer {
         path.join(dir, 'tsconfig.build.json'),
       ];
       const tsConfigPath = tsConfigPaths.find((p) =>
-        this.tsconfigs.hasOwnProperty(p)
+        this.tsConfigs.hasOwnProperty(p)
       );
 
       if (tsConfigPath) {
-        return {
-          config: this.tsconfigs[tsConfigPath],
-          configPath: tsConfigPath,
-        };
+        return this.tsConfigs[tsConfigPath];
       }
       prevDir = dir;
       dir = path.dirname(dir);

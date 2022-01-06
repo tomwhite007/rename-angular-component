@@ -35,7 +35,9 @@ _Example - Changes to an element selector in a parent template:_
 
 ## Extension Settings
 
-Currently, there are no config options for this first release. But there are plenty coming soon.
+This extension contributes the following settings:
+
+- `renameAngularComponent.debugLog`: enable/disable debug logging to file for optional submission with new issue posts
 
 ## Known Issues
 

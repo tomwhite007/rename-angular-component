@@ -80,6 +80,7 @@ export class ReferenceIndexer {
     this.index = new ReferenceIndex();
 
     return this.readPackageNames().then(() => {
+      console.log('tsconfigs:', this.tsconfigs);
       return this.scanAll(progress)
         .then(() => {
           return this.attachFileWatcher();
@@ -122,21 +123,24 @@ export class ReferenceIndexer {
         return Promise.all(promises);
       });
     const tsConfigPromise = vscode.workspace
-      .findFiles(
-        '**/tsconfig{.json,.build.json,.base.json}',
-        '**/node_modules/**',
-        1000
-      )
+      .findFiles('**/tsconfig{.json,.build.json}', '**/node_modules/**', 1000)
       .then((files) => {
+        console.log(files);
         const promises = files.map((file) => {
-          return fs.readFileAsync(file.fsPath, 'utf-8').then((content) => {
-            try {
-              const config = ts.parseConfigFileTextToJson(file.fsPath, content);
-              if (config.config) {
-                this.tsconfigs[file.fsPath] = config.config;
-              }
-            } catch (e) {}
-          });
+          return fs
+            .readFileAsync(file.fsPath, 'utf-8')
+            .then(async (content) => {
+              try {
+                const config = await this.parseExtendedTsConfigToJson(
+                  file.fsPath,
+                  content
+                );
+                if (config.config) {
+                  this.tsconfigs[file.fsPath] = config.config;
+                  console.log('add to tsconfigs', file.fsPath);
+                }
+              } catch (e) {}
+            });
         });
         return Promise.all(promises);
       });
@@ -145,6 +149,68 @@ export class ReferenceIndexer {
 
   startNewMoves(moves: FileItem[]) {
     this.output.appendLine('Files changed:');
+  }
+
+  private async parseExtendedTsConfigToJson(filePath: string, content: string) {
+    let config = ts.parseConfigFileTextToJson(filePath, content);
+    if (config.config.extends) {
+      config = await this.extendedConfigInfo({
+        config: config.config,
+        configPath: filePath,
+      });
+    }
+    return config;
+  }
+
+  private async extendedConfigInfo(
+    extenderConfigInfo: ConfigInfo
+  ): Promise<ConfigInfo> {
+    const configDir = path.dirname(extenderConfigInfo.configPath);
+    const baseConfigPath = path.join(
+      configDir,
+      extenderConfigInfo.config.extends as string
+    );
+
+    const baseContent = await fs.readFileAsync(baseConfigPath, 'utf-8');
+    const baseConfigInfo: ConfigInfo = {
+      config: ts.parseConfigFileTextToJson(baseConfigPath, baseContent).config,
+      configPath: baseConfigPath,
+    };
+
+    const merged = this.mergeConfigs(extenderConfigInfo, baseConfigInfo);
+    if (baseConfigInfo.config.extends) {
+      if (this.debugLogToFile) {
+        this.debugLogToFile(
+          'recurse next level of extension:',
+          baseConfigInfo.config.extends
+        );
+      }
+      // recurse next level of extension
+      return this.extendedConfigInfo(merged);
+    } else {
+      return merged;
+    }
+  }
+
+  private mergeConfigs(
+    extenderConfigInfo: ConfigInfo,
+    baseConfigInfo: ConfigInfo
+  ): ConfigInfo {
+    return {
+      config: {
+        ...extenderConfigInfo.config,
+        compilerOptions: {
+          ...baseConfigInfo.config?.compilerOptions,
+          ...extenderConfigInfo.config.compilerOptions,
+          // TODO: work out if paths needs to merge and how extender's need to adapt
+          paths: baseConfigInfo.config?.compilerOptions?.paths,
+          // TODO: work out what happens with two base urls and base's paths
+          baseUrl: baseConfigInfo.config?.compilerOptions?.baseUrl,
+        },
+        extends: undefined,
+      },
+      configPath: baseConfigInfo.configPath,
+    };
   }
 
   private readonly filesToScanGlob = '**/*.ts';
@@ -799,78 +865,28 @@ export class ReferenceIndexer {
   }
 
   private getTsConfig(filePath: string): ConfigInfo | null {
+    console.log('## getTsConfig ##');
     let prevDir = filePath;
     let dir = path.dirname(filePath);
     while (dir !== prevDir) {
       const tsConfigPaths = [
         path.join(dir, 'tsconfig.json'),
         path.join(dir, 'tsconfig.build.json'),
-        path.join(dir, 'tsconfig.base.json'),
       ];
       const tsConfigPath = tsConfigPaths.find((p) =>
         this.tsconfigs.hasOwnProperty(p)
       );
 
       if (tsConfigPath) {
-        const configInfo = {
+        return {
           config: this.tsconfigs[tsConfigPath],
           configPath: tsConfigPath,
         };
-
-        if (configInfo.config.extends) {
-          return this.extendedConfigInfo(configInfo);
-        }
-
-        return configInfo;
       }
       prevDir = dir;
       dir = path.dirname(dir);
     }
     return null;
-  }
-
-  private extendedConfigInfo(extenderConfigInfo: ConfigInfo): ConfigInfo {
-    const configDir = path.dirname(extenderConfigInfo.configPath);
-    const baseConfigPath = path.join(
-      configDir,
-      extenderConfigInfo.config.extends as string
-    );
-
-    if (this.tsconfigs.hasOwnProperty(baseConfigPath)) {
-      const baseConfigInfo: ConfigInfo = {
-        config: this.tsconfigs[baseConfigPath],
-        configPath: baseConfigPath,
-      };
-      const merged = this.mergeConfigs(extenderConfigInfo, baseConfigInfo);
-      if (baseConfigInfo.config.extends) {
-        // recurse next level of extension
-        return this.extendedConfigInfo(merged);
-      }
-      return merged;
-    } else {
-      return extenderConfigInfo;
-    }
-  }
-
-  private mergeConfigs(
-    extenderConfigInfo: ConfigInfo,
-    baseConfigInfo: ConfigInfo
-  ): ConfigInfo {
-    return {
-      config: {
-        ...extenderConfigInfo.config,
-        compilerOptions: {
-          ...baseConfigInfo.config?.compilerOptions,
-          ...extenderConfigInfo.config.compilerOptions,
-          // TODO: work out if paths needs to merge and how extender's need to adapt
-          paths: baseConfigInfo.config?.compilerOptions.paths,
-          // TODO: work out what happens with two base urls and base's paths
-          baseUrl: baseConfigInfo.config?.compilerOptions.baseUrl,
-        },
-        extends: undefined,
-      },
-      configPath: baseConfigInfo.configPath,
-    };
   }
 
   private getRelativeImportSpecifiers(

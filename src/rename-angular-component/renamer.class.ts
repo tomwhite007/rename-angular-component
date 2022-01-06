@@ -79,33 +79,23 @@ export class Renamer {
 
           /* TODO 
  
-          logger:
-          add new line and confirm no overwrite
-          test in windows
+          Identify Max's repo issue
 
-          click away from enter new stub causes error message in Output
-          Also reuses state from last Rename process!
- 
+          bug: SCSS file ./ import affected by move process see Shop - basket-item-old component after rename
+
           ---- v2 -----
   
-          fix numbers in string to camel case; remove underscore?
-  
-          refactor into classes
-  
-          replace selector references in (make config option):
-            spec
-            story and stories files
-  
-  
-          handle open editors
-            looks like reference indexer, replaceReferences() already can - need same for core class file
-              apply edits in dirty editor?
-  
-          fix up / remove tsmove conf() configuration
+          limit rename selector in templates to current workspace multi-folder root
   
           make sure input newStub matches constraints and formatting allowed by CLI
+
+          fix numbers in string to camel case; remove underscore?
+
+          Issue: renaming import paths in Lazy Loaded Routes
   
           refactor for clean classes, functions and pure async await
+  
+          fix up / remove tsmove conf() configuration
   
           ---- v3 -----
         */

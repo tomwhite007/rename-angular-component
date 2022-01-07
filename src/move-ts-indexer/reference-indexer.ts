@@ -15,7 +15,6 @@ import {
   GenericEditsCallback,
 } from './apply-generic-edits';
 import * as minimatch from 'minimatch';
-import { config } from 'bluebird';
 
 const BATCH_SIZE = 50;
 
@@ -64,25 +63,23 @@ export class ReferenceIndexer {
   index: ReferenceIndex = new ReferenceIndex();
   isinitialised: boolean = false;
   changeDocumentEvent!: vscode.Disposable;
-  debugLogToFile?: (...args: string[]) => void;
 
   private tsConfigs!: { [key: string]: ConfigInfo };
-  private output!: vscode.OutputChannel;
   private packageNames: { [key: string]: string } = {};
   private extensions: string[] = ['.ts'];
   private fileWatcher!: vscode.FileSystemWatcher;
 
-  constructor(output: vscode.OutputChannel) {
-    this.output = output;
-  }
+  constructor(
+    private output: vscode.OutputChannel,
+    private debugLogger: { log: (...args: string[]) => void }
+  ) {}
 
   init(progress?: vscode.Progress<{ message: string }>): Thenable<any> {
+    this.debugLogger.log('## Debug Indexer Start ###');
     this.index = new ReferenceIndex();
 
     return this.readPackageNames().then(() => {
-      if (this.debugLogToFile) {
-        this.debugLogToFile('tsConfigs: ', JSON.stringify(this.tsConfigs));
-      }
+      this.debugLogger.log('tsConfigs: ', JSON.stringify(this.tsConfigs));
 
       return this.scanAll(progress)
         .then(() => {
@@ -90,10 +87,9 @@ export class ReferenceIndexer {
         })
         .then(() => {
           console.log('indexer initialised');
-          if (this.debugLogToFile) {
-            this.debugLogToFile('indexer initialised');
-          }
           this.isinitialised = true;
+
+          this.debugLogger.log('## Debug Indexer End ###');
         });
     });
   }
@@ -127,7 +123,13 @@ export class ReferenceIndexer {
           seenPackageNames[json.name] = true;
           this.packageNames[json.name] = path.dirname(packageFile.fsPath);
         }
-      } catch (e) {}
+      } catch (e) {
+        console.warn('Load package files error: ', e);
+        this.debugLogger.log(
+          'Load package files error: ',
+          JSON.stringify(e, Object.getOwnPropertyNames(e))
+        );
+      }
     }
 
     const configFiles = await vscode.workspace.findFiles(
@@ -136,12 +138,7 @@ export class ReferenceIndexer {
       1000
     );
 
-    if (this.debugLogToFile) {
-      this.debugLogToFile(
-        'tsConfig files found: ',
-        JSON.stringify(configFiles)
-      );
-    }
+    this.debugLogger.log('tsConfig files found: ', JSON.stringify(configFiles));
 
     for (const configFile of configFiles) {
       const content = await fs.readFileAsync(configFile.fsPath, 'utf-8');
@@ -157,9 +154,10 @@ export class ReferenceIndexer {
         }
       } catch (e: any) {
         console.warn('Load config files error: ', e);
-        if (this.debugLogToFile) {
-          this.debugLogToFile('Load config files error: ', e.message);
-        }
+        this.debugLogger.log(
+          'Load config files error: ',
+          JSON.stringify(e, Object.getOwnPropertyNames(e))
+        );
       }
     }
   }
@@ -203,12 +201,11 @@ export class ReferenceIndexer {
     const merged = this.mergeConfigs(extenderConfigInfo, baseConfigInfo);
     if (baseConfigInfo.config.extends) {
       merged.config.extends = baseConfigInfo.config.extends;
-      if (this.debugLogToFile) {
-        this.debugLogToFile(
-          'recurse next level of extension:',
-          baseConfigInfo.config.extends
-        );
-      }
+      this.debugLogger.log(
+        'recurse next level of extension:',
+        baseConfigInfo.config.extends
+      );
+
       // recurse next level of extension
       return this.extendedConfigInfo(merged);
     } else {
@@ -632,13 +629,11 @@ export class ReferenceIndexer {
       );
     });
     return Promise.all(promises).catch((e) => {
-      if (this.debugLogToFile) {
-        this.debugLogToFile(
-          '',
-          'updateImports error',
-          JSON.stringify(e, Object.getOwnPropertyNames(e))
-        );
-      }
+      this.debugLogger.log(
+        'updateImports error',
+        JSON.stringify(e, Object.getOwnPropertyNames(e))
+      );
+
       console.log(e);
     });
   }

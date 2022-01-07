@@ -4,12 +4,16 @@ import { ReferenceIndexer } from './move-ts-indexer/reference-indexer';
 import { UserMessage } from './rename-angular-component/logging/user-message.class';
 import { EXTENSION_NAME } from './rename-angular-component/definitions/extension-name';
 import { Renamer } from './rename-angular-component/renamer.class';
+import { DebugLogger } from './rename-angular-component/logging/debug-logger.class';
+import { getConfig } from './rename-angular-component/definitions/getConfig.function';
 
 export function activate(context: vscode.ExtensionContext) {
+  const debugLogger = new DebugLogger(getConfig('debugLog', false));
   const indexStart = Date.now();
   const userMessage = new UserMessage(EXTENSION_NAME);
   const indexer: ReferenceIndexer = new ReferenceIndexer(
-    userMessage.outputChannel
+    userMessage.outputChannel,
+    debugLogger
   );
 
   const initWithProgress = () => {
@@ -33,7 +37,12 @@ export function activate(context: vscode.ExtensionContext) {
   };
 
   const initialisePromise = initialise();
-  const renamer = new Renamer(indexer, initialisePromise, userMessage);
+  const renamer = new Renamer(
+    indexer,
+    initialisePromise,
+    userMessage,
+    debugLogger
+  );
 
   let renameComponent = vscode.commands.registerCommand(
     'rename-angular-component.renameComponent',

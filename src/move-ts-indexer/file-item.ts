@@ -3,7 +3,7 @@ import * as fs from 'fs-extra-promise';
 import * as path from 'path';
 
 import { ReferenceIndexer } from './reference-indexer';
-import { GenericEdit, GenericEditsCallback } from './apply-generic-edits';
+import { GenericEditsCallback } from './apply-generic-edits';
 
 export class FileItem {
   constructor(

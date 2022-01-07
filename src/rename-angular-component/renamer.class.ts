@@ -24,8 +24,7 @@ import { UserMessage } from './logging/user-message.class';
 import { EXTENSION_NAME } from './definitions/extension-name';
 import { noSelectedFileHandler } from './no-selected-file-handler/no-selected-file-handler.function';
 import { getOriginalClassName } from './in-file-edits/get-original-class-name.function';
-import { getConfig } from './definitions/getConfig.function';
-import { debugLogger } from './logging/debug-logger.function';
+import { DebugLogger } from './logging/debug-logger.class';
 
 const timeoutPause = async (wait = 0) => {
   await new Promise((res) => setTimeout(res, wait));
@@ -43,17 +42,23 @@ export class Renamer {
   private renameFolder!: boolean;
   private fileMoveJobs!: FileItem[];
   private selectorTransfer!: SelectorTransfer;
-  private debugLogToFile?: (...args: string[]) => void;
 
   constructor(
     private indexer: ReferenceIndexer,
     private indexerInitialisePromise: Thenable<any>,
-    private userMessage: UserMessage
+    private userMessage: UserMessage,
+    private debugLogger: DebugLogger
   ) {}
 
   async rename(_construct: AngularConstruct, selectedUri: vscode.Uri) {
+    this.debugLogger.log('## Debug Rename Start ##');
+
     const detailsLoaded = await this.setRenameDetails(_construct, selectedUri);
     if (!detailsLoaded) {
+      this.debugLogger.log(
+        'setRenameDetails returned false, stopping.',
+        '## Debug Rename End ##'
+      );
       return;
     }
 
@@ -78,34 +83,22 @@ export class Renamer {
           await this.updateSelectorsInTemplates();
 
           /* TODO 
- 
-          logger:
-          add new line and confirm no overwrite
-          test in windows
 
-          click away from enter new stub causes error message in Output
-          Also reuses state from last Rename process!
- 
+          bug: SCSS file ./ import affected by move process see Shop - basket-item-old component after rename
+
           ---- v2 -----
   
-          fix numbers in string to camel case; remove underscore?
-  
-          refactor into classes
-  
-          replace selector references in (make config option):
-            spec
-            story and stories files
-  
-  
-          handle open editors
-            looks like reference indexer, replaceReferences() already can - need same for core class file
-              apply edits in dirty editor?
-  
-          fix up / remove tsmove conf() configuration
+          limit rename selector in templates to current workspace multi-folder root
   
           make sure input newStub matches constraints and formatting allowed by CLI
+
+          fix numbers in string to camel case; remove underscore?
+
+          Issue: renaming import paths in Lazy Loaded Routes
   
           refactor for clean classes, functions and pure async await
+  
+          fix up / remove tsmove conf() configuration
   
           ---- v3 -----
         */
@@ -123,9 +116,9 @@ export class Renamer {
             '',
             `${this.title} completed in ${renameTime} seconds`,
           ]);
-          if (this.debugLogToFile) {
-            this.debugLogToFile('## Debug Process Completed ##');
-          }
+
+          this.debugLogger.log('## Debug Rename Completed ##');
+
           await timeoutPause(50);
         } catch (e: any) {
           this.reportErrors(e);
@@ -166,12 +159,10 @@ export class Renamer {
           this.userMessage
         );
 
-        if (this.debugLogToFile) {
-          this.debugLogToFile(
-            'oldSelector: ' + this.selectorTransfer.oldSelector,
-            'newSelector: ' + this.selectorTransfer.newSelector
-          );
-        }
+        this.debugLogger.log(
+          'oldSelector: ' + this.selectorTransfer.oldSelector,
+          'newSelector: ' + this.selectorTransfer.newSelector
+        );
       } else {
         throw new Error("Selector edit not found. Couldn't amend selector.");
       }
@@ -222,8 +213,7 @@ export class Renamer {
                 this.originalFileDetails.stub,
                 this.newStub,
                 this.construct,
-                this.selectorTransfer,
-                this.debugLogToFile
+                this.selectorTransfer
               ))()
           : undefined,
       };
@@ -238,26 +228,23 @@ export class Renamer {
       );
     });
 
-    if (this.debugLogToFile) {
-      this.debugLogToFile(
-        'renameFolder: ' + this.renameFolder,
-        '',
-        'filesToMove: ',
-        JSON.stringify(filesToMove),
-        '',
-        'fileMoveJobs: ',
-        JSON.stringify(this.fileMoveJobs)
-      );
-    }
+    this.debugLogger.log(
+      'renameFolder: ' + this.renameFolder,
+      '',
+      'filesToMove: ',
+      JSON.stringify(filesToMove),
+      '',
+      'fileMoveJobs: ',
+      JSON.stringify(this.fileMoveJobs)
+    );
 
     if (this.fileMoveJobs.some((l) => l.exists())) {
       vscode.window.showErrorMessage('Not allowed to overwrite existing files');
 
-      if (this.debugLogToFile) {
-        this.debugLogToFile(
-          'l.exists(): Not allowed to overwrite existing files'
-        );
-      }
+      this.debugLogger.log(
+        'l.exists(): Not allowed to overwrite existing files'
+      );
+
       return false;
     }
     return true;
@@ -275,93 +262,96 @@ export class Renamer {
       return;
     }
 
-    console.log('error in extension.ts', e);
+    console.log('error in Renamer:', e);
     this.userMessage.logInfoToChannel([
       `Sorry, an error occurred during the ${this.title} process`,
       `I recommend reverting the changes made if there are any`,
       ...raiseIssueMsgs,
     ]);
+    this.debugLogger.log(
+      'Renamer error: ',
+      JSON.stringify(e, Object.getOwnPropertyNames(e))
+    );
   }
 
   private async setRenameDetails(
     _construct: AngularConstruct,
     selectedUri: vscode.Uri
   ): Promise<boolean> {
-    this.construct = _construct;
-    this.title = `Rename Angular ${pascalCase(this.construct)}`;
+    try {
+      this.construct = _construct;
+      this.title = `Rename Angular ${pascalCase(this.construct)}`;
 
-    // Handle if called from command menu
-    if (!selectedUri) {
-      const userEntered = await noSelectedFileHandler(
-        this.construct,
-        this.title,
-        this.userMessage
+      // Handle if called from command menu
+      if (!selectedUri) {
+        const userEntered = await noSelectedFileHandler(
+          this.construct,
+          this.title,
+          this.userMessage
+        );
+        if (userEntered) {
+          selectedUri = userEntered;
+        } else {
+          return false;
+        }
+      }
+
+      this.originalFileDetails = getOriginalFileDetails(selectedUri.path);
+      this.projectRoot = windowsFilePathFix(
+        getProjectRoot(selectedUri) as string
       );
-      if (userEntered) {
-        selectedUri = userEntered;
-      } else {
+      this.debugLogger.setWorkspaceRoot(this.projectRoot);
+
+      if (checkForOpenUnsavedEditors()) {
+        this.userMessage.popupMessage(
+          `Please save any edits before using ${this.title}`
+        );
         return false;
       }
-    }
 
-    this.originalFileDetails = getOriginalFileDetails(selectedUri.path);
-    this.projectRoot = windowsFilePathFix(
-      getProjectRoot(selectedUri) as string
-    );
-    if (getConfig('debugLog', false)) {
-      this.debugLogToFile = debugLogger(this.projectRoot);
-      this.debugLogToFile('## Debug Process Start ##');
-    }
+      const inputResult = await vscode.window.showInputBox({
+        title: this.title,
+        prompt: `Enter the new ${this.construct} name.`,
+        value: this.originalFileDetails.stub,
+      });
+      this.processTimerStart = Date.now();
 
-    if (checkForOpenUnsavedEditors()) {
-      this.userMessage.popupMessage(
-        `Please save any edits before using ${this.title}`
+      if (!inputResult) {
+        this.userMessage.popupMessage(
+          `New ${this.construct} name not entered. Stopped.`
+        );
+        return false;
+      }
+      if (this.originalFileDetails.stub === inputResult) {
+        this.userMessage.popupMessage(
+          `${pascalCase(this.construct)} name same as original. Stopped.`
+        );
+        return false;
+      }
+      if (!inputResult.match(/^[a-z0-9-_]*$/i)) {
+        this.userMessage.popupMessage(
+          `Currently only supports letters, numbers, dashes and underscore in the new name.`
+        );
+        return false;
+      }
+      // make sure it's kebab
+      this.newStub = paramCase(inputResult ?? '');
+
+      this.userMessage.setOperationTitle(this.title);
+
+      // wait for indexer initialise to complete
+      const indexTime = await this.indexerInitialisePromise;
+      this.userMessage.logInfoToChannel(
+        [
+          `Index files completed in ${
+            Math.round(indexTime * 100) / 100
+          } seconds`,
+          '',
+        ],
+        false
       );
-      return false;
-    }
 
-    const inputResult = await vscode.window.showInputBox({
-      title: this.title,
-      prompt: `Enter the new ${this.construct} name.`,
-      value: this.originalFileDetails.stub,
-    });
-    this.processTimerStart = Date.now();
-
-    if (!inputResult) {
-      this.userMessage.popupMessage(
-        `New ${this.construct} name not entered. Stopped.`
-      );
-      return false;
-    }
-    if (this.originalFileDetails.stub === inputResult) {
-      this.userMessage.popupMessage(
-        `${pascalCase(this.construct)} name same as original. Stopped.`
-      );
-      return false;
-    }
-    if (!inputResult.match(/^[a-z0-9-_]*$/i)) {
-      this.userMessage.popupMessage(
-        `Currently only supports letters, numbers, dashes and underscore in the new name.`
-      );
-      return false;
-    }
-    // make sure it's kebab
-    this.newStub = paramCase(inputResult ?? '');
-
-    this.userMessage.setOperationTitle(this.title);
-
-    // wait for indexer initialise to complete
-    const indexTime = await this.indexerInitialisePromise;
-    this.userMessage.logInfoToChannel(
-      [
-        `Index files completed in ${Math.round(indexTime * 100) / 100} seconds`,
-        '',
-      ],
-      false
-    );
-
-    if (this.debugLogToFile) {
-      this.debugLogToFile(
+      this.debugLogger.log(
         'projectRoot: ' + this.projectRoot,
         '',
         'originalFileDetails:',
@@ -371,8 +361,15 @@ export class Renamer {
         '',
         'newStub: ' + this.newStub
       );
-    }
 
-    return true;
+      return true;
+    } catch (e: any) {
+      console.warn('setRenameDetails error: ', e);
+      this.debugLogger.log(
+        'setRenameDetails error: ',
+        JSON.stringify(e, Object.getOwnPropertyNames(e))
+      );
+      return false;
+    }
   }
 }

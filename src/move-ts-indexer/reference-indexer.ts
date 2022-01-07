@@ -15,7 +15,6 @@ import {
   GenericEditsCallback,
 } from './apply-generic-edits';
 import * as minimatch from 'minimatch';
-import { config } from 'bluebird';
 
 const BATCH_SIZE = 50;
 
@@ -64,22 +63,24 @@ export class ReferenceIndexer {
   index: ReferenceIndex = new ReferenceIndex();
   isinitialised: boolean = false;
   changeDocumentEvent!: vscode.Disposable;
-  debugLogToFile?: (...args: string[]) => void;
 
-  private tsconfigs!: { [key: string]: any };
-  private output!: vscode.OutputChannel;
+  private tsConfigs!: { [key: string]: ConfigInfo };
   private packageNames: { [key: string]: string } = {};
   private extensions: string[] = ['.ts'];
   private fileWatcher!: vscode.FileSystemWatcher;
 
-  constructor(output: vscode.OutputChannel) {
-    this.output = output;
-  }
+  constructor(
+    private output: vscode.OutputChannel,
+    private debugLogger: { log: (...args: string[]) => void }
+  ) {}
 
   init(progress?: vscode.Progress<{ message: string }>): Thenable<any> {
+    this.debugLogger.log('## Debug Indexer Start ###');
     this.index = new ReferenceIndex();
 
     return this.readPackageNames().then(() => {
+      this.debugLogger.log('tsConfigs: ', JSON.stringify(this.tsConfigs));
+
       return this.scanAll(progress)
         .then(() => {
           return this.attachFileWatcher();
@@ -87,6 +88,8 @@ export class ReferenceIndexer {
         .then(() => {
           console.log('indexer initialised');
           this.isinitialised = true;
+
+          this.debugLogger.log('## Debug Indexer End ###');
         });
     });
   }
@@ -97,54 +100,138 @@ export class ReferenceIndexer {
       .get<T>(property, defaultValue);
   }
 
-  private readPackageNames(): Thenable<any> {
+  private async readPackageNames() {
     this.packageNames = {};
-    this.tsconfigs = {};
+    this.tsConfigs = {};
     let seenPackageNames: { [key: string]: boolean } = {};
-    const packagePromise = vscode.workspace
-      .findFiles('**/package.json', '**/node_modules/**', 1000)
-      .then((files) => {
-        const promises = files.map((file) => {
-          return fs.readFileAsync(file.fsPath, 'utf-8').then((content) => {
-            try {
-              let json = JSON.parse(content);
-              if (json.name) {
-                if (seenPackageNames[json.name]) {
-                  delete this.packageNames[json.name];
-                  return;
-                }
-                seenPackageNames[json.name] = true;
-                this.packageNames[json.name] = path.dirname(file.fsPath);
-              }
-            } catch (e) {}
-          });
-        });
-        return Promise.all(promises);
-      });
-    const tsConfigPromise = vscode.workspace
-      .findFiles(
-        '**/tsconfig{.json,.build.json,.base.json}',
-        '**/node_modules/**',
-        1000
-      )
-      .then((files) => {
-        const promises = files.map((file) => {
-          return fs.readFileAsync(file.fsPath, 'utf-8').then((content) => {
-            try {
-              const config = ts.parseConfigFileTextToJson(file.fsPath, content);
-              if (config.config) {
-                this.tsconfigs[file.fsPath] = config.config;
-              }
-            } catch (e) {}
-          });
-        });
-        return Promise.all(promises);
-      });
-    return Promise.all([packagePromise, tsConfigPromise]);
+
+    const packageFiles = await vscode.workspace.findFiles(
+      '**/package.json',
+      '**/node_modules/**',
+      1000
+    );
+
+    for (const packageFile of packageFiles) {
+      const content = await fs.readFileAsync(packageFile.fsPath, 'utf-8');
+      try {
+        let json = JSON.parse(content);
+        if (json.name) {
+          if (seenPackageNames[json.name]) {
+            delete this.packageNames[json.name];
+            return;
+          }
+          seenPackageNames[json.name] = true;
+          this.packageNames[json.name] = path.dirname(packageFile.fsPath);
+        }
+      } catch (e) {
+        console.warn('Load package files error: ', e);
+        this.debugLogger.log(
+          'Load package files error: ',
+          JSON.stringify(e, Object.getOwnPropertyNames(e))
+        );
+      }
+    }
+
+    const configFiles = await vscode.workspace.findFiles(
+      '**/tsconfig{.json,.build.json}',
+      '**/node_modules/**',
+      1000
+    );
+
+    this.debugLogger.log('tsConfig files found: ', JSON.stringify(configFiles));
+
+    for (const configFile of configFiles) {
+      const content = await fs.readFileAsync(configFile.fsPath, 'utf-8');
+
+      try {
+        const config = await this.parseExtendedTsConfigToJson(
+          configFile.fsPath,
+          content
+        );
+
+        if (config.config) {
+          this.tsConfigs[configFile.fsPath] = config;
+        }
+      } catch (e: any) {
+        console.warn('Load config files error: ', e);
+        this.debugLogger.log(
+          'Load config files error: ',
+          JSON.stringify(e, Object.getOwnPropertyNames(e))
+        );
+      }
+    }
   }
 
   startNewMoves(moves: FileItem[]) {
     this.output.appendLine('Files changed:');
+  }
+
+  private async parseExtendedTsConfigToJson(
+    filePath: string,
+    content: string
+  ): Promise<ConfigInfo> {
+    let config: ConfigInfo = {
+      config: ts.parseConfigFileTextToJson(filePath, content).config,
+      configPath: filePath,
+    };
+    if (config.config.extends) {
+      config = await this.extendedConfigInfo({
+        config: config.config,
+        configPath: filePath,
+      });
+    }
+    return config;
+  }
+
+  private async extendedConfigInfo(
+    extenderConfigInfo: ConfigInfo
+  ): Promise<ConfigInfo> {
+    const configDir = path.dirname(extenderConfigInfo.configPath);
+    const baseConfigPath = path.join(
+      configDir,
+      extenderConfigInfo.config.extends as string
+    );
+
+    const baseContent = await fs.readFileAsync(baseConfigPath, 'utf-8');
+    const baseConfigInfo: ConfigInfo = {
+      config: ts.parseConfigFileTextToJson(baseConfigPath, baseContent).config,
+      configPath: baseConfigPath,
+    };
+
+    const merged = this.mergeConfigs(extenderConfigInfo, baseConfigInfo);
+    if (baseConfigInfo.config.extends) {
+      merged.config.extends = baseConfigInfo.config.extends;
+      this.debugLogger.log(
+        'recurse next level of extension:',
+        baseConfigInfo.config.extends
+      );
+
+      // recurse next level of extension
+      return this.extendedConfigInfo(merged);
+    } else {
+      return merged;
+    }
+  }
+
+  private mergeConfigs(
+    extenderConfigInfo: ConfigInfo,
+    baseConfigInfo: ConfigInfo
+  ): ConfigInfo {
+    return {
+      config: {
+        ...extenderConfigInfo.config,
+        compilerOptions: {
+          ...baseConfigInfo.config?.compilerOptions,
+          ...extenderConfigInfo.config.compilerOptions,
+          // TODO: work out if paths needs to merge and how extender's need to adapt
+          paths: baseConfigInfo.config?.compilerOptions?.paths,
+          // TODO: work out what happens with two base urls and base's paths
+          baseUrl: baseConfigInfo.config?.compilerOptions?.baseUrl,
+        },
+        extends: undefined,
+      },
+      configPath: baseConfigInfo.configPath,
+    };
   }
 
   private readonly filesToScanGlob = '**/*.ts';
@@ -542,13 +629,11 @@ export class ReferenceIndexer {
       );
     });
     return Promise.all(promises).catch((e) => {
-      if (this.debugLogToFile) {
-        this.debugLogToFile(
-          '',
-          'updateImports error',
-          JSON.stringify(e, Object.getOwnPropertyNames(e))
-        );
-      }
+      this.debugLogger.log(
+        'updateImports error',
+        JSON.stringify(e, Object.getOwnPropertyNames(e))
+      );
+
       console.log(e);
     });
   }
@@ -805,72 +890,18 @@ export class ReferenceIndexer {
       const tsConfigPaths = [
         path.join(dir, 'tsconfig.json'),
         path.join(dir, 'tsconfig.build.json'),
-        path.join(dir, 'tsconfig.base.json'),
       ];
       const tsConfigPath = tsConfigPaths.find((p) =>
-        this.tsconfigs.hasOwnProperty(p)
+        this.tsConfigs.hasOwnProperty(p)
       );
 
       if (tsConfigPath) {
-        const configInfo = {
-          config: this.tsconfigs[tsConfigPath],
-          configPath: tsConfigPath,
-        };
-
-        if (configInfo.config.extends) {
-          return this.extendedConfigInfo(configInfo);
-        }
-
-        return configInfo;
+        return this.tsConfigs[tsConfigPath];
       }
       prevDir = dir;
       dir = path.dirname(dir);
     }
     return null;
-  }
-
-  private extendedConfigInfo(extenderConfigInfo: ConfigInfo): ConfigInfo {
-    const configDir = path.dirname(extenderConfigInfo.configPath);
-    const baseConfigPath = path.join(
-      configDir,
-      extenderConfigInfo.config.extends as string
-    );
-
-    if (this.tsconfigs.hasOwnProperty(baseConfigPath)) {
-      const baseConfigInfo: ConfigInfo = {
-        config: this.tsconfigs[baseConfigPath],
-        configPath: baseConfigPath,
-      };
-      const merged = this.mergeConfigs(extenderConfigInfo, baseConfigInfo);
-      if (baseConfigInfo.config.extends) {
-        // recurse next level of extension
-        return this.extendedConfigInfo(merged);
-      }
-      return merged;
-    } else {
-      return extenderConfigInfo;
-    }
-  }
-
-  private mergeConfigs(
-    extenderConfigInfo: ConfigInfo,
-    baseConfigInfo: ConfigInfo
-  ): ConfigInfo {
-    return {
-      config: {
-        ...extenderConfigInfo.config,
-        compilerOptions: {
-          ...baseConfigInfo.config?.compilerOptions,
-          ...extenderConfigInfo.config.compilerOptions,
-          // TODO: work out if paths needs to merge and how extender's need to adapt
-          paths: baseConfigInfo.config?.compilerOptions.paths,
-          // TODO: work out what happens with two base urls and base's paths
-          baseUrl: baseConfigInfo.config?.compilerOptions.baseUrl,
-        },
-        extends: undefined,
-      },
-      configPath: baseConfigInfo.configPath,
-    };
   }
 
   private getRelativeImportSpecifiers(

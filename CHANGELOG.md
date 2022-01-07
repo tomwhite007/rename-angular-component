@@ -17,3 +17,7 @@
 
 - Feature: Add optional debug log to file for issue creation
 - Refactor: Migrate Renamer code into class
+
+### [1.0.3] - 2022-01-07
+
+Bug fix: SCSS file './' type @imports affected by move process

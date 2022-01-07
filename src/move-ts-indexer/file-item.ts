@@ -31,20 +31,26 @@ export class FileItem {
 
       await index.updateMovedDir(this.sourcePath, this.targetPath);
     } else {
-      await index.updateImports(
-        this.sourcePath,
-        this.targetPath,
-        this.originalClassName,
-        this.additionalEdits?.importsEdits
-      );
+      if (this.sourcePath.endsWith('.ts')) {
+        await index.updateImports(
+          this.sourcePath,
+          this.targetPath,
+          this.originalClassName,
+          this.additionalEdits?.importsEdits
+        );
+      } else {
+        console.log('NO updateImports for: ', this.sourcePath);
+      }
 
       await fs.renameAsync(this.sourcePath, this.targetPath);
 
-      await index.updateMovedFile(
-        this.sourcePath,
-        this.targetPath,
-        this.additionalEdits?.movedFileEdits
-      );
+      if (this.sourcePath.endsWith('.ts')) {
+        await index.updateMovedFile(
+          this.sourcePath,
+          this.targetPath,
+          this.additionalEdits?.movedFileEdits
+        );
+      }
     }
   }
 

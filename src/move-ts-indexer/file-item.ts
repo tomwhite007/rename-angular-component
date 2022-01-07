@@ -1,4 +1,3 @@
-import * as Promise from 'bluebird';
 import * as fs from 'fs-extra-promise';
 import * as path from 'path';
 
@@ -22,50 +21,31 @@ export class FileItem {
     return fs.existsSync(this.targetPath);
   }
 
-  public move(index: ReferenceIndexer): Promise<FileItem> {
-    return this.ensureDir()
-      .then(() => {
-        if (this.isDir) {
-          return index
-            .updateDirImports(this.sourcePath, this.targetPath)
-            .then(() => {
-              return fs.renameAsync(this.sourcePath, this.targetPath);
-            })
-            .then(() => {
-              return index.updateMovedDir(this.sourcePath, this.targetPath);
-            })
-            .then(() => {
-              return this;
-            });
-        } else {
-          return index
-            .updateImports(
-              this.sourcePath,
-              this.targetPath,
-              this.originalClassName,
-              this.additionalEdits?.importsEdits
-            )
-            .then(() => {
-              return fs.renameAsync(this.sourcePath, this.targetPath);
-            })
-            .then(() => {
-              return index.updateMovedFile(
-                this.sourcePath,
-                this.targetPath,
-                this.additionalEdits?.movedFileEdits
-              );
-            })
-            .then(() => {
-              return this;
-            });
-        }
-      })
-      .then((): any => {
-        return this;
-      })
-      .catch((e) => {
-        console.log('error in move', e);
-      });
+  public async move(index: ReferenceIndexer) {
+    await this.ensureDir();
+
+    if (this.isDir) {
+      await index.updateDirImports(this.sourcePath, this.targetPath);
+
+      await fs.renameAsync(this.sourcePath, this.targetPath);
+
+      await index.updateMovedDir(this.sourcePath, this.targetPath);
+    } else {
+      await index.updateImports(
+        this.sourcePath,
+        this.targetPath,
+        this.originalClassName,
+        this.additionalEdits?.importsEdits
+      );
+
+      await fs.renameAsync(this.sourcePath, this.targetPath);
+
+      await index.updateMovedFile(
+        this.sourcePath,
+        this.targetPath,
+        this.additionalEdits?.movedFileEdits
+      );
+    }
   }
 
   private ensureDir(): Promise<any> {

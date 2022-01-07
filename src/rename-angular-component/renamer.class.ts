@@ -83,8 +83,6 @@ export class Renamer {
           await this.updateSelectorsInTemplates();
 
           /* TODO 
- 
-          Fix logging to debug file before file path is known
 
           bug: SCSS file ./ import affected by move process see Shop - basket-item-old component after rename
 
@@ -264,12 +262,16 @@ export class Renamer {
       return;
     }
 
-    console.log('error in extension.ts', e);
+    console.log('error in Renamer:', e);
     this.userMessage.logInfoToChannel([
       `Sorry, an error occurred during the ${this.title} process`,
       `I recommend reverting the changes made if there are any`,
       ...raiseIssueMsgs,
     ]);
+    this.debugLogger.log(
+      'Renamer error: ',
+      JSON.stringify(e, Object.getOwnPropertyNames(e))
+    );
   }
 
   private async setRenameDetails(

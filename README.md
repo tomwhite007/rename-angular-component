@@ -63,3 +63,7 @@ Bug fix: Discover original Class Name rather than predict it
 ### 1.0.2
 
 Feature: Add optional debug log to file for issue creation
+
+### 1.0.3
+
+Bug fix: SCSS file './' type @imports affected by move process

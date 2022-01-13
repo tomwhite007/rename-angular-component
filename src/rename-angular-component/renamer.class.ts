@@ -83,10 +83,10 @@ export class Renamer {
           await this.updateSelectorsInTemplates();
 
           /* TODO 
-
-          bug: SCSS file ./ import affected by move process see Shop - basket-item-old component after rename
-
           ---- v2 -----
+
+          add option to fix selector + use default prefix
+          then ask for prefix if default not ticked
   
           limit rename selector in templates to current workspace multi-folder root
   
@@ -328,7 +328,8 @@ export class Renamer {
       }
       if (!validateHtmlSelector('app-' + dasherize(inputResult))) {
         this.userMessage.popupMessage(
-          `Please enter a name that formats to a valid Selector name. Stopped.`
+          `Please enter a name that formats to a valid Selector name (W3C standards). \n
+          Must start name with a letter, then letters, numbers, full stop, dash or underscore, ending with a letter or number.`
         );
         return false;
       }

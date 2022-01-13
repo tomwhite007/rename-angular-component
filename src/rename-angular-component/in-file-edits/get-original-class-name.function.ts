@@ -1,14 +1,14 @@
-import { pascalCase } from 'change-case';
 import * as ts from 'typescript';
 import { AngularConstruct } from '../definitions/file.interfaces';
 import * as fs from 'fs-extra-promise';
+import { classify } from '../../angular-cli/strings';
 
 export async function getOriginalClassName(
   stub: string,
   filepath: string,
   construct: AngularConstruct
 ) {
-  const expectedOldClassName = `${pascalCase(stub)}${pascalCase(construct)}`;
+  const expectedOldClassName = `${classify(stub)}${classify(construct)}`;
   const sourceText = await fs.readFileAsync(filepath, 'utf-8');
 
   const file = ts.createSourceFile(
@@ -19,7 +19,7 @@ export async function getOriginalClassName(
 
   const classNamesFound: string[] = [];
   const decoratorName =
-    construct === 'service' ? 'Injectable' : pascalCase(construct);
+    construct === 'service' ? 'Injectable' : classify(construct);
 
   for (const node of file.statements) {
     // get class

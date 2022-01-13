@@ -1,4 +1,4 @@
-import { camelCase, paramCase } from 'change-case';
+import { camelize, dasherize } from '../../angular-cli/strings';
 import { getSelectorType } from './get-selector-type.function';
 
 export function generateNewSelector(
@@ -19,11 +19,11 @@ export function generateNewSelector(
       break;
     case 'attribute':
       newSelector =
-        '[' + camelCase(paramCase(oldSelector).replace(stub, newStub)) + ']';
+        '[' + camelize(dasherize(oldSelector).replace(stub, newStub)) + ']';
       break;
     case 'class':
       newSelector =
-        '.' + camelCase(paramCase(oldSelector).replace(stub, newStub));
+        '.' + camelize(dasherize(oldSelector).replace(stub, newStub));
       break;
   }
 

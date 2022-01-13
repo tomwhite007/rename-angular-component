@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import { pascalCase } from 'pascal-case';
 import {
   AngularConstruct,
   OriginalFileDetails,
@@ -8,7 +7,6 @@ import { getProjectRoot } from './definitions/get-project-root-file-path.functio
 import { ReferenceIndexer } from '../move-ts-indexer/reference-indexer';
 import { FileItem } from '../move-ts-indexer/file-item';
 import * as fs from 'fs-extra-promise';
-import { paramCase } from 'change-case';
 import { getOriginalFileDetails } from './in-file-edits/get-original-file-details.function';
 import { windowsFilePathFix } from './file-manipulation/windows-file-path-fix.function';
 import { FilesRelatedToStub } from './file-manipulation/files-related-to-stub.class';
@@ -18,13 +16,15 @@ import {
   getCoreClassEdits,
   SelectorTransfer,
 } from './in-file-edits/custom-edits';
-import { checkForOpenUnsavedEditors } from './window/check-for-open-unsaved-editors.funtion';
+import { checkForOpenUnsavedEditors } from './window/check-for-open-unsaved-editors.function';
 import * as path from 'path';
 import { UserMessage } from './logging/user-message.class';
 import { EXTENSION_NAME } from './definitions/extension-name';
 import { noSelectedFileHandler } from './no-selected-file-handler/no-selected-file-handler.function';
 import { getOriginalClassName } from './in-file-edits/get-original-class-name.function';
 import { DebugLogger } from './logging/debug-logger.class';
+import { validateHtmlSelector } from '../angular-cli/validation';
+import { classify, dasherize } from '../angular-cli/strings';
 
 const timeoutPause = async (wait = 0) => {
   await new Promise((res) => setTimeout(res, wait));
@@ -83,10 +83,10 @@ export class Renamer {
           await this.updateSelectorsInTemplates();
 
           /* TODO 
-
-          bug: SCSS file ./ import affected by move process see Shop - basket-item-old component after rename
-
           ---- v2 -----
+
+          add option to fix selector + use default prefix
+          then ask for prefix if default not ticked
   
           limit rename selector in templates to current workspace multi-folder root
   
@@ -193,9 +193,7 @@ export class Renamer {
       coreFilePath as string,
       this.construct
     );
-    const newClassName = `${pascalCase(this.newStub)}${pascalCase(
-      this.construct
-    )}`;
+    const newClassName = `${classify(this.newStub)}${classify(this.construct)}`;
 
     this.selectorTransfer = new SelectorTransfer();
 
@@ -280,7 +278,7 @@ export class Renamer {
   ): Promise<boolean> {
     try {
       this.construct = _construct;
-      this.title = `Rename Angular ${pascalCase(this.construct)}`;
+      this.title = `Rename Angular ${classify(this.construct)}`;
 
       // Handle if called from command menu
       if (!selectedUri) {
@@ -324,18 +322,19 @@ export class Renamer {
       }
       if (this.originalFileDetails.stub === inputResult) {
         this.userMessage.popupMessage(
-          `${pascalCase(this.construct)} name same as original. Stopped.`
+          `${classify(this.construct)} name same as original. Stopped.`
         );
         return false;
       }
-      if (!inputResult.match(/^[a-z0-9-_]*$/i)) {
+      if (!validateHtmlSelector('app-' + dasherize(inputResult))) {
         this.userMessage.popupMessage(
-          `Currently only supports letters, numbers, dashes and underscore in the new name.`
+          `Please enter a name that formats to a valid Selector name (W3C standards). \n
+          Must start name with a letter, then letters, numbers, full stop, dash or underscore, ending with a letter or number.`
         );
         return false;
       }
       // make sure it's kebab
-      this.newStub = paramCase(inputResult ?? '');
+      this.newStub = dasherize(inputResult ?? '');
 
       this.userMessage.setOperationTitle(this.title);
 

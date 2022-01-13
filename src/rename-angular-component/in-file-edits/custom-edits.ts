@@ -1,6 +1,6 @@
-import { pascalCase } from 'change-case';
 import escapeStringRegexp from 'escape-string-regexp';
 import * as ts from 'typescript';
+import { classify } from '../../angular-cli/strings';
 import {
   GenericEditsCallback,
   GenericEdit,
@@ -128,7 +128,7 @@ function getCoreClassFoundItems(
           'styleUrls',
         ];
 
-        const decoratorName = pascalCase(construct);
+        const decoratorName = classify(construct);
 
         // get decorator props for decoratorName
         node.decorators?.find((decorator: ts.Decorator) => {

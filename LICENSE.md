@@ -1,8 +1,9 @@
 MIT License
 
-Copyright (c) 2021 Tom White
+Copyright (c) 2021-2022 Tom White
 
-`/move-ts-indexer` original copyright (c) 2017 Ryan Stringham
+Folder: `/move-ts-indexer` original copyright (c) 2017 Ryan Stringham
+Folder: `/angular-cli` original copyright 2010-2021 Google LLC. http://angular.io/license
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

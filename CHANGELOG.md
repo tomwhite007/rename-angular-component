@@ -20,4 +20,9 @@
 
 ### [1.0.3] - 2022-01-07
 
-Bug fix: SCSS file './' type @imports affected by move process
+- Bug fix: SCSS file './' type @imports affected by move process
+- Bug fix: multi level inheritance in tsconfigs to pick up paths and baseUrl
+
+### [1.0.4] - 2022-01-13
+
+- Refactor: Use Angular CLI's own validation and string-case manipulation functions for Component name

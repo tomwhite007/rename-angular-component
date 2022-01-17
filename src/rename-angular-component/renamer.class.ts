@@ -144,13 +144,25 @@ export class Renamer {
     await timeoutPause();
     const progressIncrement = Math.floor(70 / this.fileMoveJobs.length);
     let currentProgress = 20;
-    this.indexer.startNewMoves(this.fileMoveJobs);
+    this.userMessage.logInfoToChannel(['File edits:'], false);
+    this.indexer.startNewMoves();
     for (const item of this.fileMoveJobs) {
       currentProgress += progressIncrement;
       progress.report({ increment: currentProgress });
       await timeoutPause(10);
       await item.move(this.indexer);
     }
+    this.logFileEditsToOutput(this.indexer.endNewMoves());
+  }
+
+  private logFileEditsToOutput(files: string[]) {
+    files = files.map(
+      (file) =>
+        this.fileMoveJobs.find((job) => job.sourcePath === file)?.targetPath ??
+        file
+    );
+    files = [...new Set(files.sort())];
+    this.userMessage.logInfoToChannel(files);
   }
 
   private async updateSelectorsInTemplates() {

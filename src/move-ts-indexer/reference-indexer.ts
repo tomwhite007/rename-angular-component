@@ -2,7 +2,6 @@ import * as fs from 'fs-extra-promise';
 import * as path from 'path';
 import * as ts from 'typescript';
 import * as vscode from 'vscode';
-import { FileItem } from './file-item';
 import {
   isPathToAnotherDir,
   mergeReferenceArrays,

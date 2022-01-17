@@ -72,3 +72,7 @@ Bug fix: multi level inheritance in tsconfigs to pick up paths and baseUrl
 ### 1.0.4
 
 Refactor: Use Angular CLI's own validation and string-case manipulation functions for Component name
+
+### 1.0.5
+
+Feature: Improved feedback for unexpected selector

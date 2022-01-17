@@ -2,7 +2,6 @@ import * as fs from 'fs-extra-promise';
 import * as path from 'path';
 import * as ts from 'typescript';
 import * as vscode from 'vscode';
-import { FileItem } from './file-item';
 import {
   isPathToAnotherDir,
   mergeReferenceArrays,
@@ -68,11 +67,9 @@ export class ReferenceIndexer {
   private packageNames: { [key: string]: string } = {};
   private extensions: string[] = ['.ts'];
   private fileWatcher!: vscode.FileSystemWatcher;
+  private fileEditLog: string[] = [];
 
-  constructor(
-    private output: vscode.OutputChannel,
-    private debugLogger: { log: (...args: string[]) => void }
-  ) {}
+  constructor(private debugLogger: { log: (...args: string[]) => void }) {}
 
   init(progress?: vscode.Progress<{ message: string }>): Thenable<any> {
     this.debugLogger.log('## Debug Indexer Start ###');
@@ -162,8 +159,14 @@ export class ReferenceIndexer {
     }
   }
 
-  startNewMoves(moves: FileItem[]) {
-    this.output.appendLine('Files changed:');
+  startNewMoves() {
+    this.fileEditLog = [];
+  }
+
+  endNewMoves() {
+    const files = [...this.fileEditLog];
+    this.fileEditLog = [];
+    return files;
   }
 
   private async parseExtendedTsConfigToJson(
@@ -366,8 +369,7 @@ export class ReferenceIndexer {
 
         let newText = applyGenericEdits(text, edits);
 
-        this.output.show();
-        this.output.appendLine(filePath);
+        this.fileEditLog.push(filePath);
 
         return fs.writeFileAsync(filePath, newText, 'utf-8').then(() => {
           this.processFile(newText, filePath, true);
@@ -401,8 +403,7 @@ export class ReferenceIndexer {
             );
           });
           if (edits.length > 0) {
-            this.output.show();
-            this.output.appendLine(filePath);
+            this.fileEditLog.push(filePath);
             const edit = new vscode.WorkspaceEdit();
             edit.set(doc.uri, edits);
             return attemptEdit(edit).then(() => {
@@ -642,7 +643,6 @@ export class ReferenceIndexer {
     affectedFiles: Reference[],
     exportedNameToChange?: string
   ) {
-    // WHY IS exportedNameToChange EMPTY!!!???
     if (!exportedNameToChange) {
       return affectedFiles;
     }
@@ -949,6 +949,8 @@ export class ReferenceIndexer {
           });
         }
       }
+
+      // TODO: add import STATEMENT HANDLER HERE
     });
 
     return result;

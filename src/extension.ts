@@ -11,10 +11,7 @@ export function activate(context: vscode.ExtensionContext) {
   const debugLogger = new DebugLogger(getConfig('debugLog', false));
   const indexStart = Date.now();
   const userMessage = new UserMessage(EXTENSION_NAME);
-  const indexer: ReferenceIndexer = new ReferenceIndexer(
-    userMessage.outputChannel,
-    debugLogger
-  );
+  const indexer: ReferenceIndexer = new ReferenceIndexer(debugLogger);
 
   const initWithProgress = () => {
     return vscode.window.withProgress(

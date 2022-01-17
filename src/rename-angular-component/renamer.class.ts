@@ -83,9 +83,16 @@ export class Renamer {
           await this.updateSelectorsInTemplates();
 
           /* TODO 
+
+          Fix logging of changed files to output. Exclude original filepaths - replace with new.
+
           ---- v2 -----
 
-          add option to fix selector + use default prefix
+          Add import statements (used by router) to getReferences()
+            work out performance impact, and see if regex check first improves it
+            then possibly turn it into a config option          
+
+          Add option to fix selector + use default prefix
           then ask for prefix if default not ticked
   
           limit rename selector in templates to current workspace multi-folder root
@@ -137,13 +144,25 @@ export class Renamer {
     await timeoutPause();
     const progressIncrement = Math.floor(70 / this.fileMoveJobs.length);
     let currentProgress = 20;
-    this.indexer.startNewMoves(this.fileMoveJobs);
+    this.userMessage.logInfoToChannel(['File edits:'], false);
+    this.indexer.startNewMoves();
     for (const item of this.fileMoveJobs) {
       currentProgress += progressIncrement;
       progress.report({ increment: currentProgress });
       await timeoutPause(10);
       await item.move(this.indexer);
     }
+    this.logFileEditsToOutput(this.indexer.endNewMoves());
+  }
+
+  private logFileEditsToOutput(files: string[]) {
+    files = files.map(
+      (file) =>
+        this.fileMoveJobs.find((job) => job.sourcePath === file)?.targetPath ??
+        file
+    );
+    files = [...new Set(files.sort())];
+    this.userMessage.logInfoToChannel(files);
   }
 
   private async updateSelectorsInTemplates() {
@@ -153,11 +172,23 @@ export class Renamer {
         this.selectorTransfer.oldSelector &&
         this.selectorTransfer.newSelector
       ) {
-        await findReplaceSelectorsInTemplateFiles(
-          this.selectorTransfer.oldSelector,
-          this.selectorTransfer.newSelector,
-          this.userMessage
-        );
+        if (
+          this.selectorTransfer.oldSelector !==
+          this.selectorTransfer.newSelector
+        ) {
+          await findReplaceSelectorsInTemplateFiles(
+            this.selectorTransfer.oldSelector,
+            this.selectorTransfer.newSelector,
+            this.userMessage
+          );
+        } else {
+          this.userMessage.logInfoToChannel([
+            ``,
+            `Original Selector doesn't match naming convention. Unexpected Selector not replaced.`,
+            `There is a feature request to 'Add flow for unexpected Selector'.`,
+            `You can up-vote it here: https://github.com/tomwhite007/rename-angular-component/issues/13`,
+          ]);
+        }
 
         this.debugLogger.log(
           'oldSelector: ' + this.selectorTransfer.oldSelector,
@@ -250,8 +281,8 @@ export class Renamer {
 
   private reportErrors(e: any) {
     const raiseIssueMsgs = [
-      `If it looks like a new issue, I'd welcome you raising it here: [${EXTENSION_NAME} Issues](https://github.com/tomwhite007/rename-angular-component/issues)`,
-      `If it looks like an existing issue, I'd appreciate it if you'd +1 it on Github to chivvy me along`,
+      `If it looks like a new issue, we'd appreciate you raising it here: https://github.com/tomwhite007/rename-angular-component/issues`,
+      `We're actively fixing any bugs reported.`,
     ];
 
     const msg: string = e.message;
@@ -263,7 +294,7 @@ export class Renamer {
     console.log('error in Renamer:', e);
     this.userMessage.logInfoToChannel([
       `Sorry, an error occurred during the ${this.title} process`,
-      `I recommend reverting the changes made if there are any`,
+      `We recommend reverting the changes made if there are any`,
       ...raiseIssueMsgs,
     ]);
     this.debugLogger.log(

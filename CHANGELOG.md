@@ -26,3 +26,7 @@
 ### [1.0.4] - 2022-01-13
 
 - Refactor: Use Angular CLI's own validation and string-case manipulation functions for Component name
+
+### [1.0.5] - 2022-01-17
+
+Feature: Improved feedback for unexpected selector

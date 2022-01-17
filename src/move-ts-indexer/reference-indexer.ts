@@ -642,7 +642,6 @@ export class ReferenceIndexer {
     affectedFiles: Reference[],
     exportedNameToChange?: string
   ) {
-    // WHY IS exportedNameToChange EMPTY!!!???
     if (!exportedNameToChange) {
       return affectedFiles;
     }
@@ -949,6 +948,8 @@ export class ReferenceIndexer {
           });
         }
       }
+
+      // TODO: add import STATEMENT HANDLER HERE
     });
 
     return result;

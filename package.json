@@ -84,6 +84,11 @@
           "type": "boolean",
           "default": false,
           "description": "Create debug log file to submit with new issue post"
+        },
+        "renameAngularComponent.useLocalDirectPaths": {
+          "type": "boolean",
+          "default": true,
+          "description": "Update imports/exports with direct local paths even if wildcard path exists"
         }
       }
     }

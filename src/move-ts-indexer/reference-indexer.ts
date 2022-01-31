@@ -752,6 +752,12 @@ export class ReferenceIndexer {
   }
 
   private getRelativePath(from: string, to: string): string {
+    if (this.conf('useLocalDirectPaths', false)) {
+      const fromDir = path.dirname(from);
+      if (to.startsWith(fromDir)) {
+        return to.replace(fromDir, '.');
+      }
+    }
     const configInfo = this.getTsConfig(from);
     if (configInfo) {
       const config = configInfo.config;
@@ -783,14 +789,6 @@ export class ReferenceIndexer {
         return asUnix(path.join(packageName, path.relative(packagePath, to)));
       }
     }
-    // TODO: validate if doesn't have any future benefit, then remove
-    const relativeToTsConfig = this.conf('relativeToTsconfig', false);
-    if (relativeToTsConfig && configInfo) {
-      const configDir = path.dirname(configInfo.configPath);
-      if (isInDir(configDir, from) && isInDir(configDir, to)) {
-        return asUnix(path.relative(configDir, to));
-      }
-    }
     let relative = path.relative(path.dirname(from), to);
     if (!relative.startsWith('.')) {
       relative = './' + relative;
@@ -806,14 +804,6 @@ export class ReferenceIndexer {
       if (configInfo) {
         const config = configInfo.config;
         const configPath = configInfo.configPath;
-        // TODO: validate if doesn't have any future benefit, then remove
-        const relativeToTsConfig = this.conf('relativeToTsconfig', false);
-        if (relativeToTsConfig && configPath) {
-          const check = path.resolve(path.dirname(configPath), reference);
-          if (this.doesFileExist(check)) {
-            return check;
-          }
-        }
         if (
           config.compilerOptions &&
           config.compilerOptions.paths &&

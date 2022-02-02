@@ -643,6 +643,9 @@ export class ReferenceIndexer {
     affectedFiles: Reference[],
     exportedNameToChange?: string
   ) {
+    if (affectedFiles.length === 0) {
+      return affectedFiles;
+    }
     if (!exportedNameToChange) {
       return affectedFiles;
     }
@@ -929,9 +932,17 @@ export class ReferenceIndexer {
         }
       } else if (ts.isExportDeclaration(node)) {
         if (node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier)) {
+          let specifiers: string[] = [];
+          if (node.exportClause && ts.isNamedExports(node.exportClause)) {
+            specifiers = node.exportClause?.elements.map(
+              (elem) => elem.name.text
+            );
+          }
+
           result.push({
             itemType: 'exportPath',
             itemText: node.moduleSpecifier.text,
+            specifiers,
             location: {
               start: node.moduleSpecifier.getStart(file),
               end: node.moduleSpecifier.getEnd(),
@@ -940,7 +951,7 @@ export class ReferenceIndexer {
         }
       }
 
-      // TODO: add import STATEMENT HANDLER HERE
+      // TODO: add import STATEMENT HANDLER HERE (for router modules)
     });
 
     return result;

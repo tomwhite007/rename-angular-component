@@ -84,6 +84,9 @@ export class Renamer {
 
           /* TODO 
 
+          Class name exported by barrel in same directory fails to update
+          Confirm when file watcher triggers reindex
+
           Fix MD files
             Readme has missing line break for ### 1.0.3
             Changelog has wrong h3 for half of version codes

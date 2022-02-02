@@ -2,6 +2,7 @@ import * as ts from 'typescript';
 import { AngularConstruct } from '../definitions/file.interfaces';
 import * as fs from 'fs-extra-promise';
 import { classify } from '../../angular-cli/strings';
+import { CONSTRUCTS_WITH_SELECTORS } from '../definitions/constructs-with-selectors';
 
 export async function getOriginalClassName(
   stub: string,
@@ -18,8 +19,9 @@ export async function getOriginalClassName(
   );
 
   const classNamesFound: string[] = [];
-  const decoratorName =
-    construct === 'service' ? 'Injectable' : classify(construct);
+  const decoratorName = CONSTRUCTS_WITH_SELECTORS.includes(construct)
+    ? classify(construct)
+    : 'Injectable';
 
   for (const node of file.statements) {
     // get class

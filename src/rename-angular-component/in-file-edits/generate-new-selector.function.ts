@@ -18,8 +18,7 @@ export function generateNewSelector(
       newSelector = oldSelector.replace(stub, newStub);
       break;
     case 'attribute':
-      newSelector =
-        '[' + camelize(dasherize(oldSelector).replace(stub, newStub)) + ']';
+      newSelector = camelize(dasherize(oldSelector).replace(stub, newStub));
       break;
     case 'class':
       newSelector =

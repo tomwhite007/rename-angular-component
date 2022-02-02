@@ -1001,8 +1001,12 @@ export class ReferenceIndexer {
       );
       for (let j = 0; j < this.extensions.length; j++) {
         const ext = this.extensions[j];
-        if (!referenced.endsWith(ext) && fs.existsSync(referenced + ext)) {
-          referenced += ext;
+        if (!referenced.endsWith(ext)) {
+          if (fs.existsSync(referenced + ext)) {
+            referenced += ext;
+          } else if (fs.existsSync(referenced + '/index' + ext)) {
+            referenced += '/index' + ext;
+          }
         }
       }
       this.index.addReference(

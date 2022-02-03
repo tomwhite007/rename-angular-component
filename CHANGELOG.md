@@ -35,3 +35,7 @@
 
 - Feature: Add support for direct, local path replacements when longer wildcard path is available.
 - Feature: Add support for rename Route Guards
+
+## [1.0.7] - 2022-02-03
+
+- Fix: Local Windows file path should be Unix format

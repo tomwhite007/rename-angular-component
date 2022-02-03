@@ -63,6 +63,8 @@ Thanks to you for reading this.
 
 ## Release Notes
 
-Latest version: [1.0.6]
+Latest version: [1.0.7]
 
 Added support for renaming Angular Route Guards.
+Optional local paths when wildcard path is present.
+Fix: Local Windows file path should be Unix format.

@@ -758,7 +758,7 @@ export class ReferenceIndexer {
     if (this.conf('useLocalDirectPaths', false)) {
       const fromDir = path.dirname(from);
       if (to.startsWith(fromDir)) {
-        return to.replace(fromDir, '.');
+        return asUnix(to.replace(fromDir, '.'));
       }
     }
     const configInfo = this.getTsConfig(from);

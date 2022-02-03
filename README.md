@@ -1,5 +1,5 @@
 <h1>
-  <sub><img src="https://cdn.jsdelivr.net/gh/tomwhite007/simple-reactive-viewmodel-example@master/src/assets/rename-angular-component-icon.png" height="40"></sub>
+  <sub><img src="https://cdn.jsdelivr.net/gh/tomwhite007/rename-angular-component@main/assets/rename-angular-component-icon.png" height="40"></sub>
   Rename Angular Component
 </h1>
 
@@ -13,7 +13,7 @@ Click 'Rename Angular Component' and then enter a new name.
 
 The extension converts the text you enter into kebab case for the filename, capital case for the class name, the correct case for the type of selector, and then adds all the existing pre and postfixes back on.
 
-![Rename Angular Component in action](https://cdn.jsdelivr.net/gh/tomwhite007/simple-reactive-viewmodel-example@master/src/assets/rename-angular-component-demo.gif)
+![Rename Angular Component in action](https://cdn.jsdelivr.net/gh/tomwhite007/rename-angular-component@main/assets/rename-angular-component-demo.gif)
 
 ## Features
 
@@ -37,42 +37,32 @@ _Example - Changes to an element selector in a parent template:_
 
 This extension contributes the following settings:
 
-- `renameAngularComponent.debugLog`: enable/disable debug logging to file for optional submission with new issue posts
+- `renameAngularComponent.debugLog`: Enable/disable debug logging to file for optional submission with new issue posts
+- `renameAngularComponent.useLocalDirectPaths`: Update imports/exports with direct local paths even if wildcard path exists"
 
 ## Known Issues
 
-1. [Doesn't support (but will do soon) selector changes inside Inline Templates](https://github.com/tomwhite007/rename-angular-component/issues/5) in:
-   - Component class files
-   - Test spec files
-   - Storybook files
-2. [Doesn't rename other files in the same folder with the same stub / prefix unless they are a sibling](https://github.com/tomwhite007/rename-angular-component/issues/6). Currently, the 2-4 directly associated sibling files do get changed, e.g. \*.component.ts, \*.component.scss, \*.component.html, and \*.component.spec.ts (are directly associated). But this option will be added as a config item soon.
-3. [If you have two components or directives in your repo that have the same selector, this process will currently rename those instances in the html templates as well](https://github.com/tomwhite007/rename-angular-component/issues/7). This will be addressed in a future version.
-4. It won't fix a broken naming convention. [If your sibling files don't match the Angular Style guide filename convention, or your class name or selector don't match the original filename, they won't be changed](https://github.com/tomwhite007/rename-angular-component/issues/8). This will be addressed in a future version as an option.
-5. [Currently doesn't support renaming import paths](https://github.com/tomwhite007/rename-angular-component/issues/9) in [Lazy Loaded Routes](https://angular.io/guide/lazy-loading-ngmodules). This will be added in the next version.
+1. [Support for multi-level and wildcard exports](https://github.com/tomwhite007/rename-angular-component/issues/17)
+1. [Support for Lazy Loaded route import paths](https://github.com/tomwhite007/rename-angular-component/issues/9)
+1. [Option to change same stub / prefix for files that are not CLI siblings](https://github.com/tomwhite007/rename-angular-component/issues/6)
+1. [Support for selector changes inside Inline Templates](https://github.com/tomwhite007/rename-angular-component/issues/5)
+
+## Support
+
+This extension is under active development.
+
+If you have a problem using the extension or you find a bug, please [raise an issue](https://github.com/tomwhite007/rename-angular-component/issues), and we'll get back to you asap.
+
+## Thanks
+
+Thanks to [Max Mumford](https://github.com/maxmumford) for help finding bugs after initial release.
+
+Thanks to [Aristeidis Bampakos](https://github.com/bampakoa) for feature guidance.
+
+Thanks to you for reading this.
 
 ## Release Notes
 
-### 1.0.0
+Latest version: [1.0.6]
 
-Initial release of extension
-
-### 1.0.1
-
-Bug fix: Discover original Class Name rather than predict it
-
-### 1.0.2
-
-Feature: Add optional debug log to file for issue creation
-
-### 1.0.3
-
-Bug fix: SCSS file './' type @imports affected by move process
-Bug fix: multi level inheritance in tsconfigs to pick up paths and baseUrl
-
-### 1.0.4
-
-Refactor: Use Angular CLI's own validation and string-case manipulation functions for Component name
-
-### 1.0.5
-
-Feature: Improved feedback for unexpected selector
+Added support for renaming Angular Route Guards.

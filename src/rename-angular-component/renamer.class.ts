@@ -84,11 +84,7 @@ export class Renamer {
 
           /* TODO 
 
-          Fix MD files
-            Readme has missing line break for ### 1.0.3
-            Changelog has wrong h3 for half of version codes
-            Update known issues
-            Acknowledge Max's help in readme
+
           Release notes: add to repo
 
           ---- v2 -----

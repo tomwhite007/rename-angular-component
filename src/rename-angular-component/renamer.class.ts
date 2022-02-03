@@ -89,6 +89,8 @@ export class Renamer {
 
           ---- v2 -----
 
+          fix wildcard and multi-barrel exports
+
           Add import statements (used by router) to getReferences()
             work out performance impact, and see if regex check first improves it
             then possibly turn it into a config option          

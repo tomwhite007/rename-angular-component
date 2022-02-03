@@ -25,6 +25,7 @@ import { getOriginalClassName } from './in-file-edits/get-original-class-name.fu
 import { DebugLogger } from './logging/debug-logger.class';
 import { validateHtmlSelector } from '../angular-cli/validation';
 import { classify, dasherize } from '../angular-cli/strings';
+import { CONSTRUCTS_WITH_SELECTORS } from './definitions/constructs-with-selectors';
 
 const timeoutPause = async (wait = 0) => {
   await new Promise((res) => setTimeout(res, wait));
@@ -32,7 +33,6 @@ const timeoutPause = async (wait = 0) => {
 };
 
 export class Renamer {
-  readonly constructsWithSelectors = ['component', 'directive'];
   private construct!: AngularConstruct;
   private title!: string;
   private originalFileDetails!: Readonly<OriginalFileDetails>;
@@ -84,9 +84,12 @@ export class Renamer {
 
           /* TODO 
 
-          Fix logging of changed files to output. Exclude original filepaths - replace with new.
+
+          Release notes: add to repo
 
           ---- v2 -----
+
+          fix wildcard and multi-barrel exports
 
           Add import statements (used by router) to getReferences()
             work out performance impact, and see if regex check first improves it
@@ -167,7 +170,7 @@ export class Renamer {
 
   private async updateSelectorsInTemplates() {
     // update selectors for components and directives
-    if (this.constructsWithSelectors.includes(this.construct)) {
+    if (CONSTRUCTS_WITH_SELECTORS.includes(this.construct)) {
       if (
         this.selectorTransfer.oldSelector &&
         this.selectorTransfer.newSelector

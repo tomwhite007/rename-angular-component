@@ -643,6 +643,9 @@ export class ReferenceIndexer {
     affectedFiles: Reference[],
     exportedNameToChange?: string
   ) {
+    if (affectedFiles.length === 0) {
+      return affectedFiles;
+    }
     if (!exportedNameToChange) {
       return affectedFiles;
     }
@@ -752,6 +755,12 @@ export class ReferenceIndexer {
   }
 
   private getRelativePath(from: string, to: string): string {
+    if (this.conf('useLocalDirectPaths', false)) {
+      const fromDir = path.dirname(from);
+      if (to.startsWith(fromDir)) {
+        return to.replace(fromDir, '.');
+      }
+    }
     const configInfo = this.getTsConfig(from);
     if (configInfo) {
       const config = configInfo.config;
@@ -783,14 +792,6 @@ export class ReferenceIndexer {
         return asUnix(path.join(packageName, path.relative(packagePath, to)));
       }
     }
-    // TODO: validate if doesn't have any future benefit, then remove
-    const relativeToTsConfig = this.conf('relativeToTsconfig', false);
-    if (relativeToTsConfig && configInfo) {
-      const configDir = path.dirname(configInfo.configPath);
-      if (isInDir(configDir, from) && isInDir(configDir, to)) {
-        return asUnix(path.relative(configDir, to));
-      }
-    }
     let relative = path.relative(path.dirname(from), to);
     if (!relative.startsWith('.')) {
       relative = './' + relative;
@@ -806,14 +807,6 @@ export class ReferenceIndexer {
       if (configInfo) {
         const config = configInfo.config;
         const configPath = configInfo.configPath;
-        // TODO: validate if doesn't have any future benefit, then remove
-        const relativeToTsConfig = this.conf('relativeToTsconfig', false);
-        if (relativeToTsConfig && configPath) {
-          const check = path.resolve(path.dirname(configPath), reference);
-          if (this.doesFileExist(check)) {
-            return check;
-          }
-        }
         if (
           config.compilerOptions &&
           config.compilerOptions.paths &&
@@ -939,9 +932,17 @@ export class ReferenceIndexer {
         }
       } else if (ts.isExportDeclaration(node)) {
         if (node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier)) {
+          let specifiers: string[] = [];
+          if (node.exportClause && ts.isNamedExports(node.exportClause)) {
+            specifiers = node.exportClause?.elements.map(
+              (elem) => elem.name.text
+            );
+          }
+
           result.push({
             itemType: 'exportPath',
             itemText: node.moduleSpecifier.text,
+            specifiers,
             location: {
               start: node.moduleSpecifier.getStart(file),
               end: node.moduleSpecifier.getEnd(),
@@ -950,7 +951,7 @@ export class ReferenceIndexer {
         }
       }
 
-      // TODO: add import STATEMENT HANDLER HERE
+      // TODO: add import STATEMENT HANDLER HERE (for router modules)
     });
 
     return result;
@@ -1000,8 +1001,12 @@ export class ReferenceIndexer {
       );
       for (let j = 0; j < this.extensions.length; j++) {
         const ext = this.extensions[j];
-        if (!referenced.endsWith(ext) && fs.existsSync(referenced + ext)) {
-          referenced += ext;
+        if (!referenced.endsWith(ext)) {
+          if (fs.existsSync(referenced + ext)) {
+            referenced += ext;
+          } else if (fs.existsSync(referenced + '/index' + ext)) {
+            referenced += '/index' + ext;
+          }
         }
       }
       this.index.addReference(

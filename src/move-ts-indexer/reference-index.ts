@@ -30,6 +30,8 @@ export class ReferenceIndex {
 
   public references: { [key: string]: Reference[] } = {}; // path -> all of the files that it references
 
+  public classExports: { [key: string]: string[] } = {};
+
   public fileCount() {
     return Object.keys(this.references).length;
   }

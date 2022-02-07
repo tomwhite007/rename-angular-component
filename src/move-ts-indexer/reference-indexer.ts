@@ -239,18 +239,22 @@ export class ReferenceIndexer {
 
   private readonly filesToScanGlob = '**/*.ts';
 
-  private scanAll(progress?: vscode.Progress<{ message: string }>) {
+  private async scanAll(progress?: vscode.Progress<{ message: string }>) {
     this.index = new ReferenceIndex();
     const start = Date.now();
-    return vscode.workspace
-      .findFiles(this.filesToScanGlob, '**/node_modules/**', 100000)
-      .then((files) => {
-        return this.processWorkspaceFiles(files, false, progress);
-      })
-      .then(() => {
-        console.log('scan finished in ' + (Date.now() - start) + 'ms');
-        console.log(`Indexed ${this.index.fileCount()} files`);
-      });
+
+    const files = await vscode.workspace.findFiles(
+      this.filesToScanGlob,
+      '**/node_modules/**',
+      100000
+    );
+
+    await this.processWorkspaceFiles(files, false, progress);
+
+    this.fixUpWildcardImports();
+
+    console.log('scan finished in ' + (Date.now() - start) + 'ms');
+    console.log(`Indexed ${this.index.fileCount()} files`);
   }
 
   private attachFileWatcher(): void {
@@ -710,6 +714,95 @@ export class ReferenceIndexer {
     });
   }
 
+  private fixUpWildcardImports() {
+    let emptyBarrels: { [key: string]: Reference[] } = {};
+    for (const key in this.index.references) {
+      const unnamedExports = this.getUnnamedExports(key);
+      if (unnamedExports.length > 0) {
+        emptyBarrels[key] = unnamedExports;
+      }
+    }
+
+    for (const key in emptyBarrels) {
+      this.addInferredReferences(emptyBarrels, key);
+    }
+    // logging...
+    // for (const key in emptyBarrels) {
+    //   if (
+    //     key ===
+    //     '/Users/tom/Development/dng/dgx-sales-spa-dev2/libs/common/util-foundation/src/index.ts'
+    //   ) {
+    //     console.log(this.index.references[key]);
+    //   }
+    // }
+    // console.log('ok now?');
+  }
+
+  private getUnnamedExports(key: string) {
+    return this.index.references[key].filter(
+      (ref) => ref.isExport && ref.specifiers.length === 0
+    );
+  }
+
+  private addInferredReferences(
+    emptyBarrels: { [key: string]: Reference[] },
+    key: string
+  ) {
+    const checkUnnamed = this.getUnnamedExports(key);
+    if (emptyBarrels[key].length > checkUnnamed.length) {
+      // skip updated already
+      emptyBarrels[key] = checkUnnamed;
+    }
+    for (const ref of emptyBarrels[key]) {
+      const specifiers =
+        this.index.classExports[this.removeExtension(ref.path)];
+      if (specifiers) {
+        // update references
+        this.index.addReference(ref.path, key, specifiers, ref.isExport);
+      } else if (emptyBarrels[ref.path]) {
+        // recurse through barrel children
+        this.addInferredReferences(emptyBarrels, ref.path);
+        // wrap all barrel children specifiers into top reference
+        let barrelledSpecifiers: string[] = [];
+        barrelledSpecifiers = barrelledSpecifiers.concat(
+          ...this.index.references[ref.path].map((ref) => ref.specifiers)
+        );
+        this.index.addReference(
+          ref.path,
+          key,
+          barrelledSpecifiers,
+          ref.isExport
+        );
+      }
+    }
+  }
+
+  private getWildcardSpecifiers(fsPath: string, reference: string) {
+    const referenced = this.resolveRelativeReference(fsPath, reference);
+    // console.log(referenced);
+    const data = fs.readFileSync(referenced + '.ts', 'utf8');
+    const file = ts.createSourceFile(
+      referenced + '.ts',
+      data,
+      ts.ScriptTarget.Latest
+    );
+    // console.log(data);
+    const specifiers: string[] = [];
+
+    file.statements.forEach((node: ts.Node) => {
+      if (ts.isClassDeclaration(node)) {
+        if (
+          node.modifiers?.some(
+            (modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword
+          )
+        ) {
+          specifiers.push(node.name?.escapedText ?? '');
+        }
+      }
+    });
+    return specifiers;
+  }
+
   private processDocuments(documents: vscode.TextDocument[]): Promise<any> {
     documents = documents.filter((doc) => {
       return (
@@ -937,6 +1030,16 @@ export class ReferenceIndexer {
             specifiers = node.exportClause?.elements.map(
               (elem) => elem.name.text
             );
+          } else {
+            // specifiers = this.getWildcardSpecifiers(
+            //   fileName,
+            //   node.moduleSpecifier.text
+            // );
+            // console.log(
+            //   'getWildcardSpecifiers',
+            //   node.moduleSpecifier.text,
+            //   specifiers
+            // );
           }
 
           result.push({
@@ -948,6 +1051,17 @@ export class ReferenceIndexer {
               end: node.moduleSpecifier.getEnd(),
             },
           });
+        }
+      } else if (ts.isClassDeclaration(node)) {
+        if (
+          node.modifiers?.some(
+            (modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword
+          )
+        ) {
+          this.index.classExports[fileName] = [
+            ...(this.index.classExports[fileName] ?? []),
+            node.name?.escapedText ?? '',
+          ];
         }
       }
 

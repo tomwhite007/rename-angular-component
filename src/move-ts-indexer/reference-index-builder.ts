@@ -2,18 +2,21 @@ import * as fs from 'fs-extra-promise';
 import * as path from 'path';
 import * as ts from 'typescript';
 import * as vscode from 'vscode';
-import {
-  isPathToAnotherDir,
-  mergeReferenceArrays,
-  Reference,
-  ReferenceIndex,
-} from './reference-index';
+import { ReferenceIndex } from './reference-index';
 import {
   applyGenericEdits,
   GenericEdit,
   GenericEditsCallback,
 } from './apply-generic-edits';
 import * as minimatch from 'minimatch';
+import {
+  isPathToAnotherDir,
+  mergeReferenceArrays,
+  asUnix,
+  isInDir,
+  conf,
+} from './util/helper-functions';
+import { Reference } from './util/shared-interfaces';
 
 const BATCH_SIZE = 50;
 
@@ -49,15 +52,6 @@ interface ConfigInfo {
   configPath: string;
 }
 
-export function isInDir(dir: string, p: string) {
-  const relative = path.relative(dir, p);
-  return !isPathToAnotherDir(relative);
-}
-
-export function asUnix(fsPath: string) {
-  return fsPath.replace(/\\/g, '/');
-}
-
 export class ReferenceIndexBuilder {
   index: ReferenceIndex = new ReferenceIndex();
   isinitialised: boolean = false;
@@ -71,30 +65,17 @@ export class ReferenceIndexBuilder {
 
   constructor(private debugLogger: { log: (...args: string[]) => void }) {}
 
-  init(progress?: vscode.Progress<{ message: string }>): Thenable<any> {
+  async init(progress?: vscode.Progress<{ message: string }>) {
     this.debugLogger.log('## Debug Indexer Start ###');
     this.index = new ReferenceIndex();
 
-    return this.readPackageNames().then(() => {
-      this.debugLogger.log('tsConfigs: ', JSON.stringify(this.tsConfigs));
-
-      return this.scanAll(progress)
-        .then(() => {
-          return this.attachFileWatcher();
-        })
-        .then(() => {
-          console.log('indexer initialised');
-          this.isinitialised = true;
-
-          this.debugLogger.log('## Debug Indexer End ###');
-        });
-    });
-  }
-
-  conf<T>(property: string, defaultValue: T): T {
-    return vscode.workspace
-      .getConfiguration('renameAngularComponent')
-      .get<T>(property, defaultValue);
+    await this.readPackageNames();
+    this.debugLogger.log('tsConfigs: ', JSON.stringify(this.tsConfigs));
+    await this.scanAll(progress);
+    this.attachFileWatcher();
+    console.log('indexer initialised');
+    this.isinitialised = true;
+    this.debugLogger.log('## Debug Indexer End ###');
   }
 
   private async readPackageNames() {
@@ -364,7 +345,7 @@ export class ReferenceIndexBuilder {
     getEdits: (filePath: string, text: string) => GenericEdit[]
   ): Thenable<any> {
     // TODO: refactor to not use editors unless unsaved
-    if (!this.conf('openEditors', false)) {
+    if (!conf('openEditors', false)) {
       return fs.readFileAsync(filePath, 'utf8').then((text) => {
         const edits = getEdits(filePath, text);
         if (edits.length === 0) {
@@ -860,7 +841,7 @@ export class ReferenceIndexBuilder {
   }
 
   private getRelativePath(from: string, to: string): string {
-    if (this.conf('useLocalDirectPaths', false)) {
+    if (conf('useLocalDirectPaths', false)) {
       const fromDir = path.dirname(from);
       if (to.startsWith(fromDir)) {
         return asUnix(to.replace(fromDir, '.'));

@@ -1,28 +1,10 @@
 import { is } from 'bluebird';
 import * as path from 'path';
-
-export interface Reference {
-  path: string;
-  specifiers: string[];
-  isExport?: boolean;
-}
-
-export function isPathToAnotherDir(path: string) {
-  return path.startsWith('../') || path.startsWith('..\\');
-}
+import { isPathToAnotherDir } from './util/helper-functions';
+import { Reference } from './util/shared-interfaces';
 
 function mergeSpecifiers(ref1: Reference, newSpecifiers: string[]): string[] {
   return [...new Set([...ref1.specifiers, ...newSpecifiers])];
-}
-
-export function mergeReferenceArrays(
-  arr1: Reference[],
-  arr2: Reference[]
-): Reference[] {
-  return [
-    ...arr1,
-    ...arr2.filter((r2) => !arr1.find((r1) => r1.path === r2.path)),
-  ];
 }
 
 export class ReferenceIndex {

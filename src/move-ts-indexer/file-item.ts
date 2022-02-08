@@ -1,7 +1,7 @@
 import * as fs from 'fs-extra-promise';
 import * as path from 'path';
 
-import { ReferenceIndexer } from './reference-indexer';
+import { ReferenceIndexBuilder } from './reference-index-builder';
 import { GenericEditsCallback } from './apply-generic-edits';
 
 export class FileItem {
@@ -21,7 +21,7 @@ export class FileItem {
     return fs.existsSync(this.targetPath);
   }
 
-  public async move(index: ReferenceIndexer) {
+  public async move(index: ReferenceIndexBuilder) {
     await this.ensureDir();
 
     if (this.isDir) {

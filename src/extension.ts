@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-import { ReferenceIndexer } from './move-ts-indexer/reference-indexer';
+import { ReferenceIndexBuilder } from './move-ts-indexer/reference-index-builder';
 import { UserMessage } from './rename-angular-component/logging/user-message.class';
 import { EXTENSION_NAME } from './rename-angular-component/definitions/extension-name';
 import { Renamer } from './rename-angular-component/renamer.class';
@@ -11,7 +11,7 @@ export function activate(context: vscode.ExtensionContext) {
   const debugLogger = new DebugLogger(getConfig('debugLog', false));
   const indexStart = Date.now();
   const userMessage = new UserMessage(EXTENSION_NAME);
-  const indexer: ReferenceIndexer = new ReferenceIndexer(debugLogger);
+  const indexer: ReferenceIndexBuilder = new ReferenceIndexBuilder(debugLogger);
 
   const initWithProgress = () => {
     return vscode.window.withProgress(

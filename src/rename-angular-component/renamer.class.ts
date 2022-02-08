@@ -4,7 +4,7 @@ import {
   OriginalFileDetails,
 } from './definitions/file.interfaces';
 import { getProjectRoot } from './definitions/get-project-root-file-path.function';
-import { ReferenceIndexer } from '../move-ts-indexer/reference-indexer';
+import { ReferenceIndexBuilder } from '../move-ts-indexer/reference-index-builder';
 import { FileItem } from '../move-ts-indexer/file-item';
 import * as fs from 'fs-extra-promise';
 import { getOriginalFileDetails } from './in-file-edits/get-original-file-details.function';
@@ -44,7 +44,7 @@ export class Renamer {
   private selectorTransfer!: SelectorTransfer;
 
   constructor(
-    private indexer: ReferenceIndexer,
+    private indexer: ReferenceIndexBuilder,
     private indexerInitialisePromise: Thenable<any>,
     private userMessage: UserMessage,
     private debugLogger: DebugLogger

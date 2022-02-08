@@ -58,14 +58,14 @@ export function asUnix(fsPath: string) {
   return fsPath.replace(/\\/g, '/');
 }
 
-export class ReferenceIndexer {
+export class ReferenceIndexBuilder {
   index: ReferenceIndex = new ReferenceIndex();
   isinitialised: boolean = false;
   changeDocumentEvent!: vscode.Disposable;
 
   private tsConfigs!: { [key: string]: ConfigInfo };
   private packageNames: { [key: string]: string } = {};
-  private extensions: string[] = ['.ts'];
+  private readonly extensions: string[] = ['.ts'];
   private fileWatcher!: vscode.FileSystemWatcher;
   private fileEditLog: string[] = [];
 

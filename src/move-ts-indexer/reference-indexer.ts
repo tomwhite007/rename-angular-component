@@ -655,11 +655,7 @@ export class ReferenceIndexer {
     }
     const barrels = affectedFiles.filter((ref) => ref.isExport);
     const affectedFromBarrelArrays = barrels.map((ref) =>
-      this.index
-        .getReferences(ref.path)
-        .filter((barrelRef) =>
-          barrelRef.specifiers.includes(exportedNameToChange)
-        )
+      this.getReferencesForSpecifier(ref.path, exportedNameToChange)
     );
     const affectedFromBarrel = affectedFromBarrelArrays.reduce(
       (acc, val) => acc.concat(val),
@@ -667,6 +663,22 @@ export class ReferenceIndexer {
     );
     affectedFiles = mergeReferenceArrays(affectedFiles, affectedFromBarrel);
     return affectedFiles;
+  }
+
+  private getReferencesForSpecifier(
+    path: string,
+    specifier: string
+  ): Reference[] {
+    const refs = this.index
+      .getReferences(path)
+      .filter((barrelRef) => barrelRef.specifiers.includes(specifier));
+    return refs
+      .filter((ref) => !ref.isExport)
+      .concat(
+        ...refs
+          .filter((ref) => ref.isExport)
+          .map((ref) => this.getReferencesForSpecifier(ref.path, specifier))
+      );
   }
 
   private processWorkspaceFiles(

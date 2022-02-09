@@ -30,3 +30,7 @@ export function conf<T>(property: string, defaultValue: T): T {
     .getConfiguration('renameAngularComponent')
     .get<T>(property, defaultValue);
 }
+
+export function flattenArray<T>(arr: any[]): T[] {
+  return arr.reduce((acc, val) => acc.concat(val), []);
+}

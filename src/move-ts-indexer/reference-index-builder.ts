@@ -15,6 +15,7 @@ import {
   asUnix,
   isInDir,
   conf,
+  flattenArray,
 } from './util/helper-functions';
 import { Reference } from './util/shared-interfaces';
 
@@ -650,16 +651,26 @@ export class ReferenceIndexBuilder {
     path: string,
     specifier: string
   ): Reference[] {
-    const refs = this.index
-      .getReferences(path)
-      .filter((barrelRef) => barrelRef.specifiers.includes(specifier));
-    return refs
-      .filter((ref) => !ref.isExport)
-      .concat(
-        ...refs
-          .filter((ref) => ref.isExport)
-          .map((ref) => this.getReferencesForSpecifier(ref.path, specifier))
-      );
+    const refs = this.index.getReferences(path);
+
+    const refsForSpecifier = refs.filter(
+      (barrelRef) =>
+        barrelRef.specifiers.includes(specifier) ||
+        barrelRef.specifiers.length === 0
+    );
+
+    console.log('refs', refs);
+    console.log('refsForSpecifier', refsForSpecifier);
+
+    const mergedRefs = refsForSpecifier.filter((ref) => !ref.isExport);
+
+    const deepRefs = flattenArray<Reference>(
+      refsForSpecifier
+        .filter((ref) => ref.isExport)
+        .map((ref) => this.getReferencesForSpecifier(ref.path, specifier))
+    );
+
+    return [...mergedRefs, ...deepRefs];
   }
 
   private processWorkspaceFiles(
@@ -717,6 +728,14 @@ export class ReferenceIndexBuilder {
     }
 
     for (const key in emptyBarrels) {
+      if (
+        key ===
+          '/Users/tom/Development/dng/dgx-sales-spa-dev2/libs/common/util-foundation/src/index.ts' ||
+        key ===
+          '/Users/tom/Development/dng/dgx-sales-spa-dev2/libs/common/util-foundation/src/lib/services/index.ts'
+      ) {
+        console.log(this.index.references[key]);
+      }
       this.addInferredReferences(emptyBarrels, key);
     }
     // logging...
@@ -746,54 +765,29 @@ export class ReferenceIndexBuilder {
       // skip updated already
       emptyBarrels[key] = checkUnnamed;
     }
+    let combinedSpecifiers: string[] = [];
     for (const ref of emptyBarrels[key]) {
-      const specifiers =
+      const specifiers: string[] | undefined =
         this.index.classExports[this.removeExtension(ref.path)];
+      combinedSpecifiers = combinedSpecifiers.concat(specifiers);
       if (specifiers) {
         // update references
         this.index.addReference(ref.path, key, specifiers, ref.isExport);
       } else if (emptyBarrels[ref.path]) {
         // recurse through barrel children
-        this.addInferredReferences(emptyBarrels, ref.path);
-        // wrap all barrel children specifiers into top reference
-        let barrelledSpecifiers: string[] = [];
-        barrelledSpecifiers = barrelledSpecifiers.concat(
-          ...this.index.references[ref.path].map((ref) => ref.specifiers)
+        combinedSpecifiers = combinedSpecifiers.concat(
+          this.addInferredReferences(emptyBarrels, ref.path)
         );
+
         this.index.addReference(
           ref.path,
           key,
-          barrelledSpecifiers,
+          combinedSpecifiers,
           ref.isExport
         );
       }
     }
-  }
-
-  private getWildcardSpecifiers(fsPath: string, reference: string) {
-    const referenced = this.resolveRelativeReference(fsPath, reference);
-    // console.log(referenced);
-    const data = fs.readFileSync(referenced + '.ts', 'utf8');
-    const file = ts.createSourceFile(
-      referenced + '.ts',
-      data,
-      ts.ScriptTarget.Latest
-    );
-    // console.log(data);
-    const specifiers: string[] = [];
-
-    file.statements.forEach((node: ts.Node) => {
-      if (ts.isClassDeclaration(node)) {
-        if (
-          node.modifiers?.some(
-            (modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword
-          )
-        ) {
-          specifiers.push(node.name?.escapedText ?? '');
-        }
-      }
-    });
-    return specifiers;
+    return combinedSpecifiers;
   }
 
   private processDocuments(documents: vscode.TextDocument[]): Promise<any> {
@@ -1023,18 +1017,7 @@ export class ReferenceIndexBuilder {
             specifiers = node.exportClause?.elements.map(
               (elem) => elem.name.text
             );
-          } else {
-            // specifiers = this.getWildcardSpecifiers(
-            //   fileName,
-            //   node.moduleSpecifier.text
-            // );
-            // console.log(
-            //   'getWildcardSpecifiers',
-            //   node.moduleSpecifier.text,
-            //   specifiers
-            // );
           }
-
           result.push({
             itemType: 'exportPath',
             itemText: node.moduleSpecifier.text,

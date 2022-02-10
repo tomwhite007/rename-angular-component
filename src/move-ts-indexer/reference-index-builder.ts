@@ -233,8 +233,6 @@ export class ReferenceIndexBuilder {
 
     await this.processWorkspaceFiles(files, false, progress);
 
-    // this.fixUpWildcardImports();
-
     console.log('scan finished in ' + (Date.now() - start) + 'ms');
     console.log(`Indexed ${this.index.fileCount()} files`);
   }
@@ -651,15 +649,12 @@ export class ReferenceIndexBuilder {
     path: string,
     specifier: string
   ): Reference[] {
-    const refs = this.index.getReferences(path);
-
-    const refsForSpecifier = refs.filter(
-      (barrelRef) =>
-        barrelRef.specifiers.includes(specifier) || barrelRef.isExport
-    );
-
-    console.log('refs', refs);
-    console.log('refsForSpecifier', refsForSpecifier);
+    const refsForSpecifier = this.index
+      .getReferences(path)
+      .filter(
+        (barrelRef) =>
+          barrelRef.specifiers.includes(specifier) || barrelRef.isExport
+      );
 
     const nonExportRefs = refsForSpecifier.filter((ref) => !ref.isExport);
 
@@ -717,76 +712,10 @@ export class ReferenceIndexBuilder {
     });
   }
 
-  private fixUpWildcardImports() {
-    let emptyBarrels: { [key: string]: Reference[] } = {};
-    for (const key in this.index.references) {
-      const unnamedExports = this.getUnnamedExports(key);
-      if (unnamedExports.length > 0) {
-        emptyBarrels[key] = unnamedExports;
-      }
-    }
-
-    for (const key in emptyBarrels) {
-      if (
-        key ===
-          '/Users/tom/Development/dng/dgx-sales-spa-dev2/libs/common/util-foundation/src/index.ts' ||
-        key ===
-          '/Users/tom/Development/dng/dgx-sales-spa-dev2/libs/common/util-foundation/src/lib/services/index.ts'
-      ) {
-        console.log(this.index.references[key]);
-      }
-      this.addInferredReferences(emptyBarrels, key);
-    }
-    // logging...
-    // for (const key in emptyBarrels) {
-    //   if (
-    //     key ===
-    //     '/Users/tom/Development/dng/dgx-sales-spa-dev2/libs/common/util-foundation/src/index.ts'
-    //   ) {
-    //     console.log(this.index.references[key]);
-    //   }
-    // }
-    // console.log('ok now?');
-  }
-
   private getUnnamedExports(key: string) {
     return this.index.references[key].filter(
       (ref) => ref.isExport && ref.specifiers.length === 0
     );
-  }
-
-  private addInferredReferences(
-    emptyBarrels: { [key: string]: Reference[] },
-    key: string
-  ) {
-    const checkUnnamed = this.getUnnamedExports(key);
-    if (emptyBarrels[key].length > checkUnnamed.length) {
-      // skip updated already
-      emptyBarrels[key] = checkUnnamed;
-    }
-    let combinedSpecifiers: string[] = [];
-    for (const ref of emptyBarrels[key]) {
-      const specifiers: string[] | undefined =
-        this.index.classExports[this.removeExtension(ref.path)];
-      combinedSpecifiers = combinedSpecifiers.concat(specifiers);
-      if (specifiers) {
-        // update references
-        this.index.addReference(ref.path, key, specifiers, ref.isExport);
-      } else if (emptyBarrels[ref.path]) {
-        // recurse through barrel children
-        combinedSpecifiers = combinedSpecifiers.concat(
-          this.addInferredReferences(emptyBarrels, ref.path)
-        );
-
-        this.index.addReference(
-          ref.path,
-          key,
-          combinedSpecifiers,
-          ref.isExport
-        );
-      }
-    }
-    return combinedSpecifiers;
   }
 
   private processDocuments(documents: vscode.TextDocument[]): Promise<any> {
@@ -989,7 +918,6 @@ export class ReferenceIndexBuilder {
 
   /**
    * Get import / export paths from ts file.
-   * Side effect: log Class name exports
    * @param fileName
    * @param data
    * @returns array of import / export paths as FoundItem[]
@@ -1033,17 +961,6 @@ export class ReferenceIndexBuilder {
               end: node.moduleSpecifier.getEnd(),
             },
           });
-        }
-      } else if (ts.isClassDeclaration(node)) {
-        if (
-          node.modifiers?.some(
-            (modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword
-          )
-        ) {
-          this.index.classExports[fileName] = [
-            ...(this.index.classExports[fileName] ?? []),
-            node.name?.escapedText ?? '',
-          ];
         }
       }
 

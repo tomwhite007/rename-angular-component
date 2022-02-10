@@ -634,12 +634,10 @@ export class ReferenceIndexBuilder {
       return affectedFiles;
     }
     const barrels = affectedFiles.filter((ref) => ref.isExport);
-    const affectedFromBarrelArrays = barrels.map((ref) =>
-      this.getReferencesForSpecifier(ref.path, exportedNameToChange)
-    );
-    const affectedFromBarrel = affectedFromBarrelArrays.reduce(
-      (acc, val) => acc.concat(val),
-      []
+    const affectedFromBarrel = flattenArray<Reference>(
+      barrels.map((ref) =>
+        this.getReferencesForSpecifier(ref.path, exportedNameToChange)
+      )
     );
     affectedFiles = mergeReferenceArrays(affectedFiles, affectedFromBarrel);
     return affectedFiles;

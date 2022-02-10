@@ -97,7 +97,7 @@ export class ReferenceIndexBuilder {
         if (json.name) {
           if (seenPackageNames[json.name]) {
             delete this.packageNames[json.name];
-            return;
+            continue;
           }
           seenPackageNames[json.name] = true;
           this.packageNames[json.name] = path.dirname(packageFile.fsPath);
@@ -233,7 +233,7 @@ export class ReferenceIndexBuilder {
 
     await this.processWorkspaceFiles(files, false, progress);
 
-    this.fixUpWildcardImports();
+    // this.fixUpWildcardImports();
 
     console.log('scan finished in ' + (Date.now() - start) + 'ms');
     console.log(`Indexed ${this.index.fileCount()} files`);
@@ -655,14 +655,13 @@ export class ReferenceIndexBuilder {
 
     const refsForSpecifier = refs.filter(
       (barrelRef) =>
-        barrelRef.specifiers.includes(specifier) ||
-        barrelRef.specifiers.length === 0
+        barrelRef.specifiers.includes(specifier) || barrelRef.isExport
     );
 
     console.log('refs', refs);
     console.log('refsForSpecifier', refsForSpecifier);
 
-    const mergedRefs = refsForSpecifier.filter((ref) => !ref.isExport);
+    const nonExportRefs = refsForSpecifier.filter((ref) => !ref.isExport);
 
     const deepRefs = flattenArray<Reference>(
       refsForSpecifier
@@ -670,7 +669,7 @@ export class ReferenceIndexBuilder {
         .map((ref) => this.getReferencesForSpecifier(ref.path, specifier))
     );
 
-    return [...mergedRefs, ...deepRefs];
+    return [...nonExportRefs, ...deepRefs];
   }
 
   private processWorkspaceFiles(
@@ -988,6 +987,13 @@ export class ReferenceIndexBuilder {
     }));
   }
 
+  /**
+   * Get import / export paths from ts file.
+   * Side effect: log Class name exports
+   * @param fileName
+   * @param data
+   * @returns array of import / export paths as FoundItem[]
+   */
   private getReferences(fileName: string, data: string): FoundItem[] {
     const result: FoundItem[] = [];
     const file = ts.createSourceFile(fileName, data, ts.ScriptTarget.Latest);

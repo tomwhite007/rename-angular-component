@@ -18,7 +18,16 @@ export class ReferenceIndex {
     return Object.keys(this.references).length;
   }
 
-  // path references the reference
+  //
+  /**
+   * Add reference (import/export path) that 'path' (index.references[key]) uses.
+   *
+   * Note: path references (imports/exports) the reference
+   * @param reference - the import/export path
+   * @param path - the key file
+   * @param specifiers
+   * @param isExport
+   */
   public addReference(
     reference: string,
     path: string,

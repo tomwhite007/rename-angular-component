@@ -31,6 +31,7 @@ export class FileItem {
 
       await index.updateMovedDir(this.sourcePath, this.targetPath);
     } else {
+      // is a file
       if (this.sourcePath.endsWith('.ts')) {
         await index.updateImports(
           this.sourcePath,

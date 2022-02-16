@@ -319,7 +319,6 @@ export class ReferenceIndexBuilder {
         fromPath || filePath,
         before
       );
-      const seen: any = {};
       const beforeReplacements = relativeReferences.filter((ref) => {
         return (
           this.resolveRelativeReference(fromPath || filePath, ref.itemText) ===
@@ -411,14 +410,27 @@ export class ReferenceIndexBuilder {
         new Set(this.getRelativeImportSpecifiers(text, from))
       );
 
-      return references.map((reference): [string, string] => {
-        const absReference = this.resolveRelativeReference(
-          from,
-          reference.path
-        );
-        const newReference = this.getRelativePath(to, absReference);
-        return [reference.path, newReference];
-      });
+      return (
+        references
+          .map((reference): [string, string] => {
+            const absReference = this.resolveRelativeReference(
+              from,
+              reference.path
+            );
+
+            let newReference = this.getRelativePath(to, absReference);
+            if (isPathToAnotherDir(newReference)) {
+              // if path contains ../ then look for direct path or wildcard path
+              newReference = this.resolveToPath(to, newReference);
+            }
+
+            newReference = this.removeExtension(newReference);
+            newReference = this.removeIndexSuffix(newReference);
+            return [reference.path, newReference];
+          })
+          // filter unchanged
+          .filter((replacement) => replacement[0] !== replacement[1])
+      );
     };
 
     return this.replaceEdits(
@@ -803,6 +815,50 @@ export class ReferenceIndexBuilder {
       relative = './' + relative;
     }
     return asUnix(relative);
+  }
+
+  private resolveToPath(fsPath: string, localPath: string): string {
+    const resolvedFilePath = path.resolve(path.dirname(fsPath), localPath);
+    const configInfo = this.getTsConfig(fsPath);
+    if (configInfo) {
+      const config = configInfo.config;
+      const configPath = configInfo.configPath;
+      if (
+        config.compilerOptions &&
+        config.compilerOptions.paths &&
+        config.compilerOptions.baseUrl
+      ) {
+        const baseUrl = path.resolve(
+          path.dirname(configPath),
+          config.compilerOptions.baseUrl
+        );
+        for (let p in config.compilerOptions.paths) {
+          // wildcard path mappings
+          if (p.endsWith('*')) {
+            const paths = config.compilerOptions.paths[p];
+            for (let i = 0; i < paths.length; i++) {
+              const mapped = paths[i].slice(0, -1);
+              const mappedDir = path.resolve(baseUrl, mapped);
+              if (isInDir(mappedDir, resolvedFilePath)) {
+                return p.slice(0, -1) + resolvedFilePath.replace(mappedDir, '');
+              }
+            }
+          } else {
+            // fixed path mappings
+            const paths = config.compilerOptions.paths[p];
+            for (let i = 0; i < paths.length; i++) {
+              const mapped = paths[i];
+              const mappedDir = path.resolve(baseUrl, mapped);
+              if (isInDir(mappedDir, resolvedFilePath)) {
+                return p;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return localPath;
   }
 
   private resolveRelativeReference(fsPath: string, reference: string): string {

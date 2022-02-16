@@ -97,6 +97,8 @@ export class Renamer {
 
           regex for replace in spec name should use space or quote to identify start or end of work before replacing
 
+          anyConstructRegexPartial doesn't work because it allows sub folders
+
           Add import statements (used by router) to getReferences()
             work out performance impact, and see if regex check first improves it
             then possibly turn it into a config option          

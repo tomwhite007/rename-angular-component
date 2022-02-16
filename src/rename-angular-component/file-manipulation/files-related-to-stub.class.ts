@@ -7,15 +7,17 @@ import {
 } from '../definitions/file.interfaces';
 import { windowsFilePathFix } from './windows-file-path-fix.function';
 
+interface FileDetails {
+  filePath: string;
+  sameConstruct: boolean;
+  sameStub: boolean;
+  isCoreConstruct: boolean;
+}
+
 export class FilesRelatedToStub {
   originalFileDetails!: OriginalFileDetails;
   folderNameSameAsStub = false;
-  fileDetails: {
-    filePath: string;
-    sameConstruct: boolean;
-    sameStub: boolean;
-    isCoreConstruct: boolean;
-  }[] = [];
+  fileDetails: FileDetails[] = [];
   constructFilesRegex!: RegExp;
   relatedFilesRegex!: RegExp;
 
@@ -87,10 +89,47 @@ export class FilesRelatedToStub {
 
     return this.fileDetails
       .filter((fd) => this.folderNameSameAsStub || fd.sameConstruct)
+      .sort(this.sortFileDetails)
+      .map((fd) => {
+        console.log(fd.filePath);
+        return fd;
+      })
       .map((fd) => ({
         filePath: fd.filePath,
         newFilePath: replaceStub(fd.filePath),
         isCoreConstruct: fd.isCoreConstruct,
       }));
+  }
+
+  private sortFileDetails(a: FileDetails, b: FileDetails) {
+    if (a.isCoreConstruct && a.sameConstruct) {
+      return -1;
+    }
+    if (b.isCoreConstruct && b.sameConstruct) {
+      return 1;
+    }
+
+    if (a.sameConstruct) {
+      return -1;
+    }
+    if (b.sameConstruct) {
+      return 1;
+    }
+
+    if (a.sameStub) {
+      return -1;
+    }
+    if (b.sameStub) {
+      return 1;
+    }
+
+    if (a.filePath > b.filePath) {
+      return -1;
+    }
+    if (b.filePath > a.filePath) {
+      return 1;
+    }
+
+    return 0;
   }
 }

@@ -410,27 +410,28 @@ export class ReferenceIndexBuilder {
         new Set(this.getRelativeImportSpecifiers(text, from))
       );
 
-      return (
-        references
-          .map((reference): [string, string] => {
-            const absReference = this.resolveRelativeReference(
-              from,
-              reference.path
-            );
+      return <Replacement[]>references
+        .map((reference) => {
+          const absReference = this.resolveRelativeReference(
+            from,
+            reference.path
+          );
 
-            let newReference = this.getRelativePath(to, absReference);
-            if (isPathToAnotherDir(newReference)) {
-              // if path contains ../ then look for direct path or wildcard path
-              newReference = this.resolveToPath(to, newReference);
+          let newReference = this.getRelativePath(to, absReference);
+          if (isPathToAnotherDir(newReference)) {
+            // if path contains ../ then look for direct path or wildcard path
+            const { resolved, isPath } = this.resolveToPath(to, newReference);
+            if (isPath && reference.path === resolved) {
+              return null;
             }
+          }
 
-            newReference = this.removeExtension(newReference);
-            newReference = this.removeIndexSuffix(newReference);
-            return [reference.path, newReference];
-          })
-          // filter unchanged
-          .filter((replacement) => replacement[0] !== replacement[1])
-      );
+          newReference = this.removeExtension(newReference);
+          newReference = this.removeIndexSuffix(newReference);
+          return [reference.path, newReference];
+        })
+        // filter unchanged paths
+        .filter((replacement) => !!replacement);
     };
 
     return this.replaceEdits(
@@ -817,7 +818,10 @@ export class ReferenceIndexBuilder {
     return asUnix(relative);
   }
 
-  private resolveToPath(fsPath: string, localPath: string): string {
+  private resolveToPath(
+    fsPath: string,
+    localPath: string
+  ): { resolved: string; isPath: boolean } {
     const resolvedFilePath = path.resolve(path.dirname(fsPath), localPath);
     const configInfo = this.getTsConfig(fsPath);
     if (configInfo) {
@@ -840,7 +844,11 @@ export class ReferenceIndexBuilder {
               const mapped = paths[i].slice(0, -1);
               const mappedDir = path.resolve(baseUrl, mapped);
               if (isInDir(mappedDir, resolvedFilePath)) {
-                return p.slice(0, -1) + resolvedFilePath.replace(mappedDir, '');
+                return {
+                  resolved:
+                    p.slice(0, -1) + resolvedFilePath.replace(mappedDir, ''),
+                  isPath: true,
+                };
               }
             }
           } else {
@@ -850,7 +858,10 @@ export class ReferenceIndexBuilder {
               const mapped = paths[i];
               const mappedDir = path.resolve(baseUrl, mapped);
               if (isInDir(mappedDir, resolvedFilePath)) {
-                return p;
+                return {
+                  resolved: p,
+                  isPath: true,
+                };
               }
             }
           }
@@ -858,7 +869,10 @@ export class ReferenceIndexBuilder {
       }
     }
 
-    return localPath;
+    return {
+      resolved: localPath,
+      isPath: false,
+    };
   }
 
   private resolveRelativeReference(fsPath: string, reference: string): string {

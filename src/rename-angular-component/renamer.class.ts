@@ -84,12 +84,16 @@ export class Renamer {
 
           /* TODO 
 
+          fix race? condition lower in alphabet woo->wee fails
 
-          Release notes: add to repo
+          component rename thing2 = ../thing/.2/.... on test-rename-through-barrels repo
+
+          dots dashes and special chars cause problems
+            validate to block first, then fix later
+
+          fix license.md eol formatting
 
           ---- v2 -----
-
-          fix wildcard and multi-barrel exports
 
           regex for replace in spec name should use space or quote to identify start or end of work before replacing
 

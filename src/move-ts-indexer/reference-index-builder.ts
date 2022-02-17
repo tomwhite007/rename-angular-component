@@ -790,7 +790,10 @@ export class ReferenceIndexBuilder {
     };
 
     if (conf('useLocalDirectPaths', false)) {
-      return generatePathWithoutTsConfig();
+      const fromDir = path.dirname(from);
+      if (to.startsWith(fromDir)) {
+        return generatePathWithoutTsConfig();
+      }
     }
 
     const configInfo = this.getTsConfig(from);

@@ -84,14 +84,15 @@ export class Renamer {
 
           /* TODO 
 
-          fix race? condition lower in alphabet woo->wee fails
 
           component rename thing2 = ../thing/.2/.... on test-rename-through-barrels repo
 
           dots dashes and special chars cause problems
             validate to block first, then fix later
 
-          fix license.md eol formatting
+          update changelog
+
+          create proper release
 
           ---- v2 -----
 

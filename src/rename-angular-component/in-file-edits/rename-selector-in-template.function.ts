@@ -11,7 +11,10 @@ export function renameSelectorInTemplate(
 
   switch (type) {
     case 'element': {
-      if (html.indexOf('</' + originalSelector + '>') < 0) {
+      const testRegex = new RegExp(
+        `<\\/${escapeStringRegexp(originalSelector)}(\\n|\\s|>)`
+      );
+      if (!html.match(testRegex)) {
         return null;
       }
       oriSelectorRegex = new RegExp(

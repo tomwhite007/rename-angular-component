@@ -90,10 +90,6 @@ export class FilesRelatedToStub {
     return this.fileDetails
       .filter((fd) => this.folderNameSameAsStub || fd.sameConstruct)
       .sort(this.sortFileDetails)
-      .map((fd) => {
-        console.log(fd.filePath);
-        return fd;
-      })
       .map((fd) => ({
         filePath: fd.filePath,
         newFilePath: replaceStub(fd.filePath),

@@ -612,6 +612,7 @@ export class ReferenceIndexBuilder {
         relative = this.removeExtension(relative);
 
         let newRelative = this.getRelativePath(filePath.path, to);
+        console.log('replacements', relative, newRelative);
         newRelative = this.removeExtension(newRelative);
         newRelative = this.removeIndexSuffix(newRelative);
 
@@ -774,12 +775,24 @@ export class ReferenceIndexBuilder {
   }
 
   private getRelativePath(from: string, to: string): string {
-    if (conf('useLocalDirectPaths', false)) {
-      const fromDir = path.dirname(from);
-      if (to.startsWith(fromDir)) {
-        return asUnix(to.replace(fromDir, '.'));
+    const generatePathWithoutTsConfig = () => {
+      for (let packageName in this.packageNames) {
+        const packagePath = this.packageNames[packageName];
+        if (isInDir(packagePath, to) && !isInDir(packagePath, from)) {
+          return asUnix(path.join(packageName, path.relative(packagePath, to)));
+        }
       }
+      let relative = path.relative(path.dirname(from), to);
+      if (!relative.startsWith('.')) {
+        relative = './' + relative;
+      }
+      return asUnix(relative);
+    };
+
+    if (conf('useLocalDirectPaths', false)) {
+      return generatePathWithoutTsConfig();
     }
+
     const configInfo = this.getTsConfig(from);
     if (configInfo) {
       const config = configInfo.config;
@@ -805,17 +818,8 @@ export class ReferenceIndexBuilder {
         }
       }
     }
-    for (let packageName in this.packageNames) {
-      const packagePath = this.packageNames[packageName];
-      if (isInDir(packagePath, to) && !isInDir(packagePath, from)) {
-        return asUnix(path.join(packageName, path.relative(packagePath, to)));
-      }
-    }
-    let relative = path.relative(path.dirname(from), to);
-    if (!relative.startsWith('.')) {
-      relative = './' + relative;
-    }
-    return asUnix(relative);
+
+    return generatePathWithoutTsConfig();
   }
 
   private resolveToPath(

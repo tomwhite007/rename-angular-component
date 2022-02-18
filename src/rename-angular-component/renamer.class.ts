@@ -377,8 +377,8 @@ export class Renamer {
         );
         return false;
       }
-      // make sure it's kebab
-      this.newStub = dasherize(inputResult ?? '');
+      // make sure it's kebab, and loose the dots
+      this.newStub = dasherize(inputResult.replace('.', '-') ?? '');
 
       this.userMessage.setOperationTitle(this.title);
 

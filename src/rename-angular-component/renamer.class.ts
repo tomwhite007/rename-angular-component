@@ -85,9 +85,8 @@ export class Renamer {
           /* TODO 
 
 
-          component rename thing2 = ../thing/.2/.... on test-rename-through-barrels repo
-            looks fixed but needs testing for all other cases
-            now have a problem with 2nd level affected barrel export
+          sub barrel inside component folder breaks renamed export chain 
+            because process misses folder name change e.g. test-rename-through-barrels repo
 
           dots dashes and special chars cause problems
             validate to block first, then fix later

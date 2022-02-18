@@ -612,7 +612,6 @@ export class ReferenceIndexBuilder {
         relative = this.removeExtension(relative);
 
         let newRelative = this.getRelativePath(filePath.path, to);
-        console.log('replacements', relative, newRelative);
         newRelative = this.removeExtension(newRelative);
         newRelative = this.removeIndexSuffix(newRelative);
 

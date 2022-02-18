@@ -85,17 +85,11 @@ export class Renamer {
           /* TODO 
 
 
-          sub barrel inside component folder breaks renamed export chain 
-            because process misses folder name change e.g. test-rename-through-barrels repo
-
-          dots dashes and special chars cause problems
-            validate to block first, then fix later
-
-          update changelog
-
-          create proper release
 
           ---- v2 -----
+
+          sub barrel inside component folder breaks renamed export chain 
+            because process misses folder name change e.g. test-rename-through-barrels repo
 
           regex for replace in spec name should use space or quote to identify start or end of work before replacing
 

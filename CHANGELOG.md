@@ -45,4 +45,4 @@
 - Feature: add compatibility with Nx Workspaces and projects that use layers of wildcard export barrels
 - Fix: edge case race condition on imports changed in component and spec file
 - Fix: edge case replacement of selectors missed in some templates due to line break in end tag
-- Fix: replace dots with dashes for name
+- Fix: replace dots with dashes entered for name

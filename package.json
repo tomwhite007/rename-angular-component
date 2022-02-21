@@ -65,7 +65,7 @@
     "menus": {
       "explorer/context": [
         {
-          "when": "resourceFilename =~ /^.+\\.component\\.(spec.ts|scss|html|ts)$/",
+          "when": "resourceFilename =~ /^.+\\.component\\.(spec.ts|scss|css|sass|less|html|ts)$/",
           "command": "rename-angular-component.renameComponent",
           "group": "navigation"
         },

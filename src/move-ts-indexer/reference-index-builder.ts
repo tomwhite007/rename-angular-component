@@ -667,7 +667,7 @@ export class ReferenceIndexBuilder {
           barrelRef.specifiers.includes(specifier) || barrelRef.isExport
       );
 
-    const nonExportRefs = refsForSpecifier.filter((ref) => !ref.isExport);
+    const baseRefs = refsForSpecifier;
 
     const deepRefs = flattenArray<Reference>(
       refsForSpecifier
@@ -675,7 +675,7 @@ export class ReferenceIndexBuilder {
         .map((ref) => this.getReferencesForSpecifier(ref.path, specifier))
     );
 
-    return [...nonExportRefs, ...deepRefs];
+    return [...baseRefs, ...deepRefs];
   }
 
   private processWorkspaceFiles(

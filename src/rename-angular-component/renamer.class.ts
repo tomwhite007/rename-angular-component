@@ -84,20 +84,19 @@ export class Renamer {
 
           /* TODO 
 
-
-
           ---- v2 -----
 
-          sub barrel inside component folder breaks renamed export chain 
-            because process misses folder name change e.g. test-rename-through-barrels repo
+          add integration tests
+
+          Issue: renaming import paths in Lazy Loaded Routes
+            Add import statements (used by router) to getReferences()
+            work out performance impact, and see if regex check first improves it
+            then possibly turn it into a config option       
+            https://github.com/tomwhite007/rename-angular-component/issues/9
 
           regex for replace in spec name should use space or quote to identify start or end of work before replacing
 
-          anyConstructRegexPartial doesn't work because it allows sub folders
-
-          Add import statements (used by router) to getReferences()
-            work out performance impact, and see if regex check first improves it
-            then possibly turn it into a config option          
+          anyConstructRegexPartial doesn't work because it allows sub folders   
 
           Add option to fix selector + use default prefix
           then ask for prefix if default not ticked
@@ -105,10 +104,6 @@ export class Renamer {
           limit rename selector in templates to current workspace multi-folder root
   
           make sure input newStub matches constraints and formatting allowed by CLI
-
-          fix numbers in string to camel case; remove underscore?
-
-          Issue: renaming import paths in Lazy Loaded Routes
   
           refactor for clean classes, functions and pure async await
   

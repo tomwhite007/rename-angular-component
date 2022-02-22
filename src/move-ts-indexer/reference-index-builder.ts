@@ -320,9 +320,13 @@ export class ReferenceIndexBuilder {
         before
       );
       const beforeReplacements = relativeReferences.filter((ref) => {
+        const refFullPath = this.resolveRelativeReference(
+          fromPath || filePath,
+          ref.itemText
+        );
         return (
-          this.resolveRelativeReference(fromPath || filePath, ref.itemText) ===
-          beforeReference
+          refFullPath === beforeReference ||
+          refFullPath === this.removeIndexSuffix(beforeReference)
         );
       });
       beforeReplacements.forEach((beforeReplacement) => {
@@ -667,7 +671,7 @@ export class ReferenceIndexBuilder {
           barrelRef.specifiers.includes(specifier) || barrelRef.isExport
       );
 
-    const baseRefs = refsForSpecifier;
+    const baseRefs = refsForSpecifier.filter((ref) => !ref.isExport);
 
     const deepRefs = flattenArray<Reference>(
       refsForSpecifier

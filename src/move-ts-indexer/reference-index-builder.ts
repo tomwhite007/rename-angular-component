@@ -344,14 +344,18 @@ export class ReferenceIndexBuilder {
 
   private replaceEdits(
     filePath: string,
-    getEdits: (filePath: string, text: string) => GenericEdit[]
+    getEdits: (filePath: string, text: string) => GenericEdit[],
+    processFileWhenNoEdits = false
   ): Thenable<any> {
     // TODO: refactor to not use editors unless unsaved
     if (!conf('openEditors', false)) {
       return fs.readFileAsync(filePath, 'utf8').then((text) => {
         const edits = getEdits(filePath, text);
         if (edits.length === 0) {
-          this.processFile(text, filePath, true);
+          if (processFileWhenNoEdits) {
+            // TODO: make getReferenceEdits() work separately from replacements() - due a callback within a callback, processFileWhenNoEdits cannot be set from outside
+            this.processFile(text, filePath, true);
+          }
           return Promise.resolve();
         }
 
@@ -438,7 +442,8 @@ export class ReferenceIndexBuilder {
       (filePath: string, text: string): GenericEdit[] => [
         ...this.getReferenceEdits(filePath, text, replacements(text), from),
         ...(additionalEdits ? additionalEdits(filePath, text) : []),
-      ]
+      ],
+      true
     ).then(() => {
       this.index.deleteByPath(from);
     });

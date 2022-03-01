@@ -148,7 +148,7 @@ export class Renamer {
     let currentProgress = 20;
     this.userMessage.logInfoToChannel(['File edits:'], false);
     this.indexer.startNewMoves();
-    for (const item of this.fileMoveJobs) {
+    for await (const item of this.fileMoveJobs) {
       currentProgress += progressIncrement;
       progress.report({ increment: currentProgress });
       await timeoutPause(10);

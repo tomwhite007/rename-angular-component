@@ -39,3 +39,10 @@
 ## [1.0.7] - 2022-02-03
 
 - Fix: Local Windows file path should be Unix format
+
+## [1.1.0] - 2022-02-21
+
+- Feature: add compatibility with Nx Workspaces and projects that use layers of wildcard export barrels
+- Fix: edge case race condition on imports changed in component and spec file
+- Fix: edge case replacement of selectors missed in some templates due to line break in end tag
+- Fix: replace dots with dashes entered for name

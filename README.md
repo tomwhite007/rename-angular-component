@@ -3,7 +3,7 @@
   Rename Angular Component
 </h1>
 
-Rename Angular components, directives and services - including their filenames, class names and selectors all in one go
+Rename Angular components, directives, services and guards - including their filenames, class names and selectors all in one go
 
 ## How to use
 
@@ -63,8 +63,9 @@ Thanks to you for reading this.
 
 ## Release Notes
 
-Latest version: [1.0.7]
+Latest version: [1.1.0]
 
-Added support for renaming Angular Route Guards.
-Optional local paths when wildcard path is present.
-Fix: Local Windows file path should be Unix format.
+- Feature: add compatibility with Nx Workspaces and projects that use layers of wildcard export barrels
+- Fix: edge case race condition on imports changed in component and spec file
+- Fix: edge case replacement of selectors missed in some templates due to line break in end tag
+- Fix: replace dots with dashes entered for name

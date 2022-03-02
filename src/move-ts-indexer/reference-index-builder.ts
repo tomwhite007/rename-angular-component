@@ -2,18 +2,22 @@ import * as fs from 'fs-extra-promise';
 import * as path from 'path';
 import * as ts from 'typescript';
 import * as vscode from 'vscode';
-import {
-  isPathToAnotherDir,
-  mergeReferenceArrays,
-  Reference,
-  ReferenceIndex,
-} from './reference-index';
+import { ReferenceIndex } from './reference-index';
 import {
   applyGenericEdits,
   GenericEdit,
   GenericEditsCallback,
 } from './apply-generic-edits';
 import * as minimatch from 'minimatch';
+import {
+  isPathToAnotherDir,
+  mergeReferenceArrays,
+  asUnix,
+  isInDir,
+  conf,
+  flattenArray,
+} from './util/helper-functions';
+import { Reference } from './util/shared-interfaces';
 
 const BATCH_SIZE = 50;
 
@@ -49,52 +53,30 @@ interface ConfigInfo {
   configPath: string;
 }
 
-export function isInDir(dir: string, p: string) {
-  const relative = path.relative(dir, p);
-  return !isPathToAnotherDir(relative);
-}
-
-export function asUnix(fsPath: string) {
-  return fsPath.replace(/\\/g, '/');
-}
-
-export class ReferenceIndexer {
+export class ReferenceIndexBuilder {
   index: ReferenceIndex = new ReferenceIndex();
   isinitialised: boolean = false;
   changeDocumentEvent!: vscode.Disposable;
 
   private tsConfigs!: { [key: string]: ConfigInfo };
   private packageNames: { [key: string]: string } = {};
-  private extensions: string[] = ['.ts'];
+  private readonly extensions: string[] = ['.ts'];
   private fileWatcher!: vscode.FileSystemWatcher;
   private fileEditLog: string[] = [];
 
   constructor(private debugLogger: { log: (...args: string[]) => void }) {}
 
-  init(progress?: vscode.Progress<{ message: string }>): Thenable<any> {
+  async init(progress?: vscode.Progress<{ message: string }>) {
     this.debugLogger.log('## Debug Indexer Start ###');
     this.index = new ReferenceIndex();
 
-    return this.readPackageNames().then(() => {
-      this.debugLogger.log('tsConfigs: ', JSON.stringify(this.tsConfigs));
-
-      return this.scanAll(progress)
-        .then(() => {
-          return this.attachFileWatcher();
-        })
-        .then(() => {
-          console.log('indexer initialised');
-          this.isinitialised = true;
-
-          this.debugLogger.log('## Debug Indexer End ###');
-        });
-    });
-  }
-
-  conf<T>(property: string, defaultValue: T): T {
-    return vscode.workspace
-      .getConfiguration('renameAngularComponent')
-      .get<T>(property, defaultValue);
+    await this.readPackageNames();
+    this.debugLogger.log('tsConfigs: ', JSON.stringify(this.tsConfigs));
+    await this.scanAll(progress);
+    this.attachFileWatcher();
+    console.log('indexer initialised');
+    this.isinitialised = true;
+    this.debugLogger.log('## Debug Indexer End ###');
   }
 
   private async readPackageNames() {
@@ -115,7 +97,7 @@ export class ReferenceIndexer {
         if (json.name) {
           if (seenPackageNames[json.name]) {
             delete this.packageNames[json.name];
-            return;
+            continue;
           }
           seenPackageNames[json.name] = true;
           this.packageNames[json.name] = path.dirname(packageFile.fsPath);
@@ -239,18 +221,20 @@ export class ReferenceIndexer {
 
   private readonly filesToScanGlob = '**/*.ts';
 
-  private scanAll(progress?: vscode.Progress<{ message: string }>) {
+  private async scanAll(progress?: vscode.Progress<{ message: string }>) {
     this.index = new ReferenceIndex();
     const start = Date.now();
-    return vscode.workspace
-      .findFiles(this.filesToScanGlob, '**/node_modules/**', 100000)
-      .then((files) => {
-        return this.processWorkspaceFiles(files, false, progress);
-      })
-      .then(() => {
-        console.log('scan finished in ' + (Date.now() - start) + 'ms');
-        console.log(`Indexed ${this.index.fileCount()} files`);
-      });
+
+    const files = await vscode.workspace.findFiles(
+      this.filesToScanGlob,
+      '**/node_modules/**',
+      100000
+    );
+
+    await this.processWorkspaceFiles(files, false, progress);
+
+    console.log('scan finished in ' + (Date.now() - start) + 'ms');
+    console.log(`Indexed ${this.index.fileCount()} files`);
   }
 
   private attachFileWatcher(): void {
@@ -335,11 +319,14 @@ export class ReferenceIndexer {
         fromPath || filePath,
         before
       );
-      const seen: any = {};
       const beforeReplacements = relativeReferences.filter((ref) => {
+        const refFullPath = this.resolveRelativeReference(
+          fromPath || filePath,
+          ref.itemText
+        );
         return (
-          this.resolveRelativeReference(fromPath || filePath, ref.itemText) ===
-          beforeReference
+          refFullPath === beforeReference ||
+          refFullPath === this.removeIndexSuffix(beforeReference)
         );
       });
       beforeReplacements.forEach((beforeReplacement) => {
@@ -357,13 +344,18 @@ export class ReferenceIndexer {
 
   private replaceEdits(
     filePath: string,
-    getEdits: (filePath: string, text: string) => GenericEdit[]
+    getEdits: (filePath: string, text: string) => GenericEdit[],
+    processFileWhenNoEdits = false
   ): Thenable<any> {
     // TODO: refactor to not use editors unless unsaved
-    if (!this.conf('openEditors', false)) {
+    if (!conf('openEditors', false)) {
       return fs.readFileAsync(filePath, 'utf8').then((text) => {
         const edits = getEdits(filePath, text);
         if (edits.length === 0) {
+          if (processFileWhenNoEdits) {
+            // TODO: make getReferenceEdits() work separately from replacements() - due a callback within a callback, processFileWhenNoEdits cannot be set from outside
+            this.processFile(text, filePath, true);
+          }
           return Promise.resolve();
         }
 
@@ -427,12 +419,20 @@ export class ReferenceIndexer {
         new Set(this.getRelativeImportSpecifiers(text, from))
       );
 
-      return references.map((reference): [string, string] => {
+      return <Replacement[]>references.map((reference) => {
         const absReference = this.resolveRelativeReference(
           from,
           reference.path
         );
-        const newReference = this.getRelativePath(to, absReference);
+
+        let newReference = this.getRelativePath(to, absReference);
+        if (isPathToAnotherDir(newReference)) {
+          // if path contains ../ then look for direct path or wildcard path
+          newReference = this.resolveToPath(to, newReference);
+        }
+
+        newReference = this.removeExtension(newReference);
+        newReference = this.removeIndexSuffix(newReference);
         return [reference.path, newReference];
       });
     };
@@ -442,7 +442,8 @@ export class ReferenceIndexer {
       (filePath: string, text: string): GenericEdit[] => [
         ...this.getReferenceEdits(filePath, text, replacements(text), from),
         ...(additionalEdits ? additionalEdits(filePath, text) : []),
-      ]
+      ],
+      true
     ).then(() => {
       this.index.deleteByPath(from);
     });
@@ -650,19 +651,35 @@ export class ReferenceIndexer {
       return affectedFiles;
     }
     const barrels = affectedFiles.filter((ref) => ref.isExport);
-    const affectedFromBarrelArrays = barrels.map((ref) =>
-      this.index
-        .getReferences(ref.path)
-        .filter((barrelRef) =>
-          barrelRef.specifiers.includes(exportedNameToChange)
-        )
-    );
-    const affectedFromBarrel = affectedFromBarrelArrays.reduce(
-      (acc, val) => acc.concat(val),
-      []
+    const affectedFromBarrel = flattenArray<Reference>(
+      barrels.map((ref) =>
+        this.getReferencesForSpecifier(ref.path, exportedNameToChange)
+      )
     );
     affectedFiles = mergeReferenceArrays(affectedFiles, affectedFromBarrel);
     return affectedFiles;
+  }
+
+  private getReferencesForSpecifier(
+    path: string,
+    specifier: string
+  ): Reference[] {
+    const refsForSpecifier = this.index
+      .getReferences(path)
+      .filter(
+        (barrelRef) =>
+          barrelRef.specifiers.includes(specifier) || barrelRef.isExport
+      );
+
+    const baseRefs = refsForSpecifier.filter((ref) => !ref.isExport);
+
+    const deepRefs = flattenArray<Reference>(
+      refsForSpecifier
+        .filter((ref) => ref.isExport)
+        .map((ref) => this.getReferencesForSpecifier(ref.path, specifier))
+    );
+
+    return [...baseRefs, ...deepRefs];
   }
 
   private processWorkspaceFiles(
@@ -710,6 +727,12 @@ export class ReferenceIndexer {
     });
   }
 
+  private getUnnamedExports(key: string) {
+    return this.index.references[key].filter(
+      (ref) => ref.isExport && ref.specifiers.length === 0
+    );
+  }
+
   private processDocuments(documents: vscode.TextDocument[]): Promise<any> {
     documents = documents.filter((doc) => {
       return (
@@ -755,12 +778,27 @@ export class ReferenceIndexer {
   }
 
   private getRelativePath(from: string, to: string): string {
-    if (this.conf('useLocalDirectPaths', false)) {
+    const generatePathWithoutTsConfig = () => {
+      for (let packageName in this.packageNames) {
+        const packagePath = this.packageNames[packageName];
+        if (isInDir(packagePath, to) && !isInDir(packagePath, from)) {
+          return asUnix(path.join(packageName, path.relative(packagePath, to)));
+        }
+      }
+      let relative = path.relative(path.dirname(from), to);
+      if (!relative.startsWith('.')) {
+        relative = './' + relative;
+      }
+      return asUnix(relative);
+    };
+
+    if (conf('useLocalDirectPaths', false)) {
       const fromDir = path.dirname(from);
       if (to.startsWith(fromDir)) {
-        return asUnix(to.replace(fromDir, '.'));
+        return generatePathWithoutTsConfig();
       }
     }
+
     const configInfo = this.getTsConfig(from);
     if (configInfo) {
       const config = configInfo.config;
@@ -786,17 +824,52 @@ export class ReferenceIndexer {
         }
       }
     }
-    for (let packageName in this.packageNames) {
-      const packagePath = this.packageNames[packageName];
-      if (isInDir(packagePath, to) && !isInDir(packagePath, from)) {
-        return asUnix(path.join(packageName, path.relative(packagePath, to)));
+
+    return generatePathWithoutTsConfig();
+  }
+
+  private resolveToPath(fsPath: string, localPath: string): string {
+    const resolvedFilePath = path.resolve(path.dirname(fsPath), localPath);
+    const configInfo = this.getTsConfig(fsPath);
+    if (configInfo) {
+      const config = configInfo.config;
+      const configPath = configInfo.configPath;
+      if (
+        config.compilerOptions &&
+        config.compilerOptions.paths &&
+        config.compilerOptions.baseUrl
+      ) {
+        const baseUrl = path.resolve(
+          path.dirname(configPath),
+          config.compilerOptions.baseUrl
+        );
+        for (let p in config.compilerOptions.paths) {
+          // wildcard path mappings
+          if (p.endsWith('*')) {
+            const paths = config.compilerOptions.paths[p];
+            for (let i = 0; i < paths.length; i++) {
+              const mapped = paths[i].slice(0, -1);
+              const mappedDir = path.resolve(baseUrl, mapped);
+              if (isInDir(mappedDir, resolvedFilePath)) {
+                return p.slice(0, -1) + resolvedFilePath.replace(mappedDir, '');
+              }
+            }
+          } else {
+            // fixed path mappings
+            const paths = config.compilerOptions.paths[p];
+            for (let i = 0; i < paths.length; i++) {
+              const mapped = paths[i];
+              const mappedDir = path.resolve(baseUrl, mapped);
+              if (isInDir(mappedDir, resolvedFilePath)) {
+                return p;
+              }
+            }
+          }
+        }
       }
     }
-    let relative = path.relative(path.dirname(from), to);
-    if (!relative.startsWith('.')) {
-      relative = './' + relative;
-    }
-    return asUnix(relative);
+
+    return localPath;
   }
 
   private resolveRelativeReference(fsPath: string, reference: string): string {
@@ -908,6 +981,12 @@ export class ReferenceIndexer {
     }));
   }
 
+  /**
+   * Get import / export paths from ts file.
+   * @param fileName
+   * @param data
+   * @returns array of import / export paths as FoundItem[]
+   */
   private getReferences(fileName: string, data: string): FoundItem[] {
     const result: FoundItem[] = [];
     const file = ts.createSourceFile(fileName, data, ts.ScriptTarget.Latest);
@@ -938,7 +1017,6 @@ export class ReferenceIndexer {
               (elem) => elem.name.text
             );
           }
-
           result.push({
             itemType: 'exportPath',
             itemText: node.moduleSpecifier.text,

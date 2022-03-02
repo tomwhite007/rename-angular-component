@@ -4,7 +4,7 @@ import {
   OriginalFileDetails,
 } from './definitions/file.interfaces';
 import { getProjectRoot } from './definitions/get-project-root-file-path.function';
-import { ReferenceIndexer } from '../move-ts-indexer/reference-indexer';
+import { ReferenceIndexBuilder } from '../move-ts-indexer/reference-index-builder';
 import { FileItem } from '../move-ts-indexer/file-item';
 import * as fs from 'fs-extra-promise';
 import { getOriginalFileDetails } from './in-file-edits/get-original-file-details.function';
@@ -44,7 +44,7 @@ export class Renamer {
   private selectorTransfer!: SelectorTransfer;
 
   constructor(
-    private indexer: ReferenceIndexer,
+    private indexer: ReferenceIndexBuilder,
     private indexerInitialisePromise: Thenable<any>,
     private userMessage: UserMessage,
     private debugLogger: DebugLogger
@@ -84,16 +84,19 @@ export class Renamer {
 
           /* TODO 
 
-
-          Release notes: add to repo
-
           ---- v2 -----
 
-          fix wildcard and multi-barrel exports
+          add integration tests
 
-          Add import statements (used by router) to getReferences()
+          Issue: renaming import paths in Lazy Loaded Routes
+            Add import statements (used by router) to getReferences()
             work out performance impact, and see if regex check first improves it
-            then possibly turn it into a config option          
+            then possibly turn it into a config option       
+            https://github.com/tomwhite007/rename-angular-component/issues/9
+
+          regex for replace in spec name should use space or quote to identify start or end of work before replacing
+
+          anyConstructRegexPartial doesn't work because it allows sub folders   
 
           Add option to fix selector + use default prefix
           then ask for prefix if default not ticked
@@ -101,10 +104,6 @@ export class Renamer {
           limit rename selector in templates to current workspace multi-folder root
   
           make sure input newStub matches constraints and formatting allowed by CLI
-
-          fix numbers in string to camel case; remove underscore?
-
-          Issue: renaming import paths in Lazy Loaded Routes
   
           refactor for clean classes, functions and pure async await
   
@@ -149,7 +148,7 @@ export class Renamer {
     let currentProgress = 20;
     this.userMessage.logInfoToChannel(['File edits:'], false);
     this.indexer.startNewMoves();
-    for (const item of this.fileMoveJobs) {
+    for await (const item of this.fileMoveJobs) {
       currentProgress += progressIncrement;
       progress.report({ increment: currentProgress });
       await timeoutPause(10);
@@ -367,8 +366,8 @@ export class Renamer {
         );
         return false;
       }
-      // make sure it's kebab
-      this.newStub = dasherize(inputResult ?? '');
+      // make sure it's kebab, and loose the dots
+      this.newStub = dasherize(inputResult.replace('.', '-') ?? '');
 
       this.userMessage.setOperationTitle(this.title);
 

@@ -65,7 +65,7 @@ export function getCoreClassEdits(
               new RegExp(
                 `(?<=\\/|^)${escapeStringRegexp(
                   originalFileStub
-                )}(?=.${construct}.(html|scss|css)$)`
+                )}(?=.${construct}.(html|scss|css|sass|less)$)`
               ),
               newFileStub
             )}'`;

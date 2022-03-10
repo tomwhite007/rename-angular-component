@@ -19,18 +19,13 @@ import {
 import { checkForOpenUnsavedEditors } from './window/check-for-open-unsaved-editors.function';
 import * as path from 'path';
 import { UserMessage } from './logging/user-message.class';
-import { EXTENSION_NAME } from './definitions/extension-name';
 import { noSelectedFileHandler } from './no-selected-file-handler/no-selected-file-handler.function';
 import { getOriginalClassName } from './in-file-edits/get-original-class-name.function';
 import { DebugLogger } from './logging/debug-logger.class';
 import { validateHtmlSelector } from '../angular-cli/validation';
 import { classify, dasherize } from '../angular-cli/strings';
 import { CONSTRUCTS_WITH_SELECTORS } from './definitions/constructs-with-selectors';
-
-const timeoutPause = async (wait = 0) => {
-  await new Promise((res) => setTimeout(res, wait));
-  return;
-};
+import { timeoutPause } from '../utils/timeout-pause';
 
 export class Renamer {
   private construct!: AngularConstruct;

@@ -1,5 +1,5 @@
-import escapeStringRegexp from 'escape-string-regexp';
 import { workspace } from 'vscode';
+import { escapeRegex } from '../../utils/escape-regex';
 import { likeFilesRegexPartialLookup } from '../definitions/file-regex.constants';
 import {
   OriginalFileDetails,
@@ -50,14 +50,12 @@ export class FilesRelatedToStub {
     const uris = await workspace.findFiles(glob, '**/node_modules/**', 10000);
 
     this.constructFilesRegex = RegExp(
-      `${escapeStringRegexp(fileDetails.stub)}${
+      `${escapeRegex(fileDetails.stub)}${
         likeFilesRegexPartialLookup[construct]
       }`
     );
     this.relatedFilesRegex = new RegExp(
-      `${escapeStringRegexp(fileDetails.stub)}${
-        likeFilesRegexPartialLookup.any
-      }`
+      `${escapeRegex(fileDetails.stub)}${likeFilesRegexPartialLookup.any}`
     );
 
     const isCoreConstructRegex = new RegExp(`\\.${construct}\\.ts$`);
@@ -75,7 +73,7 @@ export class FilesRelatedToStub {
 
   getFilesToMove(newStub: string) {
     const folderReplaceRegex = new RegExp(
-      `(?<=\/)${escapeStringRegexp(this.originalFileDetails.stub)}$`
+      `(?<=\/)${escapeRegex(this.originalFileDetails.stub)}$`
     );
     const replaceStub = (filePath: string) => {
       if (this.folderNameSameAsStub) {

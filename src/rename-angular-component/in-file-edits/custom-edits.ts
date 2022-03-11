@@ -1,10 +1,10 @@
-import escapeStringRegexp from 'escape-string-regexp';
 import * as ts from 'typescript';
 import { classify } from '../../angular-cli/strings';
 import {
   GenericEditsCallback,
   GenericEdit,
 } from '../../move-ts-indexer/apply-generic-edits';
+import { escapeRegex } from '../../utils/escape-regex';
 import { AngularConstruct } from '../definitions/file.interfaces';
 import { generateNewSelector } from './generate-new-selector.function';
 
@@ -63,7 +63,7 @@ export function getCoreClassEdits(
           case 'styleUrls':
             replacement = `'${foundItem.itemText.replace(
               new RegExp(
-                `(?<=\\/|^)${escapeStringRegexp(
+                `(?<=\\/|^)${escapeRegex(
                   originalFileStub
                 )}(?=.${construct}.(html|scss|css|sass|less)$)`
               ),

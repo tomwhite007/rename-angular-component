@@ -42,7 +42,8 @@ export class Renamer {
     private indexer: ReferenceIndexBuilder,
     private indexerInitialisePromise: Thenable<any>,
     private userMessage: UserMessage,
-    private debugLogger: DebugLogger
+    private debugLogger: DebugLogger,
+    private testBypassInputBox?: string
   ) {}
 
   async rename(_construct: AngularConstruct, selectedUri: vscode.Uri) {
@@ -335,11 +336,13 @@ export class Renamer {
         return false;
       }
 
-      const inputResult = await vscode.window.showInputBox({
-        title: this.title,
-        prompt: `Enter the new ${this.construct} name.`,
-        value: this.originalFileDetails.stub,
-      });
+      const inputResult =
+        this.testBypassInputBox ?? // test harness input text
+        (await vscode.window.showInputBox({
+          title: this.title,
+          prompt: `Enter the new ${this.construct} name.`,
+          value: this.originalFileDetails.stub,
+        }));
       this.processTimerStart = Date.now();
 
       if (!inputResult) {

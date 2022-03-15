@@ -8,15 +8,18 @@ suite('Extension Test Suite', () => {
   vscode.window.showInformationMessage('Start all tests.');
 
   test('Sample test', async () => {
+    const git = simpleGit({
+      baseDir:
+        '/Users/tom/Development/my-stuff/simple-reactive-viewmodel-example/',
+    });
+
     await runRenamerScenario(
+      '/Users/tom/Development/my-stuff/simple-reactive-viewmodel-example/',
       '/Users/tom/Development/my-stuff/simple-reactive-viewmodel-example/src/app/shared/book-ui/book-list/book-list.component.html',
       'tom-test'
     );
 
-    const diff = await simpleGit({
-      baseDir:
-        '/Users/tom/Development/my-stuff/simple-reactive-viewmodel-example/',
-    }).diff();
+    const diff = await git.diff();
 
     const fileDiff = await readUpsertDiffFile(
       './src/test/suite/diffs/simple-reactive-viewmodel-example.txt',
@@ -24,6 +27,8 @@ suite('Extension Test Suite', () => {
     );
 
     assert.strictEqual(diff, fileDiff);
+
+    await git.checkout(['.']);
   });
 });
 

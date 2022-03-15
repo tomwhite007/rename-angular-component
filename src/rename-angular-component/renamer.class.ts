@@ -43,7 +43,7 @@ export class Renamer {
     private indexerInitialisePromise: Thenable<any>,
     private userMessage: UserMessage,
     private debugLogger: DebugLogger,
-    private testBypassInputBox?: string
+    private testBypass?: { stub: string; projectRoot: string }
   ) {}
 
   async rename(_construct: AngularConstruct, selectedUri: vscode.Uri) {
@@ -325,7 +325,7 @@ export class Renamer {
 
       this.originalFileDetails = getOriginalFileDetails(selectedUri.path);
       this.projectRoot = windowsFilePathFix(
-        getProjectRoot(selectedUri) as string
+        this.testBypass?.projectRoot ?? (getProjectRoot(selectedUri) as string)
       );
       this.debugLogger.setWorkspaceRoot(this.projectRoot);
 
@@ -337,7 +337,7 @@ export class Renamer {
       }
 
       const inputResult =
-        this.testBypassInputBox ?? // test harness input text
+        this.testBypass?.stub ?? // test harness input text
         (await vscode.window.showInputBox({
           title: this.title,
           prompt: `Enter the new ${this.construct} name.`,

@@ -5,7 +5,11 @@ import { DebugLogger } from '../../../rename-angular-component/logging/debug-log
 import { UserMessage } from '../../../rename-angular-component/logging/user-message.class';
 import { Renamer } from '../../../rename-angular-component/renamer.class';
 
-export async function runRenamerScenario(filePath: string, newSlug: string) {
+export async function runRenamerScenario(
+  projectRoot: string,
+  filePath: string,
+  newStub: string
+) {
   const debugLogger = new DebugLogger(false);
   const userMessage = new UserMessage(EXTENSION_NAME);
   const indexer: ReferenceIndexBuilder = new ReferenceIndexBuilder(debugLogger);
@@ -28,7 +32,7 @@ export async function runRenamerScenario(filePath: string, newSlug: string) {
     Promise.resolve(),
     userMessage,
     debugLogger,
-    newSlug
+    { stub: newStub, projectRoot }
   );
 
   await renamer.rename('component', vscode.Uri.file(filePath));

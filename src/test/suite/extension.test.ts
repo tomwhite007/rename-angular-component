@@ -1,14 +1,11 @@
 import * as assert from 'assert';
 import * as vscode from 'vscode';
 import simpleGit from 'simple-git';
-import path = require('path');
-import * as fs from 'fs-extra-promise';
 import { runRenamerScenario } from './helpers/run-renamer-scenario.function';
 import { readUpsertDiffFile } from './helpers/read-upsert-diff-file.function';
 
 suite('Extension Test Suite', () => {
   vscode.window.showInformationMessage('Start all tests.');
-  // this.timeout(0);
 
   test('Sample test', async () => {
     await runRenamerScenario(
@@ -29,3 +26,14 @@ suite('Extension Test Suite', () => {
     assert.strictEqual(diff, fileDiff);
   });
 });
+
+/*
+  Todo:
+
+  Make Overwrite an npm param
+
+  make tests open different projects
+
+  run all tests from a config array
+
+*/

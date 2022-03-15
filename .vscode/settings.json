@@ -10,5 +10,5 @@
   },
   // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
   "typescript.tsc.autoDetect": "off",
-  "cSpell.words": ["camelize", "dasherize", "tsmove"]
+  "cSpell.words": ["camelize", "dasherize", "tbody", "thead", "tsmove"]
 }

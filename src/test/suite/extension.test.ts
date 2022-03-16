@@ -13,6 +13,11 @@ suite('Extension Test Suite', () => {
         '/Users/tom/Development/my-stuff/simple-reactive-viewmodel-example/',
     });
 
+    const notClean = await git.diff();
+    if (notClean) {
+      await git.clean(['f', 'd']);
+    }
+
     await runRenamerScenario(
       '/Users/tom/Development/my-stuff/simple-reactive-viewmodel-example',
       '/Users/tom/Development/my-stuff/simple-reactive-viewmodel-example/src/app/shared/book-ui/book-list/book-list.component.html',
@@ -28,7 +33,7 @@ suite('Extension Test Suite', () => {
 
     assert.strictEqual(diff, fileDiff);
 
-    await git.checkout(['.']);
+    await git.clean(['f', 'd']);
   });
 });
 

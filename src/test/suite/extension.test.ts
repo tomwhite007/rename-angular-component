@@ -14,7 +14,7 @@ suite('Extension Test Suite', () => {
     });
 
     await runRenamerScenario(
-      '/Users/tom/Development/my-stuff/simple-reactive-viewmodel-example/',
+      '/Users/tom/Development/my-stuff/simple-reactive-viewmodel-example',
       '/Users/tom/Development/my-stuff/simple-reactive-viewmodel-example/src/app/shared/book-ui/book-list/book-list.component.html',
       'tom-test'
     );

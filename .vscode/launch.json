@@ -14,14 +14,27 @@
       "preLaunchTask": "${defaultBuildTask}"
     },
     {
-      "name": "Extension Tests",
+      "name": "Extension Tests 1",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}",
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/index1",
-        "/Users/tom/Development/my-stuff/simple-reactive-viewmodel-example"
+        "/Users/tom/Development/vscode-ext/_rename-test-spas/simple-reactive-viewmodel-example"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "tasks: watch-tests"
+    },
+    {
+      "name": "Extension Tests 2",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index2",
+        "/Users/tom/Development/vscode-ext/_rename-test-spas/shp-wild-paths"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests"

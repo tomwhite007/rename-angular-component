@@ -10,7 +10,7 @@ suite('Extension Test Suite', () => {
   test('Sample test', async () => {
     const git = simpleGit({
       baseDir:
-        '/Users/tom/Development/vscode-ext/_rename-test-spas/simple-reactive-viewmodel-example',
+        '/Users/tom/Development/vscode-ext/_rename-test-spas/shp-wild-paths',
     });
     const discardChanges = async () => {
       await git.clean([CleanOptions.FORCE, CleanOptions.RECURSIVE]);
@@ -23,15 +23,15 @@ suite('Extension Test Suite', () => {
     }
 
     await runRenamerScenario(
-      '/Users/tom/Development/vscode-ext/_rename-test-spas/simple-reactive-viewmodel-example',
-      './src/app/shared/book-ui/book-list/book-list.component.html',
+      '/Users/tom/Development/vscode-ext/_rename-test-spas/shp-wild-paths',
+      './apps/Shop/src/app/registration/registration.component.scss',
       'tom-test'
     );
 
     const diff = await git.diff();
 
     const fileDiff = await readUpsertDiffFile(
-      './src/test/suite/diffs/simple-reactive-viewmodel-example.txt',
+      './src/test/suite/diffs/shp-wild-paths.txt',
       diff
     );
 

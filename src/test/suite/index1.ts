@@ -1,31 +1,5 @@
-import * as path from 'path';
-import * as Mocha from 'mocha';
+import { runMochaScenarioFile } from './helpers/run-mocha-scenario-file.function';
 
 export function run(): Promise<void> {
-  // Create the mocha test
-  const mocha = new Mocha({
-    ui: 'tdd',
-    color: true,
-    timeout: 0,
-  });
-
-  const testsRoot = path.resolve(__dirname, '..');
-
-  return new Promise((c, e) => {
-    mocha.addFile(path.resolve(testsRoot, './suite/scenario1.test.js'));
-
-    try {
-      // Run the mocha test
-      mocha.run((failures) => {
-        if (failures > 0) {
-          e(new Error(`${failures} tests failed.`));
-        } else {
-          c();
-        }
-      });
-    } catch (err) {
-      console.error(err);
-      e(err);
-    }
-  });
+  return runMochaScenarioFile('./suite/scenario1.test.js');
 }

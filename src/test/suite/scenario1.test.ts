@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as vscode from 'vscode';
-import simpleGit from 'simple-git';
+import simpleGit, { CleanOptions } from 'simple-git';
 import { runRenamerScenario } from './helpers/run-renamer-scenario.function';
 import { readUpsertDiffFile } from './helpers/read-upsert-diff-file.function';
 
@@ -15,7 +15,9 @@ suite('Extension Test Suite', () => {
 
     const notClean = await git.diff();
     if (notClean) {
-      await git.clean(['f', 'd']);
+      await git.clean(CleanOptions.FORCE, [
+        '/Users/tom/Development/my-stuff/simple-reactive-viewmodel-example/',
+      ]);
     }
 
     await runRenamerScenario(
@@ -33,7 +35,7 @@ suite('Extension Test Suite', () => {
 
     assert.strictEqual(diff, fileDiff);
 
-    await git.clean(['f', 'd']);
+    await git.clean(CleanOptions.FORCE);
   });
 });
 

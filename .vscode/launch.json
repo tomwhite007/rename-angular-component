@@ -20,7 +20,7 @@
       "runtimeExecutable": "${execPath}",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index1",
         "/Users/tom/Development/my-stuff/simple-reactive-viewmodel-example"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],

@@ -12,12 +12,14 @@ suite('Extension Test Suite', () => {
       baseDir:
         '/Users/tom/Development/my-stuff/simple-reactive-viewmodel-example/',
     });
+    const discardChanges = async () => {
+      await git.clean([CleanOptions.FORCE, CleanOptions.RECURSIVE]);
+      await git.checkout('.');
+    };
 
     const notClean = await git.diff();
     if (notClean) {
-      await git.clean(CleanOptions.FORCE, [
-        '/Users/tom/Development/my-stuff/simple-reactive-viewmodel-example/',
-      ]);
+      await discardChanges();
     }
 
     await runRenamerScenario(
@@ -35,7 +37,7 @@ suite('Extension Test Suite', () => {
 
     assert.strictEqual(diff, fileDiff);
 
-    await git.clean(CleanOptions.FORCE);
+    await discardChanges();
   });
 });
 

@@ -8,8 +8,14 @@ suite('Suite Scenario 2', () => {
     await genericTestScenario({
       projectRoot:
         '/Users/tom/Development/vscode-ext/_rename-test-spas/shp-wild-paths',
-      filePath: './apps/Shop/src/app/registration/registration.component.scss',
-      newStub: 'tom-test',
+      renames: [
+        {
+          filePath:
+            './apps/Shop/src/app/registration/registration.component.scss',
+          construct: 'component',
+          newStub: 'tom-test',
+        },
+      ],
       fileDiffPath: './src/test/suite/diffs/shp-wild-paths.txt',
     });
   });

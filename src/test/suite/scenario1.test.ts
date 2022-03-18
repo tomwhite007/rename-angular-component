@@ -8,8 +8,14 @@ suite('Suite Scenario 1', () => {
     await genericTestScenario({
       projectRoot:
         '/Users/tom/Development/vscode-ext/_rename-test-spas/simple-reactive-viewmodel-example',
-      filePath: './src/app/shared/book-ui/book-list/book-list.component.html',
-      newStub: 'tom-test',
+      renames: [
+        {
+          filePath:
+            './src/app/shared/book-ui/book-list/book-list.component.html',
+          construct: 'component',
+          newStub: 'tom-test',
+        },
+      ],
       fileDiffPath:
         './src/test/suite/diffs/simple-reactive-viewmodel-example.txt',
     });

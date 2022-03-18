@@ -8,8 +8,14 @@ suite('Suite Scenario 4', () => {
     await genericTestScenario({
       projectRoot:
         '/Users/tom/Development/vscode-ext/_rename-test-spas/test-paths-app',
-      filePath: './projects/my-service-lib/src/lib/my-service-lib.component.ts',
-      newStub: 'tom-test',
+      renames: [
+        {
+          filePath:
+            './projects/my-service-lib/src/lib/my-service-lib.component.ts',
+          construct: 'service',
+          newStub: 'tom-test',
+        },
+      ],
       fileDiffPath: './src/test/suite/diffs/test-paths-app.txt',
     });
   });

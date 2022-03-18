@@ -1,13 +1,14 @@
 import assert = require('assert');
 import simpleGit, { CleanOptions } from 'simple-git';
 import { readUpsertDiffFile } from './read-upsert-diff-file.function';
-import { runRenamerScenario } from './run-renamer-scenario.function';
+import {
+  RenameCallConfig,
+  runRenamerScenario,
+} from './run-renamer-scenario.function';
 
 export interface TestScenarioConfig {
   projectRoot: string;
-  // rename: { filePath: string; newStub: string }[];
-  filePath: string;
-  newStub: string;
+  renames: RenameCallConfig[];
   fileDiffPath: string;
 }
 
@@ -25,7 +26,7 @@ export async function genericTestScenario(config: TestScenarioConfig) {
     await discardChanges();
   }
 
-  await runRenamerScenario(config.projectRoot, config.filePath, config.newStub);
+  await runRenamerScenario(config.projectRoot, config.renames);
 
   const diff = await git.diff();
 

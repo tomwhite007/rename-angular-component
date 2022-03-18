@@ -98,6 +98,7 @@ export class Renamer {
 
           regex for replace in spec name should use space or quote to identify start or end of work before replacing
 
+          replace selector inside sibling spec files
 
           
 

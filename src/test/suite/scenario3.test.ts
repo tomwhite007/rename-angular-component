@@ -13,8 +13,20 @@ suite('Suite Scenario 3', () => {
           filePath:
             './libs/common/util-foundation/src/lib/services/build.config.service.ts',
           construct: 'service',
-          newStub: 'tom-test',
+          newStub: 'conf-test',
         },
+        {
+          filePath:
+            './libs/shared/ui-base-components/src/lib/banner/banner.component.spec.ts',
+          construct: 'component',
+          newStub: 'banner-test',
+        },
+        // {
+        //   filePath:
+        //     './libs/shared/ui-dynamic-form-builder/src/lib/_shared/directives/tooltip/tooltip.directive.ts',
+        //   construct: 'directive',
+        //   newStub: 'tooltip-test',
+        // },
       ],
       fileDiffPath: './src/test/suite/diffs/dsls-spa.txt',
     });

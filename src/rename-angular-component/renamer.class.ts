@@ -83,7 +83,12 @@ export class Renamer {
 
           ---- v2 -----
 
-          add integration tests
+          Rename directive bug: Input identifier param string needs to change with the selector...
+            @Directive({
+              selector: '[dgxDfbTipTest]',
+            })
+            export class TipTestDirective implements OnDestroy {
+              @Input('dgxDfbTooltip') tooltipTemplate!: TemplateRef<unknown>;
 
           Issue: renaming import paths in Lazy Loaded Routes
             Add import statements (used by router) to getReferences()

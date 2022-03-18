@@ -5,6 +5,7 @@ import { runRenamerScenario } from './run-renamer-scenario.function';
 
 export interface TestScenarioConfig {
   projectRoot: string;
+  // rename: { filePath: string; newStub: string }[];
   filePath: string;
   newStub: string;
   fileDiffPath: string;

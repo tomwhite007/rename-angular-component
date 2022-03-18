@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 import { genericTestScenario } from './helpers/generic-test-scenario.function';
 
-suite('Suite Scenario 1', () => {
+suite('Suite Scenario 2', () => {
   vscode.window.showInformationMessage('Start all tests.');
 
-  test('Scenario 1', async () => {
+  test('Scenario 2', async () => {
     await genericTestScenario({
       projectRoot:
         '/Users/tom/Development/vscode-ext/_rename-test-spas/shp-wild-paths',

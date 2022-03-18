@@ -1,0 +1,123 @@
+diff --git a/projects/my-service-lib/src/lib/my-service-lib.component.spec.ts b/projects/my-service-lib/src/lib/my-service-lib.component.spec.ts
+deleted file mode 100644
+index 95bef50..0000000
+--- a/projects/my-service-lib/src/lib/my-service-lib.component.spec.ts
++++ /dev/null
+@@ -1,25 +0,0 @@
+-import { ComponentFixture, TestBed } from '@angular/core/testing';
+-
+-import { MyServiceLibComponent } from './my-service-lib.component';
+-
+-describe('MyServiceLibComponent', () => {
+-  let component: MyServiceLibComponent;
+-  let fixture: ComponentFixture<MyServiceLibComponent>;
+-
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
+-      declarations: [ MyServiceLibComponent ]
+-    })
+-    .compileComponents();
+-  });
+-
+-  beforeEach(() => {
+-    fixture = TestBed.createComponent(MyServiceLibComponent);
+-    component = fixture.componentInstance;
+-    fixture.detectChanges();
+-  });
+-
+-  it('should create', () => {
+-    expect(component).toBeTruthy();
+-  });
+-});
+diff --git a/projects/my-service-lib/src/lib/my-service-lib.component.ts b/projects/my-service-lib/src/lib/my-service-lib.component.ts
+deleted file mode 100644
+index 180792a..0000000
+--- a/projects/my-service-lib/src/lib/my-service-lib.component.ts
++++ /dev/null
+@@ -1,20 +0,0 @@
+-import { Component, OnInit } from '@angular/core';
+-
+-@Component({
+-  selector: 'lib-my-service-lib',
+-  template: `
+-    <p>
+-      my-service-lib works!
+-    </p>
+-  `,
+-  styles: [
+-  ]
+-})
+-export class MyServiceLibComponent implements OnInit {
+-
+-  constructor() { }
+-
+-  ngOnInit(): void {
+-  }
+-
+-}
+diff --git a/projects/my-service-lib/src/lib/my-service-lib.module.ts b/projects/my-service-lib/src/lib/my-service-lib.module.ts
+index 54d282e..1831065 100644
+--- a/projects/my-service-lib/src/lib/my-service-lib.module.ts
++++ b/projects/my-service-lib/src/lib/my-service-lib.module.ts
+@@ -1,16 +1,16 @@
+ import { NgModule } from '@angular/core';
+-import { MyServiceLibComponent } from './my-service-lib.component';
++import { TomTestComponent } from './tom-test.component';
+ 
+ 
+ 
+ @NgModule({
+   declarations: [
+-    MyServiceLibComponent
++    TomTestComponent
+   ],
+   imports: [
+   ],
+   exports: [
+-    MyServiceLibComponent
++    TomTestComponent
+   ]
+ })
+ export class MyServiceLibModule { }
+diff --git a/projects/my-service-lib/src/public-api.ts b/projects/my-service-lib/src/public-api.ts
+index 971b69b..46e9ce3 100644
+--- a/projects/my-service-lib/src/public-api.ts
++++ b/projects/my-service-lib/src/public-api.ts
+@@ -3,6 +3,6 @@
+  */
+ 
+ export * from './lib/my-service-lib.service';
+-export * from './lib/my-service-lib.component';
++export * from './lib/tom-test.component';
+ export * from './lib/my-service-lib.module';
+ export * from './lib/services/my-test-lib.service';
+diff --git a/src/app/app.component.html b/src/app/app.component.html
+index 4630f82..fef6193 100644
+--- a/src/app/app.component.html
++++ b/src/app/app.component.html
+@@ -2,4 +2,4 @@
+ 
+ <app-sausage></app-sausage>
+ 
+-<lib-my-service-lib></lib-my-service-lib>
++<lib-tom-test></lib-tom-test>
+diff --git a/src/app/app.component.ts b/src/app/app.component.ts
+index 4213f86..449677b 100644
+--- a/src/app/app.component.ts
++++ b/src/app/app.component.ts
+@@ -1,5 +1,5 @@
+ import { Component, OnInit, ViewChild } from '@angular/core';
+-import { MyServiceLibComponent, MyTestLibService } from '@my-service-lib';
++import { TomTestComponent, MyTestLibService } from '@my-service-lib';
+ 
+ @Component({
+   selector: 'app-root',
+@@ -7,7 +7,7 @@ import { MyServiceLibComponent, MyTestLibService } from '@my-service-lib';
+   styleUrls: ['./app.component.scss'],
+ })
+ export class AppComponent implements OnInit {
+-  @ViewChild(MyServiceLibComponent) test!: MyServiceLibComponent;
++  @ViewChild(TomTestComponent) test!: TomTestComponent;
+   title = 'test-paths-app';
+ 
+   constructor(private my: MyTestLibService) {}

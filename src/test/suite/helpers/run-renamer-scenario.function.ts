@@ -1,3 +1,4 @@
+import path = require('path');
 import * as vscode from 'vscode';
 import { ReferenceIndexBuilder } from '../../../move-ts-indexer/reference-index-builder';
 import { EXTENSION_NAME } from '../../../rename-angular-component/definitions/extension-name';
@@ -35,5 +36,8 @@ export async function runRenamerScenario(
     { stub: newStub, projectRoot }
   );
 
-  await renamer.rename('component', vscode.Uri.file(filePath));
+  await renamer.rename(
+    'component',
+    vscode.Uri.file(path.join(projectRoot, filePath))
+  );
 }

@@ -32,9 +32,9 @@ export async function runRenamerScenario(
     indexer,
     Promise.resolve(),
     userMessage,
-    debugLogger,
-    { stub: newStub, projectRoot }
+    debugLogger
   );
+  renamer.testBypass = { stub: newStub };
 
   await renamer.rename(
     'component',

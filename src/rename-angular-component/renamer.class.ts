@@ -37,16 +37,17 @@ export class Renamer {
   private renameFolder!: boolean;
   private fileMoveJobs!: FileItem[];
   private selectorTransfer!: SelectorTransfer;
+  public testBypass?: { stub: string };
 
   constructor(
     private indexer: ReferenceIndexBuilder,
     private indexerInitialisePromise: Thenable<any>,
     private userMessage: UserMessage,
-    private debugLogger: DebugLogger,
-    private testBypass?: { stub: string; projectRoot: string }
+    private debugLogger: DebugLogger
   ) {}
 
   async rename(_construct: AngularConstruct, selectedUri: vscode.Uri) {
+    console.log('Rename process start');
     this.debugLogger.log('## Debug Rename Start ##');
 
     const detailsLoaded = await this.setRenameDetails(_construct, selectedUri);
@@ -125,8 +126,10 @@ export class Renamer {
           this.debugLogger.log('## Debug Rename Completed ##');
 
           await timeoutPause(50);
+          console.log('Rename process end');
         } catch (e: any) {
           this.reportErrors(e);
+          console.log('Rename process ended with errors');
         }
       }
     );
@@ -325,7 +328,7 @@ export class Renamer {
 
       this.originalFileDetails = getOriginalFileDetails(selectedUri.path);
       this.projectRoot = windowsFilePathFix(
-        this.testBypass?.projectRoot ?? (getProjectRoot(selectedUri) as string)
+        getProjectRoot(selectedUri) as string
       );
       this.debugLogger.setWorkspaceRoot(this.projectRoot);
 

@@ -7,7 +7,7 @@ export async function readUpsertDiffFile(
   localFilePath: string,
   newDiff: string
 ) {
-  console.log(`## readUpsertDiffFile OVERWRITE: ${OVERWRITE} ##`);
+  console.log(`## Snapshot OVERWRITE: ${OVERWRITE} ##`);
   const extensionDevelopmentPath = path.resolve(__dirname, '../../../../');
   const fullFilePath = path.join(extensionDevelopmentPath, localFilePath);
   const fullDirPath = path.dirname(fullFilePath);

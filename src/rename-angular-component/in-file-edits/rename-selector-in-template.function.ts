@@ -1,4 +1,4 @@
-import escapeStringRegexp from 'escape-string-regexp';
+import { escapeRegex } from '../../utils/escape-regex';
 import { getSelectorType } from './get-selector-type.function';
 
 export function renameSelectorInTemplate(
@@ -12,13 +12,13 @@ export function renameSelectorInTemplate(
   switch (type) {
     case 'element': {
       const testRegex = new RegExp(
-        `<\\/${escapeStringRegexp(originalSelector)}(\\n|\\s|>)`
+        `<\\/${escapeRegex(originalSelector)}(\\n|\\s|>)`
       );
       if (!html.match(testRegex)) {
         return null;
       }
       oriSelectorRegex = new RegExp(
-        `(?<=<|<\\/)${escapeStringRegexp(originalSelector)}(?=\\n|\\s|>)`,
+        `(?<=<|<\\/)${escapeRegex(originalSelector)}(?=\\n|\\s|>)`,
         'g'
       );
 
@@ -33,7 +33,7 @@ export function renameSelectorInTemplate(
 
       newSelector = newSelector.replace(/\[|\]/g, '');
       oriSelectorRegex = new RegExp(
-        `(?<=\\s|\\[)${escapeStringRegexp(originalSelector)}(?=\\s|\\]|\\=|>)`,
+        `(?<=\\s|\\[)${escapeRegex(originalSelector)}(?=\\s|\\]|\\=|>)`,
         'gm'
       );
 
@@ -49,13 +49,13 @@ export function renameSelectorInTemplate(
 
       newSelector = newSelector.replace(/^\./, '');
       oriSelectorRegex = new RegExp(
-        `(?<=class=("|'))[_a-zA-Z0-9-\\s]*${escapeStringRegexp(
+        `(?<=class=("|'))[_a-zA-Z0-9-\\s]*${escapeRegex(
           originalSelector
         )}[_a-zA-Z0-9-\\s]*(?="|')`,
         'gm'
       );
       const inClassRegex = new RegExp(
-        `(?<=^|\\s)${escapeStringRegexp(originalSelector)}(?=\\s|$)`,
+        `(?<=^|\\s)${escapeRegex(originalSelector)}(?=\\s|$)`,
         'gm'
       );
 

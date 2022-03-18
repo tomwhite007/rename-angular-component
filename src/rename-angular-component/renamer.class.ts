@@ -19,18 +19,13 @@ import {
 import { checkForOpenUnsavedEditors } from './window/check-for-open-unsaved-editors.function';
 import * as path from 'path';
 import { UserMessage } from './logging/user-message.class';
-import { EXTENSION_NAME } from './definitions/extension-name';
 import { noSelectedFileHandler } from './no-selected-file-handler/no-selected-file-handler.function';
 import { getOriginalClassName } from './in-file-edits/get-original-class-name.function';
 import { DebugLogger } from './logging/debug-logger.class';
 import { validateHtmlSelector } from '../angular-cli/validation';
 import { classify, dasherize } from '../angular-cli/strings';
 import { CONSTRUCTS_WITH_SELECTORS } from './definitions/constructs-with-selectors';
-
-const timeoutPause = async (wait = 0) => {
-  await new Promise((res) => setTimeout(res, wait));
-  return;
-};
+import { timeoutPause } from '../utils/timeout-pause';
 
 export class Renamer {
   private construct!: AngularConstruct;
@@ -42,6 +37,7 @@ export class Renamer {
   private renameFolder!: boolean;
   private fileMoveJobs!: FileItem[];
   private selectorTransfer!: SelectorTransfer;
+  public testBypass?: { stub: string };
 
   constructor(
     private indexer: ReferenceIndexBuilder,
@@ -51,6 +47,7 @@ export class Renamer {
   ) {}
 
   async rename(_construct: AngularConstruct, selectedUri: vscode.Uri) {
+    console.log('Rename process start');
     this.debugLogger.log('## Debug Rename Start ##');
 
     const detailsLoaded = await this.setRenameDetails(_construct, selectedUri);
@@ -86,7 +83,12 @@ export class Renamer {
 
           ---- v2 -----
 
-          add integration tests
+          Rename directive bug: Input identifier param string needs to change with the selector...
+            @Directive({
+              selector: '[dgxDfbTipTest]',
+            })
+            export class TipTestDirective implements OnDestroy {
+              @Input('dgxDfbTooltip') tooltipTemplate!: TemplateRef<unknown>;
 
           Issue: renaming import paths in Lazy Loaded Routes
             Add import statements (used by router) to getReferences()
@@ -97,6 +99,8 @@ export class Renamer {
           regex for replace in spec name should use space or quote to identify start or end of work before replacing
 
           replace selector inside sibling spec files
+
+          
 
           anyConstructRegexPartial doesn't work because it allows sub folders   
 
@@ -131,8 +135,10 @@ export class Renamer {
           this.debugLogger.log('## Debug Rename Completed ##');
 
           await timeoutPause(50);
+          console.log('Rename process end');
         } catch (e: any) {
           this.reportErrors(e);
+          console.log('Rename process ended with errors');
         }
       }
     );
@@ -342,11 +348,13 @@ export class Renamer {
         return false;
       }
 
-      const inputResult = await vscode.window.showInputBox({
-        title: this.title,
-        prompt: `Enter the new ${this.construct} name.`,
-        value: this.originalFileDetails.stub,
-      });
+      const inputResult =
+        this.testBypass?.stub ?? // test harness input text
+        (await vscode.window.showInputBox({
+          title: this.title,
+          prompt: `Enter the new ${this.construct} name.`,
+          value: this.originalFileDetails.stub,
+        }));
       this.processTimerStart = Date.now();
 
       if (!inputResult) {

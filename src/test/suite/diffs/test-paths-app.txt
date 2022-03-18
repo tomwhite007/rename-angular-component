@@ -1,0 +1,50 @@
+diff --git a/projects/my-service-lib/src/lib/my-service-lib.service.spec.ts b/projects/my-service-lib/src/lib/my-service-lib.service.spec.ts
+deleted file mode 100644
+index d4d84af..0000000
+--- a/projects/my-service-lib/src/lib/my-service-lib.service.spec.ts
++++ /dev/null
+@@ -1,16 +0,0 @@
+-import { TestBed } from '@angular/core/testing';
+-
+-import { MyServiceLibService } from './my-service-lib.service';
+-
+-describe('MyServiceLibService', () => {
+-  let service: MyServiceLibService;
+-
+-  beforeEach(() => {
+-    TestBed.configureTestingModule({});
+-    service = TestBed.inject(MyServiceLibService);
+-  });
+-
+-  it('should be created', () => {
+-    expect(service).toBeTruthy();
+-  });
+-});
+diff --git a/projects/my-service-lib/src/lib/my-service-lib.service.ts b/projects/my-service-lib/src/lib/my-service-lib.service.ts
+deleted file mode 100644
+index acc0b95..0000000
+--- a/projects/my-service-lib/src/lib/my-service-lib.service.ts
++++ /dev/null
+@@ -1,9 +0,0 @@
+-import { Injectable } from '@angular/core';
+-
+-@Injectable({
+-  providedIn: 'root'
+-})
+-export class MyServiceLibService {
+-
+-  constructor() { }
+-}
+diff --git a/projects/my-service-lib/src/public-api.ts b/projects/my-service-lib/src/public-api.ts
+index 971b69b..87f9b41 100644
+--- a/projects/my-service-lib/src/public-api.ts
++++ b/projects/my-service-lib/src/public-api.ts
+@@ -2,7 +2,7 @@
+  * Public API Surface of my-service-lib
+  */
+ 
+-export * from './lib/my-service-lib.service';
++export * from './lib/tom-test.service';
+ export * from './lib/my-service-lib.component';
+ export * from './lib/my-service-lib.module';
+ export * from './lib/services/my-test-lib.service';

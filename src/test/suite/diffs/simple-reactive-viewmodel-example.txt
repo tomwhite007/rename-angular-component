@@ -1,0 +1,132 @@
+diff --git a/src/app/book-manager-imperative/book-manager-imperative.component.html b/src/app/book-manager-imperative/book-manager-imperative.component.html
+index 7aafead..a1ce7e6 100644
+--- a/src/app/book-manager-imperative/book-manager-imperative.component.html
++++ b/src/app/book-manager-imperative/book-manager-imperative.component.html
+@@ -20,7 +20,7 @@
+     (tabSelected)="selectTab($event)"
+     [ngSwitch]="vm.selectedTab"
+   >
+-    <app-book-list *ngSwitchCase="0" [books]="vm.allBooks"></app-book-list>
++    <app-tom-test *ngSwitchCase="0" [books]="vm.allBooks"></app-tom-test>
+ 
+     <app-book-stuff *ngSwitchCase="1"></app-book-stuff>
+   </app-tabs>
+diff --git a/src/app/book-manager/book-manager.component.html b/src/app/book-manager/book-manager.component.html
+index e1f79e9..d8e3853 100644
+--- a/src/app/book-manager/book-manager.component.html
++++ b/src/app/book-manager/book-manager.component.html
+@@ -20,7 +20,7 @@
+     (tabSelected)="selectTab($event)"
+     [ngSwitch]="vm.selectedTab"
+   >
+-    <app-book-list *ngSwitchCase="0" [books]="vm.allBooks"></app-book-list>
++    <app-tom-test *ngSwitchCase="0" [books]="vm.allBooks"></app-tom-test>
+ 
+     <app-book-stuff *ngSwitchCase="1"></app-book-stuff>
+   </app-tabs>
+diff --git a/src/app/shared/book-ui/book-list/book-list.component.html b/src/app/shared/book-ui/book-list/book-list.component.html
+deleted file mode 100644
+index edba7e7..0000000
+--- a/src/app/shared/book-ui/book-list/book-list.component.html
++++ /dev/null
+@@ -1,14 +0,0 @@
+-<table class="table mt-4">
+-  <thead class="thead-dark">
+-    <tr>
+-      <th scope="col">ISBN</th>
+-      <th scope="col">Title</th>
+-    </tr>
+-  </thead>
+-  <tbody>
+-    <tr *ngFor="let book of books; trackBy: trackByFn; let i = index">
+-      <td>{{ book.id }}</td>
+-      <td>{{ book.title }}</td>
+-    </tr>
+-  </tbody>
+-</table>
+diff --git a/src/app/shared/book-ui/book-list/book-list.component.scss b/src/app/shared/book-ui/book-list/book-list.component.scss
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/src/app/shared/book-ui/book-list/book-list.component.spec.ts b/src/app/shared/book-ui/book-list/book-list.component.spec.ts
+deleted file mode 100644
+index ae9736b..0000000
+--- a/src/app/shared/book-ui/book-list/book-list.component.spec.ts
++++ /dev/null
+@@ -1,24 +0,0 @@
+-import { ComponentFixture, TestBed } from '@angular/core/testing';
+-
+-import { BookListComponent } from './book-list.component';
+-
+-describe('BookListComponent', () => {
+-  let component: BookListComponent;
+-  let fixture: ComponentFixture<BookListComponent>;
+-
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
+-      declarations: [BookListComponent],
+-    }).compileComponents();
+-  });
+-
+-  beforeEach(() => {
+-    fixture = TestBed.createComponent(BookListComponent);
+-    component = fixture.componentInstance;
+-    fixture.detectChanges();
+-  });
+-
+-  it('should create', () => {
+-    expect(component).toBeTruthy();
+-  });
+-});
+diff --git a/src/app/shared/book-ui/book-list/book-list.component.ts b/src/app/shared/book-ui/book-list/book-list.component.ts
+deleted file mode 100644
+index 730e54b..0000000
+--- a/src/app/shared/book-ui/book-list/book-list.component.ts
++++ /dev/null
+@@ -1,16 +0,0 @@
+-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+-import { BooksEntity } from '../../../+state/books.models';
+-
+-@Component({
+-  selector: 'app-book-list',
+-  templateUrl: './book-list.component.html',
+-  styleUrls: ['./book-list.component.scss'],
+-  changeDetection: ChangeDetectionStrategy.OnPush,
+-})
+-export class BookListComponent {
+-  @Input() books?: BooksEntity[];
+-
+-  trackByFn(index: number, item: BooksEntity) {
+-    return item.id;
+-  }
+-}
+diff --git a/src/app/shared/book-ui/book-ui.module.ts b/src/app/shared/book-ui/book-ui.module.ts
+index c162a7b..582a24f 100644
+--- a/src/app/shared/book-ui/book-ui.module.ts
++++ b/src/app/shared/book-ui/book-ui.module.ts
+@@ -1,7 +1,7 @@
+ import { NgModule } from '@angular/core';
+ import { CommonModule } from '@angular/common';
+ import { AddBookFormComponent } from './add-book-form/add-book-form.component';
+-import { BookListComponent } from './book-list/book-list.component';
++import { TomTestComponent } from './tom-test/tom-test.component';
+ import { BookStuffComponent } from './book-stuff/book-stuff.component';
+ import { ShowFormCheckboxComponent } from './show-form-checkbox/show-form-checkbox.component';
+ import { TabsComponent } from './tabs/tabs.component';
+@@ -9,7 +9,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+ 
+ @NgModule({
+   declarations: [
+-    BookListComponent,
++    TomTestComponent,
+     AddBookFormComponent,
+     BookStuffComponent,
+     ShowFormCheckboxComponent,
+@@ -17,7 +17,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+   ],
+   imports: [CommonModule, FormsModule, ReactiveFormsModule],
+   exports: [
+-    BookListComponent,
++    TomTestComponent,
+     AddBookFormComponent,
+     BookStuffComponent,
+     ShowFormCheckboxComponent,

@@ -98,6 +98,9 @@ export class Renamer {
 
           regex for replace in spec name should use space or quote to identify start or end of work before replacing
 
+
+          
+
           anyConstructRegexPartial doesn't work because it allows sub folders   
 
           Add option to fix selector + use default prefix

@@ -240,9 +240,23 @@ function getClassNameFoundItems(
       if (ts.isExpressionStatement(node)) {
         node.expression.forEachChild((arg) => {
           if (ts.isStringLiteral(arg)) {
-            const argIndex = arg.text.indexOf(className);
+            // const argIndex = arg.text.indexOf(className);
+
+            const argIndex = arg.text.search(
+              new RegExp(`(?<!\\w)${className}(?!\\w)`)
+            );
+
             if (argIndex >= 0) {
               result.push({
+                itemType: 'class',
+                itemText: className,
+                location: {
+                  start: arg.pos + argIndex + 1,
+                  end: arg.pos + argIndex + className.length + 1,
+                },
+              });
+
+              console.log({
                 itemType: 'class',
                 itemText: className,
                 location: {

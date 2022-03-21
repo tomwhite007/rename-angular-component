@@ -90,14 +90,6 @@ export class Renamer {
             export class TipTestDirective implements OnDestroy {
               @Input('dgxDfbTooltip') tooltipTemplate!: TemplateRef<unknown>;
 
-          Issue: renaming import paths in Lazy Loaded Routes
-            Add import statements (used by router) to getReferences()
-            work out performance impact, and see if regex check first improves it
-            then possibly turn it into a config option       
-            https://github.com/tomwhite007/rename-angular-component/issues/9
-
-          regex for replace in spec name should use space or quote to identify start or end of work before replacing
-
           replace selector inside sibling spec files
 
           

@@ -1,0 +1,115 @@
+diff --git a/src/app/app-routing.module.ts b/src/app/app-routing.module.ts
+index a81169d..e488329 100644
+--- a/src/app/app-routing.module.ts
++++ b/src/app/app-routing.module.ts
+@@ -5,7 +5,7 @@ const routes: Routes = [
+   {
+     path: 'products',
+     loadChildren: () =>
+-      import('./products/products.module').then((m) => m.ProductsModule),
++      import('./tom-test/products.module').then((m) => m.ProductsModule),
+   },
+ ];
+ 
+diff --git a/src/app/products/products-routing.module.ts b/src/app/products/products-routing.module.ts
+deleted file mode 100644
+index 72d8bd3..0000000
+--- a/src/app/products/products-routing.module.ts
++++ /dev/null
+@@ -1,11 +0,0 @@
+-import { NgModule } from '@angular/core';
+-import { RouterModule, Routes } from '@angular/router';
+-import { ProductsComponent } from './products.component';
+-
+-const routes: Routes = [{ path: '', component: ProductsComponent }];
+-
+-@NgModule({
+-  imports: [RouterModule.forChild(routes)],
+-  exports: [RouterModule]
+-})
+-export class ProductsRoutingModule { }
+diff --git a/src/app/products/products.component.html b/src/app/products/products.component.html
+deleted file mode 100644
+index d786d45..0000000
+--- a/src/app/products/products.component.html
++++ /dev/null
+@@ -1 +0,0 @@
+-<p>products works!</p>
+diff --git a/src/app/products/products.component.scss b/src/app/products/products.component.scss
+deleted file mode 100644
+index e69de29..0000000
+diff --git a/src/app/products/products.component.spec.ts b/src/app/products/products.component.spec.ts
+deleted file mode 100644
+index f471086..0000000
+--- a/src/app/products/products.component.spec.ts
++++ /dev/null
+@@ -1,25 +0,0 @@
+-import { ComponentFixture, TestBed } from '@angular/core/testing';
+-
+-import { ProductsComponent } from './products.component';
+-
+-describe('ProductsComponent', () => {
+-  let component: ProductsComponent;
+-  let fixture: ComponentFixture<ProductsComponent>;
+-
+-  beforeEach(async () => {
+-    await TestBed.configureTestingModule({
+-      declarations: [ ProductsComponent ]
+-    })
+-    .compileComponents();
+-  });
+-
+-  beforeEach(() => {
+-    fixture = TestBed.createComponent(ProductsComponent);
+-    component = fixture.componentInstance;
+-    fixture.detectChanges();
+-  });
+-
+-  it('should create', () => {
+-    expect(component).toBeTruthy();
+-  });
+-});
+diff --git a/src/app/products/products.component.ts b/src/app/products/products.component.ts
+deleted file mode 100644
+index b42ad70..0000000
+--- a/src/app/products/products.component.ts
++++ /dev/null
+@@ -1,15 +0,0 @@
+-import { Component, OnInit } from '@angular/core';
+-
+-@Component({
+-  selector: 'app-products',
+-  templateUrl: './products.component.html',
+-  styleUrls: ['./products.component.scss']
+-})
+-export class ProductsComponent implements OnInit {
+-
+-  constructor() { }
+-
+-  ngOnInit(): void {
+-  }
+-
+-}
+diff --git a/src/app/products/products.module.ts b/src/app/products/products.module.ts
+deleted file mode 100644
+index 80f8d3f..0000000
+--- a/src/app/products/products.module.ts
++++ /dev/null
+@@ -1,17 +0,0 @@
+-import { NgModule } from '@angular/core';
+-import { CommonModule } from '@angular/common';
+-
+-import { ProductsRoutingModule } from './products-routing.module';
+-import { ProductsComponent } from './products.component';
+-
+-
+-@NgModule({
+-  declarations: [
+-    ProductsComponent
+-  ],
+-  imports: [
+-    CommonModule,
+-    ProductsRoutingModule
+-  ]
+-})
+-export class ProductsModule { }

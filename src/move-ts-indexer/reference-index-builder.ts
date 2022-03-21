@@ -991,6 +991,26 @@ export class ReferenceIndexBuilder {
     const result: FoundItem[] = [];
     const file = ts.createSourceFile(fileName, data, ts.ScriptTarget.Latest);
 
+    const recurseForAngularRouterImport = (node: ts.Node) => {
+      if (
+        ts.isCallExpression(node) &&
+        node.expression.kind === ts.SyntaxKind.ImportKeyword &&
+        ts.isStringLiteral(node.arguments[0])
+      ) {
+        const importPathNode = node.arguments[0];
+        result.push({
+          itemType: 'importPath',
+          itemText: importPathNode.text,
+          location: {
+            start: importPathNode.pos,
+            end: importPathNode.end,
+          },
+        });
+      } else {
+        ts.forEachChild(node, recurseForAngularRouterImport);
+      }
+    };
+
     file.statements.forEach((node: ts.Node) => {
       if (ts.isImportDeclaration(node)) {
         if (ts.isStringLiteral(node.moduleSpecifier)) {
@@ -1027,9 +1047,11 @@ export class ReferenceIndexBuilder {
             },
           });
         }
+      } else if (fileName.match(/routing|module/)) {
+        // index lazy loaded routes in Angular router modules
+        recurseForAngularRouterImport(node);
       }
-
-      // TODO: add import STATEMENT HANDLER HERE (for router modules)
+      // console.log(fileName);
     });
 
     return result;

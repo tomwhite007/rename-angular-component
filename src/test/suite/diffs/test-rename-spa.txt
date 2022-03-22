@@ -11,64 +11,6 @@ index a81169d..e488329 100644
    },
  ];
  
-diff --git a/src/app/products/products-routing.module.ts b/src/app/products/products-routing.module.ts
-deleted file mode 100644
-index 72d8bd3..0000000
---- a/src/app/products/products-routing.module.ts
-+++ /dev/null
-@@ -1,11 +0,0 @@
--import { NgModule } from '@angular/core';
--import { RouterModule, Routes } from '@angular/router';
--import { ProductsComponent } from './products.component';
--
--const routes: Routes = [{ path: '', component: ProductsComponent }];
--
--@NgModule({
--  imports: [RouterModule.forChild(routes)],
--  exports: [RouterModule]
--})
--export class ProductsRoutingModule { }
-diff --git a/src/app/products/products.component.html b/src/app/products/products.component.html
-deleted file mode 100644
-index d786d45..0000000
---- a/src/app/products/products.component.html
-+++ /dev/null
-@@ -1 +0,0 @@
--<p>products works!</p>
-diff --git a/src/app/products/products.component.scss b/src/app/products/products.component.scss
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/src/app/products/products.component.spec.ts b/src/app/products/products.component.spec.ts
-deleted file mode 100644
-index f471086..0000000
---- a/src/app/products/products.component.spec.ts
-+++ /dev/null
-@@ -1,25 +0,0 @@
--import { ComponentFixture, TestBed } from '@angular/core/testing';
--
--import { ProductsComponent } from './products.component';
--
--describe('ProductsComponent', () => {
--  let component: ProductsComponent;
--  let fixture: ComponentFixture<ProductsComponent>;
--
--  beforeEach(async () => {
--    await TestBed.configureTestingModule({
--      declarations: [ ProductsComponent ]
--    })
--    .compileComponents();
--  });
--
--  beforeEach(() => {
--    fixture = TestBed.createComponent(ProductsComponent);
--    component = fixture.componentInstance;
--    fixture.detectChanges();
--  });
--
--  it('should create', () => {
--    expect(component).toBeTruthy();
--  });
--});
 diff --git a/src/app/products/products.component.ts b/src/app/products/products.component.ts
 deleted file mode 100644
 index b42ad70..0000000
@@ -90,26 +32,105 @@ index b42ad70..0000000
 -  }
 -
 -}
-diff --git a/src/app/products/products.module.ts b/src/app/products/products.module.ts
-deleted file mode 100644
-index 80f8d3f..0000000
---- a/src/app/products/products.module.ts
-+++ /dev/null
-@@ -1,17 +0,0 @@
--import { NgModule } from '@angular/core';
--import { CommonModule } from '@angular/common';
--
--import { ProductsRoutingModule } from './products-routing.module';
+diff --git a/src/app/products/products-routing.module.ts b/src/app/tom-test/products-routing.module.ts
+similarity index 63%
+rename from src/app/products/products-routing.module.ts
+rename to src/app/tom-test/products-routing.module.ts
+index 72d8bd3..0bd5c33 100644
+--- a/src/app/products/products-routing.module.ts
++++ b/src/app/tom-test/products-routing.module.ts
+@@ -1,8 +1,8 @@
+ import { NgModule } from '@angular/core';
+ import { RouterModule, Routes } from '@angular/router';
 -import { ProductsComponent } from './products.component';
--
--
--@NgModule({
--  declarations: [
++import { TomTestComponent } from './tom-test.component';
+ 
+-const routes: Routes = [{ path: '', component: ProductsComponent }];
++const routes: Routes = [{ path: '', component: TomTestComponent }];
+ 
+ @NgModule({
+   imports: [RouterModule.forChild(routes)],
+diff --git a/src/app/products/products.module.ts b/src/app/tom-test/products.module.ts
+similarity index 78%
+rename from src/app/products/products.module.ts
+rename to src/app/tom-test/products.module.ts
+index 80f8d3f..22522ec 100644
+--- a/src/app/products/products.module.ts
++++ b/src/app/tom-test/products.module.ts
+@@ -2,12 +2,12 @@ import { NgModule } from '@angular/core';
+ import { CommonModule } from '@angular/common';
+ 
+ import { ProductsRoutingModule } from './products-routing.module';
+-import { ProductsComponent } from './products.component';
++import { TomTestComponent } from './tom-test.component';
+ 
+ 
+ @NgModule({
+   declarations: [
 -    ProductsComponent
--  ],
--  imports: [
--    CommonModule,
--    ProductsRoutingModule
--  ]
--})
--export class ProductsModule { }
++    TomTestComponent
+   ],
+   imports: [
+     CommonModule,
+diff --git a/src/app/products/products.component.html b/src/app/tom-test/tom-test.component.html
+similarity index 100%
+rename from src/app/products/products.component.html
+rename to src/app/tom-test/tom-test.component.html
+diff --git a/src/app/products/products.component.scss b/src/app/tom-test/tom-test.component.scss
+similarity index 100%
+rename from src/app/products/products.component.scss
+rename to src/app/tom-test/tom-test.component.scss
+diff --git a/src/app/products/products.component.spec.ts b/src/app/tom-test/tom-test.component.spec.ts
+similarity index 53%
+rename from src/app/products/products.component.spec.ts
+rename to src/app/tom-test/tom-test.component.spec.ts
+index 8a96dbf..311f201 100644
+--- a/src/app/products/products.component.spec.ts
++++ b/src/app/tom-test/tom-test.component.spec.ts
+@@ -1,19 +1,19 @@
+ import { ComponentFixture, TestBed } from '@angular/core/testing';
+ 
+-import { ProductsComponent } from './products.component';
++import { TomTestComponent } from './tom-test.component';
+ 
+-describe('notChangeProductsComponent ProductsComponent', () => {
+-  let component: ProductsComponent;
+-  let fixture: ComponentFixture<ProductsComponent>;
++describe('notChangeProductsComponent TomTestComponent', () => {
++  let component: TomTestComponent;
++  let fixture: ComponentFixture<TomTestComponent>;
+ 
+   beforeEach(async () => {
+     await TestBed.configureTestingModule({
+-      declarations: [ProductsComponent],
++      declarations: [TomTestComponent],
+     }).compileComponents();
+   });
+ 
+   beforeEach(() => {
+-    fixture = TestBed.createComponent(ProductsComponent);
++    fixture = TestBed.createComponent(TomTestComponent);
+     component = fixture.componentInstance;
+     fixture.detectChanges();
+   });
+diff --git a/src/app/tom-test/tom-test.component.ts b/src/app/tom-test/tom-test.component.ts
+new file mode 100644
+index 0000000..c4a0e53
+--- /dev/null
++++ b/src/app/tom-test/tom-test.component.ts
+@@ -0,0 +1,15 @@
++import { Component, OnInit } from '@angular/core';
++
++@Component({
++  selector: 'app-tom-test',
++  templateUrl: './tom-test.component.html',
++  styleUrls: ['./tom-test.component.scss']
++})
++export class TomTestComponent implements OnInit {
++
++  constructor() { }
++
++  ngOnInit(): void {
++  }
++
++}

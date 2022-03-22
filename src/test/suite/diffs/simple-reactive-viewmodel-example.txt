@@ -24,81 +24,6 @@ index e1f79e9..d8e3853 100644
  
      <app-book-stuff *ngSwitchCase="1"></app-book-stuff>
    </app-tabs>
-diff --git a/src/app/shared/book-ui/book-list/book-list.component.html b/src/app/shared/book-ui/book-list/book-list.component.html
-deleted file mode 100644
-index edba7e7..0000000
---- a/src/app/shared/book-ui/book-list/book-list.component.html
-+++ /dev/null
-@@ -1,14 +0,0 @@
--<table class="table mt-4">
--  <thead class="thead-dark">
--    <tr>
--      <th scope="col">ISBN</th>
--      <th scope="col">Title</th>
--    </tr>
--  </thead>
--  <tbody>
--    <tr *ngFor="let book of books; trackBy: trackByFn; let i = index">
--      <td>{{ book.id }}</td>
--      <td>{{ book.title }}</td>
--    </tr>
--  </tbody>
--</table>
-diff --git a/src/app/shared/book-ui/book-list/book-list.component.scss b/src/app/shared/book-ui/book-list/book-list.component.scss
-deleted file mode 100644
-index e69de29..0000000
-diff --git a/src/app/shared/book-ui/book-list/book-list.component.spec.ts b/src/app/shared/book-ui/book-list/book-list.component.spec.ts
-deleted file mode 100644
-index ae9736b..0000000
---- a/src/app/shared/book-ui/book-list/book-list.component.spec.ts
-+++ /dev/null
-@@ -1,24 +0,0 @@
--import { ComponentFixture, TestBed } from '@angular/core/testing';
--
--import { BookListComponent } from './book-list.component';
--
--describe('BookListComponent', () => {
--  let component: BookListComponent;
--  let fixture: ComponentFixture<BookListComponent>;
--
--  beforeEach(async () => {
--    await TestBed.configureTestingModule({
--      declarations: [BookListComponent],
--    }).compileComponents();
--  });
--
--  beforeEach(() => {
--    fixture = TestBed.createComponent(BookListComponent);
--    component = fixture.componentInstance;
--    fixture.detectChanges();
--  });
--
--  it('should create', () => {
--    expect(component).toBeTruthy();
--  });
--});
-diff --git a/src/app/shared/book-ui/book-list/book-list.component.ts b/src/app/shared/book-ui/book-list/book-list.component.ts
-deleted file mode 100644
-index 730e54b..0000000
---- a/src/app/shared/book-ui/book-list/book-list.component.ts
-+++ /dev/null
-@@ -1,16 +0,0 @@
--import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
--import { BooksEntity } from '../../../+state/books.models';
--
--@Component({
--  selector: 'app-book-list',
--  templateUrl: './book-list.component.html',
--  styleUrls: ['./book-list.component.scss'],
--  changeDetection: ChangeDetectionStrategy.OnPush,
--})
--export class BookListComponent {
--  @Input() books?: BooksEntity[];
--
--  trackByFn(index: number, item: BooksEntity) {
--    return item.id;
--  }
--}
 diff --git a/src/app/shared/book-ui/book-ui.module.ts b/src/app/shared/book-ui/book-ui.module.ts
 index c162a7b..582a24f 100644
 --- a/src/app/shared/book-ui/book-ui.module.ts
@@ -130,3 +55,68 @@ index c162a7b..582a24f 100644
      AddBookFormComponent,
      BookStuffComponent,
      ShowFormCheckboxComponent,
+diff --git a/src/app/shared/book-ui/book-list/book-list.component.html b/src/app/shared/book-ui/tom-test/tom-test.component.html
+similarity index 100%
+rename from src/app/shared/book-ui/book-list/book-list.component.html
+rename to src/app/shared/book-ui/tom-test/tom-test.component.html
+diff --git a/src/app/shared/book-ui/book-list/book-list.component.scss b/src/app/shared/book-ui/tom-test/tom-test.component.scss
+similarity index 100%
+rename from src/app/shared/book-ui/book-list/book-list.component.scss
+rename to src/app/shared/book-ui/tom-test/tom-test.component.scss
+diff --git a/src/app/shared/book-ui/book-list/book-list.component.spec.ts b/src/app/shared/book-ui/tom-test/tom-test.component.spec.ts
+similarity index 55%
+rename from src/app/shared/book-ui/book-list/book-list.component.spec.ts
+rename to src/app/shared/book-ui/tom-test/tom-test.component.spec.ts
+index ae9736b..4101a7b 100644
+--- a/src/app/shared/book-ui/book-list/book-list.component.spec.ts
++++ b/src/app/shared/book-ui/tom-test/tom-test.component.spec.ts
+@@ -1,19 +1,19 @@
+ import { ComponentFixture, TestBed } from '@angular/core/testing';
+ 
+-import { BookListComponent } from './book-list.component';
++import { TomTestComponent } from './tom-test.component';
+ 
+-describe('BookListComponent', () => {
+-  let component: BookListComponent;
+-  let fixture: ComponentFixture<BookListComponent>;
++describe('TomTestComponent', () => {
++  let component: TomTestComponent;
++  let fixture: ComponentFixture<TomTestComponent>;
+ 
+   beforeEach(async () => {
+     await TestBed.configureTestingModule({
+-      declarations: [BookListComponent],
++      declarations: [TomTestComponent],
+     }).compileComponents();
+   });
+ 
+   beforeEach(() => {
+-    fixture = TestBed.createComponent(BookListComponent);
++    fixture = TestBed.createComponent(TomTestComponent);
+     component = fixture.componentInstance;
+     fixture.detectChanges();
+   });
+diff --git a/src/app/shared/book-ui/book-list/book-list.component.ts b/src/app/shared/book-ui/tom-test/tom-test.component.ts
+similarity index 67%
+rename from src/app/shared/book-ui/book-list/book-list.component.ts
+rename to src/app/shared/book-ui/tom-test/tom-test.component.ts
+index 730e54b..59cdfa8 100644
+--- a/src/app/shared/book-ui/book-list/book-list.component.ts
++++ b/src/app/shared/book-ui/tom-test/tom-test.component.ts
+@@ -2,12 +2,12 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+ import { BooksEntity } from '../../../+state/books.models';
+ 
+ @Component({
+-  selector: 'app-book-list',
+-  templateUrl: './book-list.component.html',
+-  styleUrls: ['./book-list.component.scss'],
++  selector: 'app-tom-test',
++  templateUrl: './tom-test.component.html',
++  styleUrls: ['./tom-test.component.scss'],
+   changeDetection: ChangeDetectionStrategy.OnPush,
+ })
+-export class BookListComponent {
++export class TomTestComponent {
+   @Input() books?: BooksEntity[];
+ 
+   trackByFn(index: number, item: BooksEntity) {

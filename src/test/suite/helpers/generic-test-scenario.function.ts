@@ -1,5 +1,5 @@
 import assert = require('assert');
-import simpleGit, { CleanOptions } from 'simple-git';
+import simpleGit, { CleanOptions, ResetMode } from 'simple-git';
 import { readUpsertDiffFile } from './read-upsert-diff-file.function';
 import {
   RenameCallConfig,
@@ -17,22 +17,25 @@ export async function genericTestScenario(config: TestScenarioConfig) {
     baseDir: config.projectRoot,
   });
   const discardChanges = async () => {
-    await git.clean([CleanOptions.FORCE, CleanOptions.RECURSIVE]);
-    await git.checkout('.');
+    await git.reset(['--hard', 'HEAD']);
+    // unstaged changes:
+    // await git.clean([CleanOptions.FORCE, CleanOptions.RECURSIVE]);
+    // await git.checkout('.');
   };
 
-  const notClean = await git.diff();
+  const notClean = await git.diff(['--staged']);
   if (notClean) {
     await discardChanges();
   }
 
   await runRenamerScenario(config.projectRoot, config.renames);
 
-  const diff = await git.diff();
+  await git.add('.');
+  const diff = await git.diff(['--staged']);
 
   const fileDiff = await readUpsertDiffFile(config.fileDiffPath, diff);
 
-  assert.strictEqual(diff, fileDiff);
-
   await discardChanges();
+
+  assert.strictEqual(diff, fileDiff);
 }

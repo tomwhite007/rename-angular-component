@@ -216,30 +216,16 @@ function getCoreClassFoundItems(
       ) {
         ts.forEachChild(node, (childNode) => {
           if (ts.isPropertyDeclaration(childNode)) {
+            // Input property name is different to template property
             childNode.decorators?.find((dec) => {
-              // if (ts.isCallExpression(dec.expression)) {
-              //   console.log('isCallExpression');
-
-              //   if (ts.isIdentifier(dec.expression.expression)) {
-              //     console.log('isIdentifier');
-              //     if (dec.expression.expression.escapedText === 'Input') {
-              //       console.log('is Input');
-
-              //       if (dec.expression.arguments.length > 0) {
-              //         console.log('has  arguments');
-              //       }
-              //     }
-              //   }
-              // }
-
               if (
                 ts.isCallExpression(dec.expression) &&
                 ts.isIdentifier(dec.expression.expression) &&
-                dec.expression.expression.escapedText === 'Input' &&
-                dec.expression.arguments.length > 0
+                dec.expression.expression.escapedText === 'Input'
               ) {
                 const identifier = dec.expression.arguments[0];
                 if (
+                  identifier &&
                   ts.isStringLiteral(identifier) &&
                   identifier.text === stripSelectorBraces(selector)
                 ) {
@@ -255,6 +241,24 @@ function getCoreClassFoundItems(
                 }
               }
             });
+
+            if (ts.isIdentifier(childNode.name)) {
+              const identifier = childNode.name;
+              // Input property name is same as template property
+              if (
+                identifier.escapedText === stripSelectorBraces(selector, true)
+              ) {
+                result.push({
+                  itemType: 'attributeInput',
+                  itemText: identifier.escapedText,
+                  location: {
+                    start: identifier.pos + 1,
+                    end: identifier.end,
+                  },
+                });
+                return true;
+              }
+            }
           }
         });
       }

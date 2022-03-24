@@ -214,6 +214,8 @@ function getCoreClassFoundItems(
         getSelectorType(selector) === 'attribute' &&
         ts.isClassDeclaration(node)
       ) {
+        let renameClassProperty = false;
+
         ts.forEachChild(node, (childNode) => {
           if (ts.isPropertyDeclaration(childNode)) {
             // Input property name is different to template property
@@ -256,11 +258,41 @@ function getCoreClassFoundItems(
                     end: identifier.end,
                   },
                 });
+
+                renameClassProperty = true;
                 return true;
               }
             }
           }
         });
+
+        if (renameClassProperty) {
+          // loop again to find Property Access Expressions
+
+          const propertyAccessRecursor = (node: ts.Node) => {
+            if (
+              ts.isPropertyAccessExpression(node) &&
+              node.expression.kind === ts.SyntaxKind.ThisKeyword &&
+              ts.isIdentifier(node.name) &&
+              node.name.escapedText === stripSelectorBraces(selector, true)
+            ) {
+              result.push({
+                itemType: 'attributeInput',
+                itemText: node.name.escapedText,
+                location: {
+                  start: node.name.pos,
+                  end: node.name.end,
+                },
+              });
+            } else {
+              ts.forEachChild(node, propertyAccessRecursor);
+            }
+          };
+
+          ts.forEachChild(node, (childNode) => {
+            propertyAccessRecursor(childNode);
+          });
+        }
       }
     }
 

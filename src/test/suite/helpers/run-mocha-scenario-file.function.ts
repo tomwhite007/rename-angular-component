@@ -8,7 +8,7 @@ export function runMochaScenarioFile(scenarioFile: string): Promise<void> {
     color: true,
     timeout: 0,
     reporterOptions: {
-      maxDiffSize: 20000,
+      maxDiffSize: 200000,
     },
   });
 

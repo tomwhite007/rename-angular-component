@@ -14,6 +14,18 @@ suite('Suite Scenario 5', () => {
           construct: 'component',
           newStub: 'tom-test',
         },
+        {
+          filePath:
+            './projects/shared/src/lib/multiply-by-ten/multiply-by-ten.directive.ts',
+          construct: 'directive',
+          newStub: 'dir-prop',
+        },
+        {
+          filePath:
+            './projects/shared/src/lib/multiply-by-twenty/multiply-by-twenty.directive.spec.ts',
+          construct: 'directive',
+          newStub: 'dir-identifier',
+        },
       ],
       fileDiffPath: './src/test/suite/diffs/test-rename-spa.txt',
     });

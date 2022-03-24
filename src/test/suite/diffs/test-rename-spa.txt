@@ -1,3 +1,179 @@
+diff --git a/projects/shared/src/lib/dir-identifier/dir-identifier.directive.spec.ts b/projects/shared/src/lib/dir-identifier/dir-identifier.directive.spec.ts
+new file mode 100644
+index 0000000..c1dceff
+--- /dev/null
++++ b/projects/shared/src/lib/dir-identifier/dir-identifier.directive.spec.ts
+@@ -0,0 +1,8 @@
++import { DirIdentifierDirective } from './dir-identifier.directive';
++
++describe('DirIdentifierDirective', () => {
++  it('should create an instance', () => {
++    const directive = new DirIdentifierDirective();
++    expect(directive).toBeTruthy();
++  });
++});
+diff --git a/projects/shared/src/lib/multiply-by-twenty/multiply-by-twenty.directive.ts b/projects/shared/src/lib/dir-identifier/dir-identifier.directive.ts
+similarity index 70%
+rename from projects/shared/src/lib/multiply-by-twenty/multiply-by-twenty.directive.ts
+rename to projects/shared/src/lib/dir-identifier/dir-identifier.directive.ts
+index bee0500..f294a9a 100644
+--- a/projects/shared/src/lib/multiply-by-twenty/multiply-by-twenty.directive.ts
++++ b/projects/shared/src/lib/dir-identifier/dir-identifier.directive.ts
+@@ -7,10 +7,10 @@ import {
+ } from '@angular/core';
+ 
+ @Directive({
+-  selector: '[libMultiplyByTwenty]',
++  selector: '[libDirIdentifier]',
+ })
+-export class MultiplyByTwentyDirective implements OnInit {
+-  @Input('libMultiplyByTwenty') multiplier: number = 0;
++export class DirIdentifierDirective implements OnInit {
++  @Input('libDirIdentifier') multiplier: number = 0;
+   @HostBinding()
+   result = 0;
+ 
+diff --git a/projects/shared/src/lib/dir-prop/dir-prop.directive.spec.ts b/projects/shared/src/lib/dir-prop/dir-prop.directive.spec.ts
+new file mode 100644
+index 0000000..9430eed
+--- /dev/null
++++ b/projects/shared/src/lib/dir-prop/dir-prop.directive.spec.ts
+@@ -0,0 +1,8 @@
++import { DirPropDirective } from './dir-prop.directive';
++
++describe('DirPropDirective', () => {
++  it('should create an instance', () => {
++    const directive = new DirPropDirective();
++    expect(directive).toBeTruthy();
++  });
++});
+diff --git a/projects/shared/src/lib/dir-prop/dir-prop.directive.ts b/projects/shared/src/lib/dir-prop/dir-prop.directive.ts
+new file mode 100644
+index 0000000..990c6d8
+--- /dev/null
++++ b/projects/shared/src/lib/dir-prop/dir-prop.directive.ts
+@@ -0,0 +1,24 @@
++import {
++  Directive,
++  ElementRef,
++  HostBinding,
++  Input,
++  OnInit,
++} from '@angular/core';
++
++@Directive({
++  selector: '[libDirProp]',
++})
++export class DirPropDirective implements OnInit {
++  @Input() libDirProp: number = 0;
++  @HostBinding()
++  result = 0;
++
++  constructor(private el: ElementRef) {}
++
++  ngOnInit(): void {
++    this.result = this.libDirProp * 10;
++
++    this.el.nativeElement.innerHTML = `${this.libDirProp} multiplied by 10 is <br> = ${this.result}`;
++  }
++}
+diff --git a/projects/shared/src/lib/dir-prop/index.ts b/projects/shared/src/lib/dir-prop/index.ts
+new file mode 100644
+index 0000000..8d2a9b8
+--- /dev/null
++++ b/projects/shared/src/lib/dir-prop/index.ts
+@@ -0,0 +1 @@
++export * from './dir-prop.directive';
+diff --git a/projects/shared/src/lib/multiply-by-ten/index.ts b/projects/shared/src/lib/multiply-by-ten/index.ts
+deleted file mode 100644
+index 72e7240..0000000
+--- a/projects/shared/src/lib/multiply-by-ten/index.ts
++++ /dev/null
+@@ -1 +0,0 @@
+-export * from './multiply-by-ten.directive';
+diff --git a/projects/shared/src/lib/multiply-by-ten/multiply-by-ten.directive.spec.ts b/projects/shared/src/lib/multiply-by-ten/multiply-by-ten.directive.spec.ts
+deleted file mode 100644
+index f2e9bfb..0000000
+--- a/projects/shared/src/lib/multiply-by-ten/multiply-by-ten.directive.spec.ts
++++ /dev/null
+@@ -1,8 +0,0 @@
+-import { MultiplyByTenDirective } from './multiply-by-ten.directive';
+-
+-describe('MultiplyByTenDirective', () => {
+-  it('should create an instance', () => {
+-    const directive = new MultiplyByTenDirective();
+-    expect(directive).toBeTruthy();
+-  });
+-});
+diff --git a/projects/shared/src/lib/multiply-by-ten/multiply-by-ten.directive.ts b/projects/shared/src/lib/multiply-by-ten/multiply-by-ten.directive.ts
+deleted file mode 100644
+index 4cec28e..0000000
+--- a/projects/shared/src/lib/multiply-by-ten/multiply-by-ten.directive.ts
++++ /dev/null
+@@ -1,24 +0,0 @@
+-import {
+-  Directive,
+-  ElementRef,
+-  HostBinding,
+-  Input,
+-  OnInit,
+-} from '@angular/core';
+-
+-@Directive({
+-  selector: '[libMultiplyByTen]',
+-})
+-export class MultiplyByTenDirective implements OnInit {
+-  @Input() libMultiplyByTen: number = 0;
+-  @HostBinding()
+-  result = 0;
+-
+-  constructor(private el: ElementRef) {}
+-
+-  ngOnInit(): void {
+-    this.result = this.libMultiplyByTen * 10;
+-
+-    this.el.nativeElement.innerHTML = `${this.libMultiplyByTen} multiplied by 10 is <br> = ${this.result}`;
+-  }
+-}
+diff --git a/projects/shared/src/lib/multiply-by-twenty/multiply-by-twenty.directive.spec.ts b/projects/shared/src/lib/multiply-by-twenty/multiply-by-twenty.directive.spec.ts
+deleted file mode 100644
+index 429df7f..0000000
+--- a/projects/shared/src/lib/multiply-by-twenty/multiply-by-twenty.directive.spec.ts
++++ /dev/null
+@@ -1,8 +0,0 @@
+-import { MultiplyByTwentyDirective } from './multiply-by-twenty.directive';
+-
+-describe('MultiplyByTwentyDirective', () => {
+-  it('should create an instance', () => {
+-    const directive = new MultiplyByTwentyDirective();
+-    expect(directive).toBeTruthy();
+-  });
+-});
+diff --git a/projects/shared/src/lib/shared.module.ts b/projects/shared/src/lib/shared.module.ts
+index ca2efdc..7a02a90 100644
+--- a/projects/shared/src/lib/shared.module.ts
++++ b/projects/shared/src/lib/shared.module.ts
+@@ -1,15 +1,15 @@
+ import { NgModule } from '@angular/core';
+ import { SharedComponent } from './shared.component';
+-import { MultiplyByTenDirective } from './multiply-by-ten';
+-import { MultiplyByTwentyDirective } from './multiply-by-twenty/multiply-by-twenty.directive';
++import { DirPropDirective } from './dir-prop';
++import { DirIdentifierDirective } from './dir-identifier/dir-identifier.directive';
+ 
+ @NgModule({
+   declarations: [
+     SharedComponent,
+-    MultiplyByTenDirective,
+-    MultiplyByTwentyDirective,
++    DirPropDirective,
++    DirIdentifierDirective,
+   ],
+   imports: [],
+-  exports: [SharedComponent, MultiplyByTenDirective, MultiplyByTwentyDirective],
++  exports: [SharedComponent, DirPropDirective, DirIdentifierDirective],
+ })
+ export class SharedModule {}
 diff --git a/src/app/app-routing.module.ts b/src/app/app-routing.module.ts
 index a81169d..e488329 100644
 --- a/src/app/app-routing.module.ts
@@ -11,6 +187,17 @@ index a81169d..e488329 100644
    },
  ];
  
+diff --git a/src/app/products/products.component.html b/src/app/products/products.component.html
+deleted file mode 100644
+index bec9393..0000000
+--- a/src/app/products/products.component.html
++++ /dev/null
+@@ -1,5 +0,0 @@
+-<p>products works!</p>
+-
+-<p [libMultiplyByTen]="99"></p>
+-
+-<p [libMultiplyByTwenty]="99"></p>
 diff --git a/src/app/products/products.component.ts b/src/app/products/products.component.ts
 deleted file mode 100644
 index b42ad70..0000000
@@ -51,31 +238,38 @@ index 72d8bd3..0bd5c33 100644
  @NgModule({
    imports: [RouterModule.forChild(routes)],
 diff --git a/src/app/products/products.module.ts b/src/app/tom-test/products.module.ts
-similarity index 78%
+similarity index 66%
 rename from src/app/products/products.module.ts
 rename to src/app/tom-test/products.module.ts
-index 80f8d3f..22522ec 100644
+index a2fe432..04b7e22 100644
 --- a/src/app/products/products.module.ts
 +++ b/src/app/tom-test/products.module.ts
-@@ -2,12 +2,12 @@ import { NgModule } from '@angular/core';
+@@ -2,11 +2,11 @@ import { NgModule } from '@angular/core';
  import { CommonModule } from '@angular/common';
  
  import { ProductsRoutingModule } from './products-routing.module';
 -import { ProductsComponent } from './products.component';
+-import { SharedModule } from '@shared';
 +import { TomTestComponent } from './tom-test.component';
- 
++import { SharedModule } from 'shared/src';
  
  @NgModule({
-   declarations: [
--    ProductsComponent
-+    TomTestComponent
-   ],
-   imports: [
-     CommonModule,
-diff --git a/src/app/products/products.component.html b/src/app/tom-test/tom-test.component.html
-similarity index 100%
-rename from src/app/products/products.component.html
-rename to src/app/tom-test/tom-test.component.html
+-  declarations: [ProductsComponent],
++  declarations: [TomTestComponent],
+   imports: [CommonModule, ProductsRoutingModule, SharedModule],
+ })
+ export class ProductsModule {}
+diff --git a/src/app/tom-test/tom-test.component.html b/src/app/tom-test/tom-test.component.html
+new file mode 100644
+index 0000000..014f286
+--- /dev/null
++++ b/src/app/tom-test/tom-test.component.html
+@@ -0,0 +1,5 @@
++<p>products works!</p>
++
++<p [libDirProp]="99"></p>
++
++<p [libDirIdentifier]="99"></p>
 diff --git a/src/app/products/products.component.scss b/src/app/tom-test/tom-test.component.scss
 similarity index 100%
 rename from src/app/products/products.component.scss

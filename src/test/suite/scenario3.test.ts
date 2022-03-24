@@ -21,12 +21,12 @@ suite('Suite Scenario 3', () => {
           construct: 'component',
           newStub: 'banner-test',
         },
-        // {
-        //   filePath:
-        //     './libs/shared/ui-dynamic-form-builder/src/lib/_shared/directives/tooltip/tooltip.directive.ts',
-        //   construct: 'directive',
-        //   newStub: 'tooltip-test',
-        // },
+        {
+          filePath:
+            './libs/shared/ui-dynamic-form-builder/src/lib/_shared/directives/tooltip/tooltip.directive.ts',
+          construct: 'directive',
+          newStub: 'tooltip-test',
+        },
       ],
       fileDiffPath: './src/test/suite/diffs/dsls-spa.txt',
     });

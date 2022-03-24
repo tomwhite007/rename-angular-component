@@ -1,5 +1,6 @@
 import assert = require('assert');
 import simpleGit, { CleanOptions, ResetMode } from 'simple-git';
+import { DISCARD_STAGED_CHANGES } from './constants-helper-config';
 import { readUpsertDiffFile } from './read-upsert-diff-file.function';
 import {
   RenameCallConfig,
@@ -17,6 +18,9 @@ export async function genericTestScenario(config: TestScenarioConfig) {
     baseDir: config.projectRoot,
   });
   const discardChanges = async () => {
+    if (!DISCARD_STAGED_CHANGES) {
+      return;
+    }
     await git.reset(['--hard', 'HEAD']);
     // unstaged changes:
     // await git.clean([CleanOptions.FORCE, CleanOptions.RECURSIVE]);

@@ -1,18 +1,17 @@
 import path = require('path');
 import * as fs from 'fs-extra-promise';
-
-const OVERWRITE = false;
+import { OVERWRITE_DIFF_SNAPSHOTS } from './constants-helper-config';
 
 export async function readUpsertDiffFile(
   localFilePath: string,
   newDiff: string
 ) {
-  console.log(`## Snapshot OVERWRITE: ${OVERWRITE} ##`);
+  console.log(`## Snapshot OVERWRITE: ${OVERWRITE_DIFF_SNAPSHOTS} ##`);
   const extensionDevelopmentPath = path.resolve(__dirname, '../../../../');
   const fullFilePath = path.join(extensionDevelopmentPath, localFilePath);
   const fullDirPath = path.dirname(fullFilePath);
 
-  if (OVERWRITE) {
+  if (OVERWRITE_DIFF_SNAPSHOTS) {
     if (!fs.existsSync(fullDirPath)) {
       await fs.mkdir(fullDirPath);
     }

@@ -83,14 +83,9 @@ export class Renamer {
 
           ---- v2 -----
 
-          Rename directive bug: Input identifier param string needs to change with the selector...
-            @Directive({
-              selector: '[dgxDfbTipTest]',
-            })
-            export class TipTestDirective implements OnDestroy {
-              @Input('dgxDfbTooltip') tooltipTemplate!: TemplateRef<unknown>;
+          
 
-          replace selector inside sibling spec files
+          bug: shared module import in products.module breaks when renaming products page on test-rename-spa
 
           
 

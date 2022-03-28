@@ -815,10 +815,15 @@ export class ReferenceIndexBuilder {
         for (let p in config.compilerOptions.paths) {
           const paths = config.compilerOptions.paths[p];
           for (let i = 0; i < paths.length; i++) {
-            const mapped = paths[i].slice(0, -1);
+            const mapped = paths[i].endsWith('/')
+              ? paths[i].slice(0, -1)
+              : paths[i];
             const mappedDir = path.resolve(baseUrl, mapped);
             if (isInDir(mappedDir, to)) {
-              return asUnix(p.slice(0, -1) + path.relative(mappedDir, to));
+              return asUnix(
+                (p.endsWith('*') ? p.slice(0, -1) : p) +
+                  path.relative(mappedDir, to)
+              );
             }
           }
         }

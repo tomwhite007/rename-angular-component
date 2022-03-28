@@ -28,9 +28,9 @@
     "component",
     "directive",
     "service",
+    "selector",
     "relative",
-    "paths",
-    "selector"
+    "paths"
   ],
   "activationEvents": [
     "onCommand:rename-angular-component.renameComponent",

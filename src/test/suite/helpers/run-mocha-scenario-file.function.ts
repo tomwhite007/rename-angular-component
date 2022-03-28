@@ -7,6 +7,9 @@ export function runMochaScenarioFile(scenarioFile: string): Promise<void> {
     ui: 'tdd',
     color: true,
     timeout: 0,
+    reporterOptions: {
+      maxDiffSize: 200000,
+    },
   });
 
   const testsRoot = path.resolve(__dirname, '../../');

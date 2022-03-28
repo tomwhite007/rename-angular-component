@@ -3,7 +3,15 @@
   Rename Angular Component
 </h1>
 
-Rename Angular components, directives, services and guards - including their filenames, class names and selectors all in one go
+Rename Angular components, directives, and services - including their filenames, class names and selectors all in one go
+
+Currently works with these Angular features:
+
+- components
+- directives
+- services
+- guards
+- coming soon: modules
 
 ## How to use
 
@@ -38,14 +46,12 @@ _Example - Changes to an element selector in a parent template:_
 This extension contributes the following settings:
 
 - `renameAngularComponent.debugLog`: Enable/disable debug logging to file for optional submission with new issue posts
-- `renameAngularComponent.useLocalDirectPaths`: Update imports/exports with direct local paths even if wildcard path exists"
+- `renameAngularComponent.useLocalDirectPaths`: Update imports/exports with direct local paths even if wildcard path exists
 
 ## Known Issues
 
-1. [Support for multi-level and wildcard exports](https://github.com/tomwhite007/rename-angular-component/issues/17)
-1. [Support for Lazy Loaded route import paths](https://github.com/tomwhite007/rename-angular-component/issues/9)
-1. [Option to change same stub / prefix for files that are not CLI siblings](https://github.com/tomwhite007/rename-angular-component/issues/6)
-1. [Support for selector changes inside Inline Templates](https://github.com/tomwhite007/rename-angular-component/issues/5)
+1. [Add flow for unexpected Selector name](https://github.com/tomwhite007/rename-angular-component/issues/13)
+1. [Add renamer process for Angular modules](https://github.com/tomwhite007/rename-angular-component/issues/26)
 
 ## Support
 
@@ -63,9 +69,10 @@ Thanks to you for reading this.
 
 ## Release Notes
 
-Latest version: [1.1.0]
+Latest version: [2.0.0] - 2022-03-29
 
-- Feature: add compatibility with Nx Workspaces and projects that use layers of wildcard export barrels
-- Fix: edge case race condition on imports changed in component and spec file
-- Fix: edge case replacement of selectors missed in some templates due to line break in end tag
-- Fix: replace dots with dashes entered for name
+- Add lazy loaded route imports to renamer process
+- Rename selectors in .spec files, inline component templates and Storybook .stories files
+- Fix: rename directive input attribute if it matches the current selector
+- Fix: tsmove bug; handle fixed path rules in get relative path
+- Add integration testing capability using Git diff snapshots

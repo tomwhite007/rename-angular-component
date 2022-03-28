@@ -46,3 +46,11 @@
 - Fix: edge case race condition on imports changed in component and spec file
 - Fix: edge case replacement of selectors missed in some templates due to line break in end tag
 - Fix: replace dots with dashes entered for name
+
+## [2.0.0] - 2022-03-29
+
+- Add lazy loaded route imports to renamer process
+- Rename selectors in .spec files, inline component templates and Storybook .stories files
+- Fix: rename directive input attribute if it matches the current selector
+- Fix: tsmove bug; handle fixed path rules in get relative path
+- Add integration testing capability using Git diff snapshots

@@ -5,6 +5,11 @@ suite('Suite Scenario 3', () => {
   vscode.window.showInformationMessage('Start all tests.');
 
   test('Scenario 3', async () => {
+    /*
+    This test scenario uses a private repo as the seed to base 3 renamer tests on.
+    See src/test/suite/scenario1.test.ts and src/test/suite/scenario5.test.ts for publicly available test repos.
+    */
+
     await genericTestScenario({
       projectRoot:
         '/Users/tom/Development/vscode-ext/_rename-test-spas/dsls-spa',
@@ -21,12 +26,12 @@ suite('Suite Scenario 3', () => {
           construct: 'component',
           newStub: 'banner-test',
         },
-        // {
-        //   filePath:
-        //     './libs/shared/ui-dynamic-form-builder/src/lib/_shared/directives/tooltip/tooltip.directive.ts',
-        //   construct: 'directive',
-        //   newStub: 'tooltip-test',
-        // },
+        {
+          filePath:
+            './libs/shared/ui-dynamic-form-builder/src/lib/_shared/directives/tooltip/tooltip.directive.ts',
+          construct: 'directive',
+          newStub: 'tooltip-test',
+        },
       ],
       fileDiffPath: './src/test/suite/diffs/dsls-spa.txt',
     });

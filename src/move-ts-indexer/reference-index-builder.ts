@@ -814,11 +814,24 @@ export class ReferenceIndexBuilder {
         );
         for (let p in config.compilerOptions.paths) {
           const paths = config.compilerOptions.paths[p];
-          for (let i = 0; i < paths.length; i++) {
-            const mapped = paths[i].slice(0, -1);
-            const mappedDir = path.resolve(baseUrl, mapped);
-            if (isInDir(mappedDir, to)) {
-              return asUnix(p.slice(0, -1) + path.relative(mappedDir, to));
+          // wildcard path mappings
+          if (p.endsWith('*')) {
+            const paths = config.compilerOptions.paths[p];
+            for (let i = 0; i < paths.length; i++) {
+              const mapped = paths[i].slice(0, -1);
+              const mappedDir = path.resolve(baseUrl, mapped);
+              if (isInDir(mappedDir, to)) {
+                return asUnix(p.slice(0, -1) + path.relative(mappedDir, to));
+              }
+            }
+          } else {
+            // fixed path mappings
+            const paths = config.compilerOptions.paths[p];
+            for (let i = 0; i < paths.length; i++) {
+              const fullPath = path.resolve(baseUrl, paths[i]);
+              if (!from.startsWith(fullPath) && isInDir(fullPath, to)) {
+                return p;
+              }
             }
           }
         }
@@ -991,6 +1004,26 @@ export class ReferenceIndexBuilder {
     const result: FoundItem[] = [];
     const file = ts.createSourceFile(fileName, data, ts.ScriptTarget.Latest);
 
+    const recurseForAngularRouterImport = (node: ts.Node) => {
+      if (
+        ts.isCallExpression(node) &&
+        node.expression.kind === ts.SyntaxKind.ImportKeyword &&
+        ts.isStringLiteral(node.arguments[0])
+      ) {
+        const importPathNode = node.arguments[0];
+        result.push({
+          itemType: 'importPath',
+          itemText: importPathNode.text,
+          location: {
+            start: importPathNode.pos,
+            end: importPathNode.end,
+          },
+        });
+      } else {
+        ts.forEachChild(node, recurseForAngularRouterImport);
+      }
+    };
+
     file.statements.forEach((node: ts.Node) => {
       if (ts.isImportDeclaration(node)) {
         if (ts.isStringLiteral(node.moduleSpecifier)) {
@@ -1027,9 +1060,11 @@ export class ReferenceIndexBuilder {
             },
           });
         }
+      } else if (fileName.match(/routing|module/)) {
+        // index lazy loaded routes in Angular router modules
+        recurseForAngularRouterImport(node);
       }
-
-      // TODO: add import STATEMENT HANDLER HERE (for router modules)
+      // console.log(fileName);
     });
 
     return result;

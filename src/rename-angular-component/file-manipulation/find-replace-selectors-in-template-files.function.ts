@@ -12,7 +12,7 @@ export async function findReplaceSelectorsInTemplateFiles(
     return;
   }
   const uris = await workspace.findFiles(
-    '**/*.html',
+    '**/*.{html,spec.ts,component.ts,stories.ts}',
     '**/node_modules/**',
     10000
   );

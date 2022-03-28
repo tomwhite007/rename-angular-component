@@ -7,9 +7,16 @@ import {
 import { escapeRegex } from '../../utils/escape-regex';
 import { AngularConstruct } from '../definitions/file.interfaces';
 import { generateNewSelector } from './generate-new-selector.function';
+import { getSelectorType } from './get-selector-type.function';
+import { stripSelectorBraces } from './strip-selector-braces.function';
 
 interface FoundItem {
-  itemType: 'class' | 'selector' | 'templateUrl' | 'styleUrls';
+  itemType:
+    | 'class'
+    | 'selector'
+    | 'templateUrl'
+    | 'styleUrls'
+    | 'attributeInput';
   itemText: string;
   location: { start: number; end: number };
 }
@@ -70,9 +77,21 @@ export function getCoreClassEdits(
               newFileStub
             )}'`;
             break;
+          case 'attributeInput':
+            if (selectorTransfer.newSelector) {
+              replacement = stripSelectorBraces(selectorTransfer.newSelector);
+            } else {
+              const msg =
+                'selectorTransfer.newSelector undefined for attributeInput!';
+              console.error(msg);
+              if (debugLogToFile) {
+                debugLogToFile(msg);
+              }
+            }
+            break;
         }
 
-        if (replacement === foundItem.itemText) {
+        if (replacement === foundItem.itemText || !replacement) {
           return null;
         }
 
@@ -118,6 +137,8 @@ function getCoreClassFoundItems(
         classNameChangedAlready = true;
       }
 
+      let selector = '';
+
       if (
         node.name?.escapedText === originalClassName ||
         classNameChangedAlready
@@ -155,6 +176,9 @@ function getCoreClassFoundItems(
                         end: prop.initializer.end,
                       },
                     });
+                    if (prop.name.text === 'selector') {
+                      selector = prop.initializer.text;
+                    }
                   }
 
                   // 'styleUrls' are an ArrayLiteralExpression
@@ -183,6 +207,92 @@ function getCoreClassFoundItems(
             return true;
           }
         });
+      }
+
+      // Rename Input if same name as selector
+      if (
+        getSelectorType(selector) === 'attribute' &&
+        ts.isClassDeclaration(node)
+      ) {
+        let renameClassProperty = false;
+
+        ts.forEachChild(node, (childNode) => {
+          if (ts.isPropertyDeclaration(childNode)) {
+            // Input property name is different to template property
+            childNode.decorators?.find((dec) => {
+              if (
+                ts.isCallExpression(dec.expression) &&
+                ts.isIdentifier(dec.expression.expression) &&
+                dec.expression.expression.escapedText === 'Input'
+              ) {
+                const identifier = dec.expression.arguments[0];
+                if (
+                  identifier &&
+                  ts.isStringLiteral(identifier) &&
+                  identifier.text === stripSelectorBraces(selector)
+                ) {
+                  result.push({
+                    itemType: 'attributeInput',
+                    itemText: identifier.text,
+                    location: {
+                      start: identifier.pos + 1,
+                      end: identifier.end - 1,
+                    },
+                  });
+                  return true;
+                }
+              }
+            });
+
+            if (ts.isIdentifier(childNode.name)) {
+              const identifier = childNode.name;
+              // Input property name is same as template property
+              if (
+                identifier.escapedText === stripSelectorBraces(selector, true)
+              ) {
+                result.push({
+                  itemType: 'attributeInput',
+                  itemText: identifier.escapedText,
+                  location: {
+                    start: identifier.pos + 1,
+                    end: identifier.end,
+                  },
+                });
+
+                renameClassProperty = true;
+                return true;
+              }
+            }
+          }
+        });
+
+        if (renameClassProperty) {
+          // loop again to find Property Access Expressions
+
+          const propertyAccessRecursor = (node: ts.Node) => {
+            if (
+              ts.isPropertyAccessExpression(node) &&
+              node.expression.kind === ts.SyntaxKind.ThisKeyword &&
+              ts.isIdentifier(node.name) &&
+              node.name.escapedText === stripSelectorBraces(selector, true)
+            ) {
+              result.push({
+                itemType: 'attributeInput',
+                itemText: node.name.escapedText,
+                location: {
+                  start: node.name.pos,
+                  end: node.name.end,
+                },
+              });
+            } else {
+              ts.forEachChild(node, propertyAccessRecursor);
+            }
+          };
+
+          ts.forEachChild(node, (childNode) => {
+            propertyAccessRecursor(childNode);
+          });
+        }
       }
     }
 
@@ -240,7 +350,10 @@ function getClassNameFoundItems(
       if (ts.isExpressionStatement(node)) {
         node.expression.forEachChild((arg) => {
           if (ts.isStringLiteral(arg)) {
-            const argIndex = arg.text.indexOf(className);
+            const argIndex = arg.text.search(
+              new RegExp(`(?<!\\w)${className}(?!\\w)`)
+            );
+
             if (argIndex >= 0) {
               result.push({
                 itemType: 'class',

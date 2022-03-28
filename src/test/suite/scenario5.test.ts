@@ -5,6 +5,11 @@ suite('Suite Scenario 5', () => {
   vscode.window.showInformationMessage('Start all tests.');
 
   test('Scenario 5', async () => {
+    /*
+    This test scenario uses publicly available repo: https://github.com/tomwhite007/test-rename-spa
+    as the seed to base 3 renamer tests on.
+    */
+
     await genericTestScenario({
       projectRoot:
         '/Users/tom/Development/vscode-ext/_rename-test-spas/test-rename-spa',

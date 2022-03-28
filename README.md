@@ -71,8 +71,8 @@ Thanks to you for reading this.
 
 Latest version: [2.0.0] - 2022-03-29
 
-- Add lazy loaded route imports to renamer process
-- Rename selectors in .spec files, inline component templates and Storybook .stories files
-- Fix: rename directive input attribute if it matches the current selector
-- Fix: tsmove bug; handle fixed path rules in get relative path
-- Add integration testing capability using Git diff snapshots
+- Feature: Add lazy loaded route imports to renamer process
+- Feature: Rename selectors in .spec files, inline component templates and Storybook .stories files
+- Fix: Rename directive input attribute if it matches the current selector
+- Fix: Tsmove bug; handle fixed path rules in get relative path
+- Feature: Add integration testing capability using Git diff snapshots

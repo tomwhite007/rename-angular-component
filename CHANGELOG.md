@@ -42,15 +42,15 @@
 
 ## [1.1.0] - 2022-02-21
 
-- Feature: add compatibility with Nx Workspaces and projects that use layers of wildcard export barrels
-- Fix: edge case race condition on imports changed in component and spec file
-- Fix: edge case replacement of selectors missed in some templates due to line break in end tag
-- Fix: replace dots with dashes entered for name
+- Feature: Add compatibility with Nx Workspaces and projects that use layers of wildcard export barrels
+- Fix: Edge case race condition on imports changed in component and spec file
+- Fix: Edge case replacement of selectors missed in some templates due to line break in end tag
+- Fix: Replace dots with dashes entered for name
 
 ## [2.0.0] - 2022-03-29
 
-- Add lazy loaded route imports to renamer process
-- Rename selectors in .spec files, inline component templates and Storybook .stories files
-- Fix: rename directive input attribute if it matches the current selector
-- Fix: tsmove bug; handle fixed path rules in get relative path
-- Add integration testing capability using Git diff snapshots
+- Feature: Add lazy loaded route imports to renamer process
+- Feature: Rename selectors in .spec files, inline component templates and Storybook .stories files
+- Fix: Rename directive input attribute if it matches the current selector
+- Fix: Tsmove bug; handle fixed path rules in get relative path
+- Feature: Add integration testing capability using Git diff snapshots

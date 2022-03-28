@@ -238,10 +238,10 @@ index 72d8bd3..0bd5c33 100644
  @NgModule({
    imports: [RouterModule.forChild(routes)],
 diff --git a/src/app/products/products.module.ts b/src/app/tom-test/products.module.ts
-similarity index 66%
+similarity index 76%
 rename from src/app/products/products.module.ts
 rename to src/app/tom-test/products.module.ts
-index a2fe432..04b7e22 100644
+index a2fe432..8c8db38 100644
 --- a/src/app/products/products.module.ts
 +++ b/src/app/tom-test/products.module.ts
 @@ -2,11 +2,11 @@ import { NgModule } from '@angular/core';
@@ -249,9 +249,8 @@ index a2fe432..04b7e22 100644
  
  import { ProductsRoutingModule } from './products-routing.module';
 -import { ProductsComponent } from './products.component';
--import { SharedModule } from '@shared';
 +import { TomTestComponent } from './tom-test.component';
-+import { SharedModule } from 'shared/src';
+ import { SharedModule } from '@shared';
  
  @NgModule({
 -  declarations: [ProductsComponent],

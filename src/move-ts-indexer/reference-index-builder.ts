@@ -814,11 +814,24 @@ export class ReferenceIndexBuilder {
         );
         for (let p in config.compilerOptions.paths) {
           const paths = config.compilerOptions.paths[p];
-          for (let i = 0; i < paths.length; i++) {
-            const mapped = paths[i].slice(0, -1);
-            const mappedDir = path.resolve(baseUrl, mapped);
-            if (isInDir(mappedDir, to)) {
-              return asUnix(p.slice(0, -1) + path.relative(mappedDir, to));
+          // wildcard path mappings
+          if (p.endsWith('*')) {
+            const paths = config.compilerOptions.paths[p];
+            for (let i = 0; i < paths.length; i++) {
+              const mapped = paths[i].slice(0, -1);
+              const mappedDir = path.resolve(baseUrl, mapped);
+              if (isInDir(mappedDir, to)) {
+                return asUnix(p.slice(0, -1) + path.relative(mappedDir, to));
+              }
+            }
+          } else {
+            // fixed path mappings
+            const paths = config.compilerOptions.paths[p];
+            for (let i = 0; i < paths.length; i++) {
+              const fullPath = path.resolve(baseUrl, paths[i]);
+              if (!from.startsWith(fullPath) && isInDir(fullPath, to)) {
+                return p;
+              }
             }
           }
         }

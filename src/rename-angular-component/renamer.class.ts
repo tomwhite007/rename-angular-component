@@ -81,9 +81,7 @@ export class Renamer {
 
           /* TODO 
 
-          ---- v2 -----
-
-          anyConstructRegexPartial doesn't work because it allows sub folders   
+          ---- v2 ----- 
   
           limit rename selector in templates to current workspace multi-folder root
   

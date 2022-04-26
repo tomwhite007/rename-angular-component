@@ -83,20 +83,9 @@ export class Renamer {
 
           ---- v2 -----
 
-          
-
-          bug: shared module import in products.module breaks when renaming products page on test-rename-spa
-
-          
-
           anyConstructRegexPartial doesn't work because it allows sub folders   
-
-          Add option to fix selector + use default prefix
-          then ask for prefix if default not ticked
   
           limit rename selector in templates to current workspace multi-folder root
-  
-          make sure input newStub matches constraints and formatting allowed by CLI
   
           refactor for clean classes, functions and pure async await
   

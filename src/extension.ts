@@ -41,29 +41,33 @@ export function activate(context: vscode.ExtensionContext) {
     debugLogger
   );
 
-  let renameComponent = vscode.commands.registerCommand(
-    'rename-angular-component.renameComponent',
-    async (uri: vscode.Uri) => renamer.rename('component', uri)
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'rename-angular-component.renameComponent',
+      async (uri: vscode.Uri) => renamer.rename('component', uri)
+    )
   );
-  context.subscriptions.push(renameComponent);
 
-  let renameDirective = vscode.commands.registerCommand(
-    'rename-angular-component.renameDirective',
-    (uri: vscode.Uri) => renamer.rename('directive', uri)
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'rename-angular-component.renameDirective',
+      (uri: vscode.Uri) => renamer.rename('directive', uri)
+    )
   );
-  context.subscriptions.push(renameDirective);
 
-  let renameService = vscode.commands.registerCommand(
-    'rename-angular-component.renameService',
-    (uri: vscode.Uri) => renamer.rename('service', uri)
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'rename-angular-component.renameService',
+      (uri: vscode.Uri) => renamer.rename('service', uri)
+    )
   );
-  context.subscriptions.push(renameService);
 
-  let renameGuard = vscode.commands.registerCommand(
-    'rename-angular-component.renameGuard',
-    (uri: vscode.Uri) => renamer.rename('guard', uri)
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'rename-angular-component.renameGuard',
+      (uri: vscode.Uri) => renamer.rename('guard', uri)
+    )
   );
-  context.subscriptions.push(renameGuard);
 }
 
 export function deactivate() {}

@@ -3,7 +3,15 @@ export type AngularConstruct =
   | 'directive'
   | 'service'
   | 'module'
-  | 'guard';
+  | 'guard'
+  | 'class'
+  | 'enum'
+  | 'guard'
+  | 'interceptor'
+  | 'interface'
+  | 'module'
+  | 'pipe'
+  | 'resolver';
 
 export interface OriginalFileDetails {
   path: string;

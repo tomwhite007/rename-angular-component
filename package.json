@@ -36,7 +36,8 @@
     "onCommand:rename-angular-component.renameComponent",
     "onCommand:rename-angular-component.renameDirective",
     "onCommand:rename-angular-component.renameService",
-    "onCommand:rename-angular-component.renameGuard"
+    "onCommand:rename-angular-component.renameGuard",
+    "onCommand:rename-angular-component.renameModule"
   ],
   "extensionKind": [
     "ui",
@@ -60,6 +61,10 @@
       {
         "command": "rename-angular-component.renameGuard",
         "title": "Rename Angular Route Guard"
+      },
+      {
+        "command": "rename-angular-component.renameModule",
+        "title": "Rename Angular Module"
       }
     ],
     "menus": {
@@ -82,6 +87,11 @@
         {
           "when": "resourceFilename =~ /^.+\\.guard\\.(spec.ts|ts)$/",
           "command": "rename-angular-component.renameGuard",
+          "group": "navigation"
+        },
+        {
+          "when": "resourceFilename =~ /^.+\\.module\\.(spec.ts|ts)$/",
+          "command": "rename-angular-component.renameModule",
           "group": "navigation"
         }
       ]

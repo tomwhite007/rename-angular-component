@@ -68,6 +68,13 @@ export function activate(context: vscode.ExtensionContext) {
       (uri: vscode.Uri) => renamer.rename('guard', uri)
     )
   );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'rename-angular-component.renameModule',
+      (uri: vscode.Uri) => renamer.rename('module', uri)
+    )
+  );
 }
 
 export function deactivate() {}

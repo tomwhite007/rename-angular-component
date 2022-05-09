@@ -81,6 +81,9 @@ export class Renamer {
 
           /* TODO 
 
+          src/rename-angular-component/in-file-edits/get-original-file-details.function.ts
+            may cause issue with -routing.module if it is the selected file
+
           ---- v2 ----- 
   
           limit rename selector in templates to current workspace multi-folder root

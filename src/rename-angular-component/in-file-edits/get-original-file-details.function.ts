@@ -10,7 +10,7 @@ export function getOriginalFileDetails(filePath: string): OriginalFileDetails {
 
   const file = filePath.substr(lastSlash + 1, filePath.length - lastSlash - 1);
   const stub = file.split(
-    /\.(component|directive|service|guard)\.(spec.ts|scss|css|sass|less|html|ts)$/
+    /(-routing\.module|\.(component|directive|service|guard|module))\.(spec.ts|scss|css|sass|less|html|ts)$/
   )[0];
   return { path, file, stub, filePath };
 }

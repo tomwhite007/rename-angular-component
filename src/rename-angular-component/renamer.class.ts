@@ -26,6 +26,8 @@ import { validateHtmlSelector } from '../angular-cli/validation';
 import { classify, dasherize } from '../angular-cli/strings';
 import { CONSTRUCTS_WITH_SELECTORS } from './definitions/constructs-with-selectors';
 import { timeoutPause } from '../utils/timeout-pause';
+import { getCoreFilePath } from './in-file-edits/get-core-file-path.function';
+import { routifyClassName } from './in-file-edits/routify-class-name.function';
 
 export class Renamer {
   private construct!: AngularConstruct;
@@ -50,7 +52,7 @@ export class Renamer {
     console.log('Rename process start');
     this.debugLogger.log('## Debug Rename Start ##');
 
-    const detailsLoaded = await this.setRenameDetails(_construct, selectedUri);
+    const detailsLoaded = await this.prepRenameDetails(_construct, selectedUri);
     if (!detailsLoaded) {
       this.debugLogger.log(
         'setRenameDetails returned false, stopping.',
@@ -70,12 +72,12 @@ export class Renamer {
         await timeoutPause();
 
         try {
-          const fileMoveJobsReady = await this.setFileMoveJobs();
+          const fileMoveJobsReady = await this.prepFileMoveJobs();
           if (!fileMoveJobsReady) {
             return;
           }
 
-          await this.indexerMoveJobs(progress);
+          await this.runFileMoveJobs(progress);
 
           await this.updateSelectorsInTemplates();
 
@@ -121,7 +123,7 @@ export class Renamer {
     );
   }
 
-  private async indexerMoveJobs(
+  private async runFileMoveJobs(
     progress: vscode.Progress<{
       message?: string | undefined;
       increment?: number | undefined;
@@ -187,7 +189,7 @@ export class Renamer {
     }
   }
 
-  private async setFileMoveJobs(): Promise<boolean> {
+  private async prepFileMoveJobs(): Promise<boolean> {
     const filesRelatedToStub = await FilesRelatedToStub.init(
       this.originalFileDetails,
       this.projectRoot,
@@ -205,7 +207,7 @@ export class Renamer {
       return false;
     }
 
-    const coreFilePath = filesToMove.find((f) => f.isCoreConstruct)?.filePath;
+    const coreFilePath = getCoreFilePath(filesToMove);
     const oldClassName = await getOriginalClassName(
       this.originalFileDetails.stub,
       coreFilePath as string,
@@ -224,8 +226,8 @@ export class Renamer {
         movedFileEdits: f.isCoreConstruct
           ? (() =>
               getCoreClassEdits(
-                oldClassName,
-                newClassName,
+                routifyClassName(oldClassName, f.filePath),
+                routifyClassName(newClassName, f.filePath),
                 this.originalFileDetails.stub,
                 this.newStub,
                 this.construct,
@@ -290,7 +292,7 @@ export class Renamer {
     );
   }
 
-  private async setRenameDetails(
+  private async prepRenameDetails(
     _construct: AngularConstruct,
     selectedUri: vscode.Uri
   ): Promise<boolean> {
@@ -353,7 +355,7 @@ export class Renamer {
         );
         return false;
       }
-      // make sure it's kebab, and loose the dots
+      // make sure it's kebab, and lose the dots
       this.newStub = dasherize(inputResult.replace('.', '-') ?? '');
 
       this.userMessage.setOperationTitle(this.title);

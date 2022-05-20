@@ -14,6 +14,12 @@ interface FileDetails {
   isCoreConstruct: boolean;
 }
 
+export interface FileToMove {
+  filePath: string;
+  newFilePath: string;
+  isCoreConstruct: boolean;
+}
+
 export class FilesRelatedToStub {
   originalFileDetails!: OriginalFileDetails;
   folderNameSameAsStub = false;
@@ -71,7 +77,7 @@ export class FilesRelatedToStub {
     });
   }
 
-  getFilesToMove(newStub: string) {
+  getFilesToMove(newStub: string): FileToMove[] {
     const folderReplaceRegex = new RegExp(
       `(?<=\/)${escapeRegex(this.originalFileDetails.stub)}$`
     );
@@ -115,6 +121,13 @@ export class FilesRelatedToStub {
     }
     if (b.sameStub) {
       return 1;
+    }
+
+    if (a.filePath.match(/-routing\.module\.ts$/)) {
+      return 1;
+    }
+    if (b.filePath.match(/-routing\.module\.ts$/)) {
+      return -1;
     }
 
     if (a.filePath > b.filePath) {

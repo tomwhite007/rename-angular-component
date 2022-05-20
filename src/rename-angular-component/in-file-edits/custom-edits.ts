@@ -37,12 +37,6 @@ export function getCoreClassEdits(
   selectorTransfer: SelectorTransfer,
   debugLogToFile?: (...args: string[]) => void
 ): GenericEditsCallback {
-  if (construct === 'module' && originalClassName.endsWith('RoutingModule')) {
-    if (!newClassName.endsWith('RoutingModule')) {
-      newClassName = newClassName.replace('Module', 'RoutingModule');
-    }
-  }
-
   return (fileName: string, sourceText: string) => {
     const foundItems = getCoreClassFoundItems(
       fileName,

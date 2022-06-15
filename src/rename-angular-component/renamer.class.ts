@@ -83,8 +83,7 @@ export class Renamer {
 
           /* TODO 
 
-          src/rename-angular-component/in-file-edits/get-original-file-details.function.ts
-            may cause issue with -routing.module if it is the selected file
+          fix up import identifier in core module for routing.module
 
           ---- v2 ----- 
   

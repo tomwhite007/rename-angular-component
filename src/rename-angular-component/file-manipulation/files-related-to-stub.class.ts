@@ -14,6 +14,12 @@ interface FileDetails {
   isCoreConstruct: boolean;
 }
 
+export interface FileToMove {
+  filePath: string;
+  newFilePath: string;
+  isCoreConstruct: boolean;
+}
+
 export class FilesRelatedToStub {
   originalFileDetails!: OriginalFileDetails;
   folderNameSameAsStub = false;

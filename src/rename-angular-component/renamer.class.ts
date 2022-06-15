@@ -26,6 +26,7 @@ import { validateHtmlSelector } from '../angular-cli/validation';
 import { classify, dasherize } from '../angular-cli/strings';
 import { CONSTRUCTS_WITH_SELECTORS } from './definitions/constructs-with-selectors';
 import { timeoutPause } from '../utils/timeout-pause';
+import { getCoreFilePath } from './in-file-edits/get-core-file-path.function';
 
 export class Renamer {
   private construct!: AngularConstruct;
@@ -50,7 +51,7 @@ export class Renamer {
     console.log('Rename process start');
     this.debugLogger.log('## Debug Rename Start ##');
 
-    const detailsLoaded = await this.setRenameDetails(_construct, selectedUri);
+    const detailsLoaded = await this.prepRenameDetails(_construct, selectedUri);
     if (!detailsLoaded) {
       this.debugLogger.log(
         'setRenameDetails returned false, stopping.',
@@ -70,33 +71,22 @@ export class Renamer {
         await timeoutPause();
 
         try {
-          const fileMoveJobsReady = await this.setFileMoveJobs();
+          const fileMoveJobsReady = await this.prepFileMoveJobs();
           if (!fileMoveJobsReady) {
             return;
           }
 
-          await this.indexerMoveJobs(progress);
+          await this.runFileMoveJobs(progress);
 
           await this.updateSelectorsInTemplates();
 
           /* TODO 
 
-          ---- v2 -----
+          fix up import identifier in core module for routing.module
 
-          
-
-          bug: shared module import in products.module breaks when renaming products page on test-rename-spa
-
-          
-
-          anyConstructRegexPartial doesn't work because it allows sub folders   
-
-          Add option to fix selector + use default prefix
-          then ask for prefix if default not ticked
+          ---- v2 ----- 
   
           limit rename selector in templates to current workspace multi-folder root
-  
-          make sure input newStub matches constraints and formatting allowed by CLI
   
           refactor for clean classes, functions and pure async await
   
@@ -131,7 +121,7 @@ export class Renamer {
     );
   }
 
-  private async indexerMoveJobs(
+  private async runFileMoveJobs(
     progress: vscode.Progress<{
       message?: string | undefined;
       increment?: number | undefined;
@@ -197,7 +187,7 @@ export class Renamer {
     }
   }
 
-  private async setFileMoveJobs(): Promise<boolean> {
+  private async prepFileMoveJobs(): Promise<boolean> {
     const filesRelatedToStub = await FilesRelatedToStub.init(
       this.originalFileDetails,
       this.projectRoot,
@@ -215,7 +205,7 @@ export class Renamer {
       return false;
     }
 
-    const coreFilePath = filesToMove.find((f) => f.isCoreConstruct)?.filePath;
+    const coreFilePath = getCoreFilePath(filesToMove);
     const oldClassName = await getOriginalClassName(
       this.originalFileDetails.stub,
       coreFilePath as string,
@@ -300,7 +290,7 @@ export class Renamer {
     );
   }
 
-  private async setRenameDetails(
+  private async prepRenameDetails(
     _construct: AngularConstruct,
     selectedUri: vscode.Uri
   ): Promise<boolean> {
@@ -363,7 +353,7 @@ export class Renamer {
         );
         return false;
       }
-      // make sure it's kebab, and loose the dots
+      // make sure it's kebab, and lose the dots
       this.newStub = dasherize(inputResult.replace('.', '-') ?? '');
 
       this.userMessage.setOperationTitle(this.title);

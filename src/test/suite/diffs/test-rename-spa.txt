@@ -175,7 +175,7 @@ index ca2efdc..7a02a90 100644
  })
  export class SharedModule {}
 diff --git a/src/app/app-routing.module.ts b/src/app/app-routing.module.ts
-index a81169d..e488329 100644
+index a81169d..e1ed888 100644
 --- a/src/app/app-routing.module.ts
 +++ b/src/app/app-routing.module.ts
 @@ -5,7 +5,7 @@ const routes: Routes = [
@@ -183,7 +183,7 @@ index a81169d..e488329 100644
      path: 'products',
      loadChildren: () =>
 -      import('./products/products.module').then((m) => m.ProductsModule),
-+      import('./tom-test/products.module').then((m) => m.ProductsModule),
++      import('./tom-test/tom-test.module').then((m) => m.TomTestModule),
    },
  ];
  
@@ -237,27 +237,6 @@ index 72d8bd3..0bd5c33 100644
  
  @NgModule({
    imports: [RouterModule.forChild(routes)],
-diff --git a/src/app/products/products.module.ts b/src/app/tom-test/products.module.ts
-similarity index 76%
-rename from src/app/products/products.module.ts
-rename to src/app/tom-test/products.module.ts
-index a2fe432..8c8db38 100644
---- a/src/app/products/products.module.ts
-+++ b/src/app/tom-test/products.module.ts
-@@ -2,11 +2,11 @@ import { NgModule } from '@angular/core';
- import { CommonModule } from '@angular/common';
- 
- import { ProductsRoutingModule } from './products-routing.module';
--import { ProductsComponent } from './products.component';
-+import { TomTestComponent } from './tom-test.component';
- import { SharedModule } from '@shared';
- 
- @NgModule({
--  declarations: [ProductsComponent],
-+  declarations: [TomTestComponent],
-   imports: [CommonModule, ProductsRoutingModule, SharedModule],
- })
- export class ProductsModule {}
 diff --git a/src/app/tom-test/tom-test.component.html b/src/app/tom-test/tom-test.component.html
 new file mode 100644
 index 0000000..014f286
@@ -327,3 +306,25 @@ index 0000000..c4a0e53
 +  }
 +
 +}
+diff --git a/src/app/products/products.module.ts b/src/app/tom-test/tom-test.module.ts
+similarity index 68%
+rename from src/app/products/products.module.ts
+rename to src/app/tom-test/tom-test.module.ts
+index a2fe432..090ba81 100644
+--- a/src/app/products/products.module.ts
++++ b/src/app/tom-test/tom-test.module.ts
+@@ -2,11 +2,11 @@ import { NgModule } from '@angular/core';
+ import { CommonModule } from '@angular/common';
+ 
+ import { ProductsRoutingModule } from './products-routing.module';
+-import { ProductsComponent } from './products.component';
++import { TomTestComponent } from './tom-test.component';
+ import { SharedModule } from '@shared';
+ 
+ @NgModule({
+-  declarations: [ProductsComponent],
++  declarations: [TomTestComponent],
+   imports: [CommonModule, ProductsRoutingModule, SharedModule],
+ })
+-export class ProductsModule {}
++export class TomTestModule {}

@@ -31,6 +31,11 @@ suite('Suite Scenario 5', () => {
           construct: 'directive',
           newStub: 'dir-identifier',
         },
+        {
+          filePath: './src/app/tom-test/products.module.ts',
+          construct: 'module',
+          newStub: 'tom-test',
+        },
       ],
       fileDiffPath: './src/test/suite/diffs/test-rename-spa.txt',
     });

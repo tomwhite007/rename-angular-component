@@ -97,7 +97,7 @@ export class Renamer {
 
           // delete original folder
           if (this.renameFolder) {
-            fs.remove(this.originalFileDetails.path);
+            workspace.fs.remove(this.originalFileDetails.path);
           }
 
           // report process completed
@@ -237,7 +237,7 @@ export class Renamer {
       return new FileItem(
         windowsFilePathFix(f.filePath, true),
         windowsFilePathFix(f.newFilePath, true),
-        fs.statSync(f.filePath).isDirectory(),
+        workspace.fs.statSync(f.filePath).isDirectory(),
         oldClassName,
         newClassName,
         additionalEdits

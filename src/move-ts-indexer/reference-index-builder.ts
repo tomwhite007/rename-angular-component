@@ -91,7 +91,10 @@ export class ReferenceIndexBuilder {
     );
 
     for (const packageFile of packageFiles) {
-      const content = await fs.readFileAsync(packageFile.fsPath, 'utf-8');
+      const content = await workspace.fs.readFileAsync(
+        packageFile.fsPath,
+        'utf-8'
+      );
       try {
         let json = JSON.parse(content);
         if (json.name) {
@@ -120,7 +123,10 @@ export class ReferenceIndexBuilder {
     this.debugLogger.log('tsConfig files found: ', JSON.stringify(configFiles));
 
     for (const configFile of configFiles) {
-      const content = await fs.readFileAsync(configFile.fsPath, 'utf-8');
+      const content = await workspace.fs.readFileAsync(
+        configFile.fsPath,
+        'utf-8'
+      );
 
       try {
         const config = await this.parseExtendedTsConfigToJson(
@@ -177,7 +183,10 @@ export class ReferenceIndexBuilder {
       extenderConfigInfo.config.extends as string
     );
 
-    const baseContent = await fs.readFileAsync(baseConfigPath, 'utf-8');
+    const baseContent = await workspace.fs.readFileAsync(
+      baseConfigPath,
+      'utf-8'
+    );
     const baseConfigInfo: ConfigInfo = {
       config: ts.parseConfigFileTextToJson(baseConfigPath, baseContent).config,
       configPath: baseConfigPath,
@@ -349,7 +358,7 @@ export class ReferenceIndexBuilder {
   ): Thenable<any> {
     // TODO: refactor to not use editors unless unsaved
     if (!conf('openEditors', false)) {
-      return fs.readFileAsync(filePath, 'utf8').then((text) => {
+      return workspace.fs.readFileAsync(filePath, 'utf8').then((text) => {
         const edits = getEdits(filePath, text);
         if (edits.length === 0) {
           if (processFileWhenNoEdits) {
@@ -363,9 +372,11 @@ export class ReferenceIndexBuilder {
 
         this.fileEditLog.push(filePath);
 
-        return fs.writeFileAsync(filePath, newText, 'utf-8').then(() => {
-          this.processFile(newText, filePath, true);
-        });
+        return workspace.fs
+          .writeFileAsync(filePath, newText, 'utf-8')
+          .then(() => {
+            this.processFile(newText, filePath, true);
+          });
       });
     } else {
       function attemptEdit(
@@ -704,7 +715,7 @@ export class ReferenceIndexBuilder {
         for (let i = 0; i < BATCH_SIZE && index < files.length; i++) {
           const file = files[index++];
           try {
-            const data = fs.readFileSync(file.fsPath, 'utf8');
+            const data = workspace.fs.readFileSync(file.fsPath, 'utf8');
             this.processFile(data, file.fsPath, deleteByFile);
           } catch (e) {
             console.log('Failed to load file', e);
@@ -766,11 +777,11 @@ export class ReferenceIndexBuilder {
   }
 
   private doesFileExist(filePath: string) {
-    if (fs.existsSync(filePath)) {
+    if (workspace.fs.existsSync(filePath)) {
       return true;
     }
     for (let i = 0; i < this.extensions.length; i++) {
-      if (fs.existsSync(filePath + this.extensions[i])) {
+      if (workspace.fs.existsSync(filePath + this.extensions[i])) {
         return true;
       }
     }
@@ -1115,9 +1126,9 @@ export class ReferenceIndexBuilder {
       for (let j = 0; j < this.extensions.length; j++) {
         const ext = this.extensions[j];
         if (!referenced.endsWith(ext)) {
-          if (fs.existsSync(referenced + ext)) {
+          if (workspace.fs.existsSync(referenced + ext)) {
             referenced += ext;
-          } else if (fs.existsSync(referenced + '/index' + ext)) {
+          } else if (workspace.fs.existsSync(referenced + '/index' + ext)) {
             referenced += '/index' + ext;
           }
         }

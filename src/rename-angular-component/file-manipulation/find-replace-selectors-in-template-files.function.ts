@@ -21,12 +21,15 @@ export async function findReplaceSelectorsInTemplateFiles(
 
   let changed = 0;
   for (const uri of uris) {
-    let html: string | null = await fs.readFileAsync(uri.fsPath, 'utf-8');
+    let html: string | null = await workspace.fs.readFileAsync(
+      uri.fsPath,
+      'utf-8'
+    );
     if (html) {
       html = renameSelectorInTemplate(html, originalSelector, newSelector);
     }
     if (html) {
-      await fs.writeFileAsync(uri.fsPath, html, 'utf-8');
+      await workspace.fs.writeFileAsync(uri.fsPath, html, 'utf-8');
       userMessage.logInfoToChannel([uri.fsPath], false);
       changed++;
     }

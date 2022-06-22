@@ -49,7 +49,7 @@ export class DebugLogger {
     }
     let fileContents = '';
     if (fs.existsSync(this.debugFilePath)) {
-      fileContents = fs.readFileSync(this.debugFilePath, 'utf-8');
+      fileContents = workspace.fs.readFileSync(this.debugFilePath, 'utf-8');
       fileContents += '\n---\n';
     }
     return fileContents;
@@ -59,7 +59,7 @@ export class DebugLogger {
     if (!this.debugFilePath) {
       this.preSaveCash = fileContents;
     } else {
-      fs.writeFileSync(this.debugFilePath, fileContents, 'utf-8');
+      workspace.fs.writeFileSync(this.debugFilePath, fileContents, 'utf-8');
     }
   }
 }

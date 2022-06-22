@@ -13,11 +13,11 @@ export async function readUpsertDiffFile(
 
   if (OVERWRITE_DIFF_SNAPSHOTS) {
     if (!fs.existsSync(fullDirPath)) {
-      await fs.mkdir(fullDirPath);
+      await workspace.fs.mkdir(fullDirPath);
     }
-    await fs.writeFileAsync(fullFilePath, newDiff, 'utf-8');
+    await workspace.fs.writeFileAsync(fullFilePath, newDiff, 'utf-8');
     return newDiff;
   } else {
-    return await fs.readFileAsync(fullFilePath, 'utf-8');
+    return await workspace.fs.readFileAsync(fullFilePath, 'utf-8');
   }
 }

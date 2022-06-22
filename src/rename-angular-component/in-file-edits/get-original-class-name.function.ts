@@ -10,7 +10,7 @@ export async function getOriginalClassName(
   construct: AngularConstruct
 ) {
   const expectedOldClassName = `${classify(stub)}${classify(construct)}`;
-  const sourceText = await fs.readFileAsync(filepath, 'utf-8');
+  const sourceText = await workspace.fs.readFileAsync(filepath, 'utf-8');
 
   const file = ts.createSourceFile(
     filepath,

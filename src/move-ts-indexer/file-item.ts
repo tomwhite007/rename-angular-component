@@ -1,4 +1,4 @@
-import * as fs from 'fs-extra-promise';
+import { workspace } from 'vscode';
 import * as path from 'path';
 
 import { ReferenceIndexBuilder } from './reference-index-builder';
@@ -18,7 +18,7 @@ export class FileItem {
   ) {}
 
   exists(): boolean {
-    return fs.existsSync(this.targetPath);
+    return workspace.fs.existsSync(this.targetPath);
   }
 
   public async move(index: ReferenceIndexBuilder) {
@@ -27,7 +27,7 @@ export class FileItem {
     if (this.isDir) {
       await index.updateDirImports(this.sourcePath, this.targetPath);
 
-      await fs.renameAsync(this.sourcePath, this.targetPath);
+      await workspace.fs.rename(this.sourcePath, this.targetPath);
 
       await index.updateMovedDir(this.sourcePath, this.targetPath);
     } else {
@@ -43,7 +43,7 @@ export class FileItem {
         console.log('NO updateImports for: ', this.sourcePath);
       }
 
-      await fs.renameAsync(this.sourcePath, this.targetPath);
+      await workspace.fs.renameAsync(this.sourcePath, this.targetPath);
 
       if (this.sourcePath.endsWith('.ts')) {
         await index.updateMovedFile(
@@ -56,6 +56,6 @@ export class FileItem {
   }
 
   private ensureDir(): Promise<any> {
-    return fs.ensureDirAsync(path.dirname(this.targetPath));
+    return workspace.fs.ensureDirAsync(path.dirname(this.targetPath));
   }
 }

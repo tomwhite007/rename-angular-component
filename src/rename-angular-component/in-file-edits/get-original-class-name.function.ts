@@ -1,6 +1,6 @@
 import * as ts from 'typescript';
 import { AngularConstruct } from '../definitions/file.interfaces';
-import * as fs from 'fs-extra-promise';
+import { workspace } from 'vscode';
 import { classify } from '../../angular-cli/strings';
 import { getDecoratorName } from './get-decorator-name.function';
 

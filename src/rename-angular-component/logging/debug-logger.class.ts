@@ -1,4 +1,4 @@
-import * as fs from 'fs-extra-promise';
+import { workspace } from 'vscode';
 import * as path from 'path';
 
 export class DebugLogger {

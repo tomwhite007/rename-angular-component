@@ -11,7 +11,9 @@ export function activate(context: vscode.ExtensionContext) {
   const debugLogger = new DebugLogger(getConfig('debugLog', false));
   const indexStart = Date.now();
   const userMessage = new UserMessage(EXTENSION_NAME);
-  const indexer: ReferenceIndexBuilder = new ReferenceIndexBuilder(debugLogger);
+  const indexBuilder: ReferenceIndexBuilder = new ReferenceIndexBuilder(
+    debugLogger
+  );
 
   const initWithProgress = () => {
     return vscode.window.withProgress(
@@ -20,13 +22,13 @@ export function activate(context: vscode.ExtensionContext) {
         title: `${EXTENSION_NAME} is indexing`,
       },
       async (progress) => {
-        return indexer.init(progress);
+        return indexBuilder.init(progress);
       }
     );
   };
 
   const initialise = async () => {
-    if (indexer.isinitialised) {
+    if (indexBuilder.isinitialised) {
       return Promise.resolve();
     }
     await initWithProgress();
@@ -35,7 +37,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   const initialisePromise = initialise();
   const renamer = new Renamer(
-    indexer,
+    indexBuilder,
     initialisePromise,
     userMessage,
     debugLogger

@@ -1,4 +1,3 @@
-import { is } from 'bluebird';
 import * as path from 'path';
 import { isPathToAnotherDir } from './util/helper-functions';
 import { Reference } from './util/shared-interfaces';

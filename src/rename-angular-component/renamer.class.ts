@@ -27,6 +27,8 @@ import { classify, dasherize } from '../angular-cli/strings';
 import { CONSTRUCTS_WITH_SELECTORS } from './definitions/constructs-with-selectors';
 import { timeoutPause } from '../utils/timeout-pause';
 import { getCoreFilePath } from './in-file-edits/get-core-file-path.function';
+import { isDirectory } from '../utils/isDirectory.function';
+import { fileExists } from '../utils/fileExists.function';
 
 export class Renamer {
   private construct!: AngularConstruct;
@@ -49,11 +51,11 @@ export class Renamer {
 
   async rename(_construct: AngularConstruct, selectedUri: vscode.Uri) {
     console.log('Rename process start');
-    this.debugLogger.log('## Debug Rename Start ##');
+    await this.debugLogger.log('## Debug Rename Start ##');
 
     const detailsLoaded = await this.prepRenameDetails(_construct, selectedUri);
     if (!detailsLoaded) {
-      this.debugLogger.log(
+      await this.debugLogger.log(
         'setRenameDetails returned false, stopping.',
         '## Debug Rename End ##'
       );
@@ -97,7 +99,7 @@ export class Renamer {
 
           // delete original folder
           if (this.renameFolder) {
-            workspace.fs.remove(this.originalFileDetails.path);
+            workspace.fs.delete(vscode.Uri.file(this.originalFileDetails.path));
           }
 
           // report process completed
@@ -109,12 +111,12 @@ export class Renamer {
             `${this.title} completed in ${renameTime} seconds`,
           ]);
 
-          this.debugLogger.log('## Debug Rename Completed ##');
+          await this.debugLogger.log('## Debug Rename Completed ##');
 
           await timeoutPause(50);
           console.log('Rename process end');
         } catch (e: any) {
-          this.reportErrors(e);
+          await this.reportErrors(e);
           console.log('Rename process ended with errors');
         }
       }
@@ -177,7 +179,7 @@ export class Renamer {
           ]);
         }
 
-        this.debugLogger.log(
+        await this.debugLogger.log(
           'oldSelector: ' + this.selectorTransfer.oldSelector,
           'newSelector: ' + this.selectorTransfer.newSelector
         );
@@ -237,14 +239,13 @@ export class Renamer {
       return new FileItem(
         windowsFilePathFix(f.filePath, true),
         windowsFilePathFix(f.newFilePath, true),
-        workspace.fs.statSync(f.filePath).isDirectory(),
         oldClassName,
         newClassName,
         additionalEdits
       );
     });
 
-    this.debugLogger.log(
+    await this.debugLogger.log(
       'renameFolder: ' + this.renameFolder,
       '',
       'filesToMove: ',
@@ -254,19 +255,23 @@ export class Renamer {
       JSON.stringify(this.fileMoveJobs)
     );
 
-    if (this.fileMoveJobs.some((l) => l.exists())) {
-      vscode.window.showErrorMessage('Not allowed to overwrite existing files');
+    for (const job of this.fileMoveJobs) {
+      if (await fileExists(vscode.Uri.file(job.targetPath))) {
+        vscode.window.showErrorMessage(
+          'Not allowed to overwrite existing files'
+        );
 
-      this.debugLogger.log(
-        'l.exists(): Not allowed to overwrite existing files'
-      );
+        await this.debugLogger.log(
+          'l.exists(): Not allowed to overwrite existing files'
+        );
 
-      return false;
+        return false;
+      }
     }
     return true;
   }
 
-  private reportErrors(e: any) {
+  private async reportErrors(e: any) {
     const raiseIssueMsgs = [
       `If it looks like a new issue, we'd appreciate you raising it here: https://github.com/tomwhite007/rename-angular-component/issues`,
       `We're actively fixing any bugs reported.`,
@@ -284,7 +289,7 @@ export class Renamer {
       `We recommend reverting the changes made if there are any`,
       ...raiseIssueMsgs,
     ]);
-    this.debugLogger.log(
+    await this.debugLogger.log(
       'Renamer error: ',
       JSON.stringify(e, Object.getOwnPropertyNames(e))
     );
@@ -316,7 +321,7 @@ export class Renamer {
       this.projectRoot = windowsFilePathFix(
         getProjectRoot(selectedUri) as string
       );
-      this.debugLogger.setWorkspaceRoot(this.projectRoot);
+      await this.debugLogger.setWorkspaceRoot(this.projectRoot);
 
       if (checkForOpenUnsavedEditors()) {
         this.userMessage.popupMessage(
@@ -370,7 +375,7 @@ export class Renamer {
         false
       );
 
-      this.debugLogger.log(
+      await this.debugLogger.log(
         'projectRoot: ' + this.projectRoot,
         '',
         'originalFileDetails:',
@@ -384,7 +389,7 @@ export class Renamer {
       return true;
     } catch (e: any) {
       console.warn('setRenameDetails error: ', e);
-      this.debugLogger.log(
+      await this.debugLogger.log(
         'setRenameDetails error: ',
         JSON.stringify(e, Object.getOwnPropertyNames(e))
       );

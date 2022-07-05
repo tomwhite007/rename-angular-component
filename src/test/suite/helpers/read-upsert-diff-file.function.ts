@@ -1,5 +1,8 @@
 import path = require('path');
-import { workspace } from 'vscode';
+import { Uri, workspace } from 'vscode';
+import { fileExists } from '../../../utils/fileExists.function';
+import { readFile } from '../../../utils/readFile.function';
+import { writeFile } from '../../../utils/writeFile.function';
 import { OVERWRITE_DIFF_SNAPSHOTS } from './constants-helper-config';
 
 export async function readUpsertDiffFile(
@@ -12,12 +15,12 @@ export async function readUpsertDiffFile(
   const fullDirPath = path.dirname(fullFilePath);
 
   if (OVERWRITE_DIFF_SNAPSHOTS) {
-    if (!fs.existsSync(fullDirPath)) {
-      await workspace.fs.mkdir(fullDirPath);
+    if (!(await fileExists(Uri.file(fullDirPath)))) {
+      await workspace.fs.createDirectory(Uri.file(fullDirPath));
     }
-    await workspace.fs.writeFileAsync(fullFilePath, newDiff, 'utf-8');
+    await writeFile(Uri.file(fullFilePath), newDiff);
     return newDiff;
   } else {
-    return await workspace.fs.readFileAsync(fullFilePath, 'utf-8');
+    return await readFile(Uri.file(fullFilePath));
   }
 }

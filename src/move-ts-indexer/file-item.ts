@@ -1,14 +1,14 @@
-import { workspace } from 'vscode';
+import { Uri, workspace } from 'vscode';
 import * as path from 'path';
 
 import { ReferenceIndexBuilder } from './reference-index-builder';
 import { GenericEditsCallback } from './apply-generic-edits';
+import { isDirectory } from '../utils/isDirectory.function';
 
 export class FileItem {
   constructor(
     public sourcePath: string,
     public targetPath: string,
-    public isDir: boolean,
     public originalClassName?: string,
     public newClassName?: string,
     public additionalEdits?: {
@@ -17,19 +17,11 @@ export class FileItem {
     }
   ) {}
 
-  exists(): boolean {
-    return workspace.fs.existsSync(this.targetPath);
-  }
-
   public async move(index: ReferenceIndexBuilder) {
-    await this.ensureDir();
-
-    if (this.isDir) {
-      await index.updateDirImports(this.sourcePath, this.targetPath);
-
-      await workspace.fs.rename(this.sourcePath, this.targetPath);
-
-      await index.updateMovedDir(this.sourcePath, this.targetPath);
+    if (await isDirectory(Uri.file(this.sourcePath))) {
+      throw new Error(
+        'This process no longer supports move / rename by directory'
+      );
     } else {
       // is a file
       if (this.sourcePath.endsWith('.ts')) {
@@ -43,7 +35,10 @@ export class FileItem {
         console.log('NO updateImports for: ', this.sourcePath);
       }
 
-      await workspace.fs.renameAsync(this.sourcePath, this.targetPath);
+      await workspace.fs.rename(
+        Uri.file(this.sourcePath),
+        Uri.file(this.targetPath)
+      );
 
       if (this.sourcePath.endsWith('.ts')) {
         await index.updateMovedFile(
@@ -53,9 +48,5 @@ export class FileItem {
         );
       }
     }
-  }
-
-  private ensureDir(): Promise<any> {
-    return workspace.fs.ensureDirAsync(path.dirname(this.targetPath));
   }
 }

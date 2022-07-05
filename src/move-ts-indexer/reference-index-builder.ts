@@ -1,4 +1,3 @@
-import { workspace } from 'vscode';
 import * as path from 'path';
 import * as ts from 'typescript';
 import * as vscode from 'vscode';
@@ -18,6 +17,10 @@ import {
   flattenArray,
 } from './util/helper-functions';
 import { Reference } from './util/shared-interfaces';
+import { readFile } from '../utils/readFile.function';
+import { writeFile } from '../utils/writeFile.function';
+import { timeoutPause } from '../utils/timeout-pause';
+import { fileExists } from '../utils/fileExists.function';
 
 const BATCH_SIZE = 50;
 
@@ -91,10 +94,7 @@ export class ReferenceIndexBuilder {
     );
 
     for (const packageFile of packageFiles) {
-      const content = await workspace.fs.readFileAsync(
-        packageFile.fsPath,
-        'utf-8'
-      );
+      const content = await readFile(packageFile);
       try {
         let json = JSON.parse(content);
         if (json.name) {
@@ -123,10 +123,7 @@ export class ReferenceIndexBuilder {
     this.debugLogger.log('tsConfig files found: ', JSON.stringify(configFiles));
 
     for (const configFile of configFiles) {
-      const content = await workspace.fs.readFileAsync(
-        configFile.fsPath,
-        'utf-8'
-      );
+      const content = await readFile(configFile);
 
       try {
         const config = await this.parseExtendedTsConfigToJson(
@@ -183,10 +180,7 @@ export class ReferenceIndexBuilder {
       extenderConfigInfo.config.extends as string
     );
 
-    const baseContent = await workspace.fs.readFileAsync(
-      baseConfigPath,
-      'utf-8'
-    );
+    const baseContent = await readFile(vscode.Uri.file(baseConfigPath));
     const baseConfigInfo: ConfigInfo = {
       config: ts.parseConfigFileTextToJson(baseConfigPath, baseContent).config,
       configPath: baseConfigPath,
@@ -307,37 +301,41 @@ export class ReferenceIndexBuilder {
     });
   }
 
-  private getReferenceEdits(
+  private async getReferenceEdits(
     filePath: string,
     text: string,
     replacements: Replacement[],
     fromPath?: string
-  ): GenericEdit[] {
+  ): Promise<GenericEdit[] | undefined> {
     const edits: GenericEdit[] = [];
-    const relativeReferences = this.getRelativeReferences(
+    const relativeReferences = await this.getRelativeReferences(
       text,
       fromPath || filePath
     );
-    replacements.forEach((replacement) => {
+    for (const replacement of replacements) {
       const before = replacement[0];
       const after = replacement[1];
       if (before === after) {
         return;
       }
-      const beforeReference = this.resolveRelativeReference(
+      const beforeReference = await this.resolveRelativeReference(
         fromPath || filePath,
         before
       );
-      const beforeReplacements = relativeReferences.filter((ref) => {
-        const refFullPath = this.resolveRelativeReference(
+      const beforeReplacements: FoundItem[] = [];
+      for (const ref of relativeReferences) {
+        const refFullPath = await this.resolveRelativeReference(
           fromPath || filePath,
           ref.itemText
         );
-        return (
+        if (
           refFullPath === beforeReference ||
           refFullPath === this.removeIndexSuffix(beforeReference)
-        );
-      });
+        ) {
+          beforeReplacements.push(ref);
+        }
+      }
+
       beforeReplacements.forEach((beforeReplacement) => {
         const edit = {
           start: beforeReplacement.location.start + 1,
@@ -346,24 +344,25 @@ export class ReferenceIndexBuilder {
         };
         edits.push(edit);
       });
-    });
+    }
 
     return edits;
   }
 
   private replaceEdits(
     filePath: string,
-    getEdits: (filePath: string, text: string) => GenericEdit[],
+    getEdits: (filePath: string, text: string) => Promise<GenericEdit[]>,
     processFileWhenNoEdits = false
   ): Thenable<any> {
     // TODO: refactor to not use editors unless unsaved
     if (!conf('openEditors', false)) {
-      return workspace.fs.readFileAsync(filePath, 'utf8').then((text) => {
-        const edits = getEdits(filePath, text);
+      const fileUri = vscode.Uri.file(filePath);
+      return readFile(fileUri).then(async (text) => {
+        const edits = await getEdits(filePath, text);
         if (edits.length === 0) {
           if (processFileWhenNoEdits) {
             // TODO: make getReferenceEdits() work separately from replacements() - due a callback within a callback, processFileWhenNoEdits cannot be set from outside
-            this.processFile(text, filePath, true);
+            await this.processFile(text, filePath, true);
           }
           return Promise.resolve();
         }
@@ -372,11 +371,9 @@ export class ReferenceIndexBuilder {
 
         this.fileEditLog.push(filePath);
 
-        return workspace.fs
-          .writeFileAsync(filePath, newText, 'utf-8')
-          .then(() => {
-            this.processFile(newText, filePath, true);
-          });
+        return writeFile(fileUri, newText).then(async () => {
+          await this.processFile(newText, filePath, true);
+        });
       });
     } else {
       function attemptEdit(
@@ -393,9 +390,9 @@ export class ReferenceIndexBuilder {
 
       return vscode.workspace
         .openTextDocument(filePath)
-        .then((doc: vscode.TextDocument): Thenable<any> => {
+        .then(async (doc: vscode.TextDocument) => {
           const text = doc.getText();
-          const rawEdits = getEdits(filePath, text);
+          const rawEdits = await getEdits(filePath, text);
           const edits = rawEdits.map((edit: GenericEdit) => {
             return vscode.TextEdit.replace(
               new vscode.Range(
@@ -409,9 +406,9 @@ export class ReferenceIndexBuilder {
             this.fileEditLog.push(filePath);
             const edit = new vscode.WorkspaceEdit();
             edit.set(doc.uri, edits);
-            return attemptEdit(edit).then(() => {
+            return attemptEdit(edit).then(async () => {
               const newText = applyGenericEdits(text, rawEdits);
-              this.processFile(newText, filePath, true);
+              await this.processFile(newText, filePath, true);
             });
           } else {
             return Promise.resolve();
@@ -425,13 +422,13 @@ export class ReferenceIndexBuilder {
     to: string,
     additionalEdits?: GenericEditsCallback
   ): Thenable<any> {
-    const replacements = (text: string): Replacement[] => {
-      const references = Array.from(
-        new Set(this.getRelativeImportSpecifiers(text, from))
-      );
+    const replacements = async (text: string): Promise<Replacement[]> => {
+      let references = await this.getRelativeImportSpecifiers(text, from);
+      references = Array.from(new Set(references));
 
-      return <Replacement[]>references.map((reference) => {
-        const absReference = this.resolveRelativeReference(
+      const replacementArray: Replacement[] = [];
+      for (const reference of references) {
+        const absReference = await this.resolveRelativeReference(
           from,
           reference.path
         );
@@ -444,146 +441,26 @@ export class ReferenceIndexBuilder {
 
         newReference = this.removeExtension(newReference);
         newReference = this.removeIndexSuffix(newReference);
-        return [reference.path, newReference];
-      });
+        replacementArray.push([reference.path, newReference]);
+      }
+      return replacementArray;
     };
 
     return this.replaceEdits(
       to,
-      (filePath: string, text: string): GenericEdit[] => [
-        ...this.getReferenceEdits(filePath, text, replacements(text), from),
+      async (filePath: string, text: string): Promise<GenericEdit[]> => [
+        ...((await this.getReferenceEdits(
+          filePath,
+          text,
+          await replacements(text),
+          from
+        )) ?? []),
         ...(additionalEdits ? additionalEdits(filePath, text) : []),
       ],
       true
     ).then(() => {
       this.index.deleteByPath(from);
     });
-  }
-
-  updateMovedDir(
-    from: string,
-    to: string,
-    fileNames: string[] = []
-  ): Thenable<any> {
-    const relative = vscode.workspace.asRelativePath(to);
-    const glob = this.filesToScanGlob;
-    const whiteList = new Set<string>(fileNames);
-    return vscode.workspace
-      .findFiles(relative + '/**', undefined, 100000)
-      .then((files) => {
-        const promises = files
-          .filter((file) => {
-            if (whiteList.size > 0) {
-              return (
-                minimatch(file.fsPath, glob) &&
-                whiteList.has(path.relative(to, file.fsPath).split(path.sep)[0])
-              );
-            }
-            return minimatch(file.fsPath, glob);
-          })
-          .map((file) => {
-            const originalPath = path.resolve(
-              from,
-              path.relative(to, file.fsPath)
-            );
-
-            const replacements = (text: string): Replacement[] => {
-              const references = this.getRelativeImportSpecifiers(
-                text,
-                file.fsPath
-              );
-              const change = references
-                .filter((p) => {
-                  const abs = this.resolveRelativeReference(
-                    originalPath,
-                    p.path
-                  );
-                  if (whiteList.size > 0) {
-                    const name = path.relative(from, abs).split(path.sep)[0];
-                    if (whiteList.has(name)) {
-                      return false;
-                    }
-                    for (let i = 0; i < this.extensions.length; i++) {
-                      if (whiteList.has(name + this.extensions[i])) {
-                        return false;
-                      }
-                    }
-                    return true;
-                  }
-                  return isPathToAnotherDir(path.relative(from, abs));
-                })
-                .map((p): Replacement => {
-                  const abs = this.resolveRelativeReference(
-                    originalPath,
-                    p.path
-                  );
-                  const relative = this.getRelativePath(file.fsPath, abs);
-                  return [p.path, relative];
-                });
-              return change;
-            };
-
-            return this.replaceEdits(
-              file.fsPath,
-              (filePath: string, text: string): GenericEdit[] => {
-                return this.getReferenceEdits(
-                  filePath,
-                  text,
-                  replacements(text),
-                  originalPath
-                );
-              }
-            );
-          });
-        return Promise.all(promises);
-      });
-  }
-
-  updateDirImports(
-    from: string,
-    to: string,
-    fileNames: string[] = []
-  ): Thenable<any> {
-    const whiteList = new Set(fileNames);
-    const affectedFiles = this.index.getDirReferences(from, fileNames);
-    const promises = affectedFiles.map((reference) => {
-      const replacements = (text: string): Replacement[] => {
-        const imports = this.getRelativeImportSpecifiers(text, reference.path);
-        const change = imports
-          .filter((p) => {
-            const abs = this.resolveRelativeReference(reference.path, p.path);
-            if (fileNames.length > 0) {
-              const name = path.relative(from, abs).split(path.sep)[0];
-              if (whiteList.has(name)) {
-                return true;
-              }
-              for (let i = 0; i < this.extensions.length; i++) {
-                if (whiteList.has(name + this.extensions[i])) {
-                  return true;
-                }
-              }
-              return false;
-            }
-            return !isPathToAnotherDir(path.relative(from, abs));
-          })
-          .map((p): [string, string] => {
-            const abs = this.resolveRelativeReference(reference.path, p.path);
-            const relative = path.relative(from, abs);
-            const newabs = path.resolve(to, relative);
-            const changeTo = this.getRelativePath(reference.path, newabs);
-            return [p.path, changeTo];
-          });
-        return change;
-      };
-
-      return this.replaceEdits(
-        reference.path,
-        (filePath: string, text: string): GenericEdit[] => {
-          return this.getReferenceEdits(filePath, text, replacements(text));
-        }
-      );
-    });
-    return Promise.all(promises);
   }
 
   removeExtension(filePath: string): string {
@@ -610,7 +487,7 @@ export class ReferenceIndexBuilder {
     to: string,
     exportedNameToChange?: string,
     additionalEdits?: GenericEditsCallback
-  ): Promise<any> {
+  ) {
     let affectedFiles = this.index.getReferences(from);
     affectedFiles = this.addAffectedByBarrels(
       affectedFiles,
@@ -621,7 +498,7 @@ export class ReferenceIndexBuilder {
       affectedFiles.push({ path: from, specifiers: [] });
     }
 
-    const promises = affectedFiles.map((filePath) => {
+    const promises = affectedFiles.map(async (filePath) => {
       const replacements = (text: string): Replacement[] => {
         let relative = this.getRelativePath(filePath.path, from);
         relative = this.removeExtension(relative);
@@ -635,8 +512,12 @@ export class ReferenceIndexBuilder {
 
       return this.replaceEdits(
         filePath.path,
-        (filePath: string, text: string): GenericEdit[] => [
-          ...this.getReferenceEdits(filePath, text, replacements(text)),
+        async (filePath: string, text: string) => [
+          ...((await this.getReferenceEdits(
+            filePath,
+            text,
+            replacements(text)
+          )) ?? []),
           ...(additionalEdits ? additionalEdits(filePath, text) : []),
         ]
       );
@@ -693,13 +574,13 @@ export class ReferenceIndexBuilder {
     return [...baseRefs, ...deepRefs];
   }
 
-  private processWorkspaceFiles(
+  private async processWorkspaceFiles(
     files: vscode.Uri[],
     deleteByFile: boolean = false,
     progress?: vscode.Progress<{
       message: string;
     }>
-  ): Promise<any> {
+  ) {
     files = files.filter((f) => {
       return (
         f.fsPath.indexOf('typings') === -1 &&
@@ -708,34 +589,23 @@ export class ReferenceIndexBuilder {
       );
     });
 
-    return new Promise((resolve) => {
-      let index = 0;
+    let count = 0;
+    for await (const fileUri of files) {
+      try {
+        const data = await readFile(fileUri);
+        await this.processFile(data, fileUri.fsPath, deleteByFile);
+      } catch (e) {
+        console.log('Failed to load file', e);
+      }
 
-      const next = () => {
-        for (let i = 0; i < BATCH_SIZE && index < files.length; i++) {
-          const file = files[index++];
-          try {
-            const data = workspace.fs.readFileSync(file.fsPath, 'utf8');
-            this.processFile(data, file.fsPath, deleteByFile);
-          } catch (e) {
-            console.log('Failed to load file', e);
-          }
-        }
-
-        if (progress) {
-          progress.report({
-            message: index + '/' + files.length + ' indexed',
-          });
-        }
-
-        if (index < files.length) {
-          setTimeout(next, 0);
-        } else {
-          resolve(true);
-        }
-      };
-      next();
-    });
+      count++;
+      if (count % BATCH_SIZE === 0 && progress) {
+        progress.report({
+          message: count + '/' + files.length + ' indexed',
+        });
+        await timeoutPause(0);
+      }
+    }
   }
 
   private getUnnamedExports(key: string) {
@@ -744,7 +614,7 @@ export class ReferenceIndexBuilder {
     );
   }
 
-  private processDocuments(documents: vscode.TextDocument[]): Promise<any> {
+  private async processDocuments(documents: vscode.TextDocument[]) {
     documents = documents.filter((doc) => {
       return (
         doc.uri.fsPath.indexOf('typings') === -1 &&
@@ -753,35 +623,29 @@ export class ReferenceIndexBuilder {
       );
     });
 
-    return new Promise((resolve) => {
-      let index = 0;
+    let count = 0;
+    for await (const doc of documents) {
+      try {
+        const data = doc.getText();
+        await this.processFile(data, doc.uri.fsPath, false);
+      } catch (e) {
+        console.log('Failed to load file', e);
+      }
 
-      const next = () => {
-        for (let i = 0; i < BATCH_SIZE && index < documents.length; i++) {
-          const doc = documents[index++];
-          try {
-            const data = doc.getText();
-            this.processFile(data, doc.uri.fsPath, false);
-          } catch (e) {
-            console.log('Failed to load file', e);
-          }
-        }
-        if (index < documents.length) {
-          setTimeout(next, 0);
-        } else {
-          resolve(true);
-        }
-      };
-      next();
-    });
+      count++;
+      if (count % BATCH_SIZE === 0) {
+        await timeoutPause(0);
+      }
+    }
   }
 
-  private doesFileExist(filePath: string) {
-    if (workspace.fs.existsSync(filePath)) {
+  private async doesFileExist(filePath: string) {
+    if (await fileExists(vscode.Uri.file(filePath))) {
       return true;
     }
-    for (let i = 0; i < this.extensions.length; i++) {
-      if (workspace.fs.existsSync(filePath + this.extensions[i])) {
+
+    for await (const ext of this.extensions) {
+      if (await fileExists(vscode.Uri.file(filePath + ext))) {
         return true;
       }
     }
@@ -896,7 +760,10 @@ export class ReferenceIndexBuilder {
     return localPath;
   }
 
-  private resolveRelativeReference(fsPath: string, reference: string): string {
+  private async resolveRelativeReference(
+    fsPath: string,
+    reference: string
+  ): Promise<string> {
     if (reference.startsWith('.')) {
       return path.resolve(path.dirname(fsPath), reference);
     } else {
@@ -924,7 +791,7 @@ export class ReferenceIndexBuilder {
                   mappedDir,
                   reference.substr(p.slice(0, -1).length)
                 );
-                if (this.doesFileExist(potential)) {
+                if (await this.doesFileExist(potential)) {
                   return potential;
                 }
               }
@@ -945,7 +812,7 @@ export class ReferenceIndexBuilder {
                 const paths = config.compilerOptions.paths[p];
                 for (let i = 0; i < paths.length; i++) {
                   const potential = path.resolve(baseUrl, paths[i]);
-                  if (this.doesFileExist(potential)) {
+                  if (await this.doesFileExist(potential)) {
                     return potential;
                   }
                 }
@@ -955,7 +822,7 @@ export class ReferenceIndexBuilder {
 
           // non-relative base url paths
           const potential = path.resolve(baseUrl, reference);
-          if (this.doesFileExist(potential)) {
+          if (await this.doesFileExist(potential)) {
             return potential;
           }
         }
@@ -994,11 +861,12 @@ export class ReferenceIndexBuilder {
     return null;
   }
 
-  private getRelativeImportSpecifiers(
+  private async getRelativeImportSpecifiers(
     data: string,
     filePath: string
-  ): Reference[] {
-    return this.getRelativeReferences(data, filePath).map((ref) => ({
+  ): Promise<Reference[]> {
+    const refs = await this.getRelativeReferences(data, filePath);
+    return refs.map((ref) => ({
       path: ref.itemText,
       specifiers: ref.specifiers ?? [],
       isExport: ref.itemType === 'exportPath',
@@ -1081,7 +949,10 @@ export class ReferenceIndexBuilder {
     return result;
   }
 
-  private getRelativeReferences(data: string, filePath: string): FoundItem[] {
+  private async getRelativeReferences(
+    data: string,
+    filePath: string
+  ): Promise<FoundItem[]> {
     const references: Set<string> = new Set();
     let cachedConfig: any = undefined;
     const getConfig = () => {
@@ -1096,7 +967,10 @@ export class ReferenceIndexBuilder {
       if (importModule.startsWith('.')) {
         references.add(importModule);
       } else {
-        const resolved = this.resolveRelativeReference(filePath, importModule);
+        const resolved = await this.resolveRelativeReference(
+          filePath,
+          importModule
+        );
         if (resolved.length > 0) {
           references.add(importModule);
         }
@@ -1105,7 +979,7 @@ export class ReferenceIndexBuilder {
     return imports.filter((i) => references.has(i.itemText));
   }
 
-  private processFile(
+  private async processFile(
     data: string,
     filePath: string,
     deleteByFile: boolean = false
@@ -1116,19 +990,21 @@ export class ReferenceIndexBuilder {
 
     const fsPath = this.removeExtension(filePath);
 
-    const references = this.getRelativeImportSpecifiers(data, fsPath);
+    const references = await this.getRelativeImportSpecifiers(data, fsPath);
 
     for (let i = 0; i < references.length; i++) {
-      let referenced = this.resolveRelativeReference(
+      let referenced = await this.resolveRelativeReference(
         filePath,
         references[i].path
       );
       for (let j = 0; j < this.extensions.length; j++) {
         const ext = this.extensions[j];
         if (!referenced.endsWith(ext)) {
-          if (workspace.fs.existsSync(referenced + ext)) {
+          if (await fileExists(vscode.Uri.file(referenced + ext))) {
             referenced += ext;
-          } else if (workspace.fs.existsSync(referenced + '/index' + ext)) {
+          } else if (
+            await fileExists(vscode.Uri.file(referenced + '/index' + ext))
+          ) {
             referenced += '/index' + ext;
           }
         }

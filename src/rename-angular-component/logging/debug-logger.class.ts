@@ -1,14 +1,17 @@
-import { workspace } from 'vscode';
+import { Uri, workspace } from 'vscode';
 import * as path from 'path';
+import { fileExists } from '../../utils/fileExists.function';
+import { readFile } from '../../utils/readFile.function';
+import { writeFile } from '../../utils/writeFile.function';
 
 export class DebugLogger {
   private preSaveCash = '';
-  private debugFilePath?: string;
+  private debugFileUri?: Uri;
 
   constructor(private logToFile: boolean) {}
 
-  log(...text: string[]) {
-    let fileContents = this.getCurrentFileContents();
+  async log(...text: string[]) {
+    let fileContents = await this.getCurrentFileContents();
 
     for (const line of text) {
       fileContents += line + '\n';
@@ -17,7 +20,7 @@ export class DebugLogger {
     this.saveToFile(fileContents);
   }
 
-  setWorkspaceRoot(workspaceRootFolder: string) {
+  async setWorkspaceRoot(workspaceRootFolder: string) {
     if (!this.logToFile) {
       return;
     }
@@ -27,15 +30,15 @@ export class DebugLogger {
       'rename-angular-component-debug-log.txt'
     );
 
-    if (this.debugFilePath === newPath) {
+    if (this.debugFileUri?.fsPath === newPath) {
       return;
     }
-    if (this.debugFilePath) {
+    if (this.debugFileUri) {
       throw new Error('Workspace Root already set');
     }
 
-    this.debugFilePath = newPath;
-    this.saveToFile(this.preSaveCash);
+    this.debugFileUri = Uri.file(newPath);
+    await this.saveToFile(this.preSaveCash);
     this.preSaveCash = '';
   }
 
@@ -43,23 +46,23 @@ export class DebugLogger {
     return this.preSaveCash;
   }
 
-  private getCurrentFileContents() {
-    if (!this.debugFilePath) {
+  private async getCurrentFileContents() {
+    if (!this.debugFileUri) {
       return this.preSaveCash;
     }
     let fileContents = '';
-    if (fs.existsSync(this.debugFilePath)) {
-      fileContents = workspace.fs.readFileSync(this.debugFilePath, 'utf-8');
+    if (this.debugFileUri && (await fileExists(this.debugFileUri))) {
+      fileContents = await readFile(this.debugFileUri);
       fileContents += '\n---\n';
     }
     return fileContents;
   }
 
-  private saveToFile(fileContents: string) {
-    if (!this.debugFilePath) {
+  private async saveToFile(fileContents: string) {
+    if (!this.debugFileUri) {
       this.preSaveCash = fileContents;
     } else {
-      workspace.fs.writeFileSync(this.debugFilePath, fileContents, 'utf-8');
+      await writeFile(this.debugFileUri, fileContents);
     }
   }
 }

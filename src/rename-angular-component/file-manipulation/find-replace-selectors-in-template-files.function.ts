@@ -1,5 +1,6 @@
 import { OutputChannel, workspace } from 'vscode';
-import { workspace } from 'vscode';
+import { readFile } from '../../utils/readFile.function';
+import { writeFile } from '../../utils/writeFile.function';
 import { renameSelectorInTemplate } from '../in-file-edits/rename-selector-in-template.function';
 import { UserMessage } from '../logging/user-message.class';
 
@@ -21,15 +22,12 @@ export async function findReplaceSelectorsInTemplateFiles(
 
   let changed = 0;
   for (const uri of uris) {
-    let html: string | null = await workspace.fs.readFileAsync(
-      uri.fsPath,
-      'utf-8'
-    );
+    let html: string | null = await readFile(uri);
     if (html) {
       html = renameSelectorInTemplate(html, originalSelector, newSelector);
     }
     if (html) {
-      await workspace.fs.writeFileAsync(uri.fsPath, html, 'utf-8');
+      await writeFile(uri, html);
       userMessage.logInfoToChannel([uri.fsPath], false);
       changed++;
     }

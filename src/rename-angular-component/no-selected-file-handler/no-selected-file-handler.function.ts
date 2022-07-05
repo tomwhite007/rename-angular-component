@@ -2,6 +2,7 @@ import { Uri, window } from 'vscode';
 import { AngularConstruct } from '../definitions/file.interfaces';
 import { workspace } from 'vscode';
 import { UserMessage } from '../logging/user-message.class';
+import { fileExists } from '../../utils/fileExists.function';
 
 export async function noSelectedFileHandler(
   construct: AngularConstruct,
@@ -18,8 +19,9 @@ export async function noSelectedFileHandler(
     return null;
   }
 
-  if (fs.existsSync(inputResult)) {
-    return Uri.file(inputResult);
+  const inputUri = Uri.file(inputResult);
+  if (await fileExists(inputUri)) {
+    return inputUri;
   }
 
   userMessage.popupMessage(`Cannot find file. Stopped.`);

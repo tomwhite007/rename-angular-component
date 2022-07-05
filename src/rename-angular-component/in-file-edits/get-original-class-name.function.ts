@@ -1,8 +1,9 @@
 import * as ts from 'typescript';
 import { AngularConstruct } from '../definitions/file.interfaces';
-import { workspace } from 'vscode';
+import { Uri, workspace } from 'vscode';
 import { classify } from '../../angular-cli/strings';
 import { getDecoratorName } from './get-decorator-name.function';
+import { readFile } from '../../utils/readFile.function';
 
 export async function getOriginalClassName(
   stub: string,
@@ -10,7 +11,7 @@ export async function getOriginalClassName(
   construct: AngularConstruct
 ) {
   const expectedOldClassName = `${classify(stub)}${classify(construct)}`;
-  const sourceText = await workspace.fs.readFileAsync(filepath, 'utf-8');
+  const sourceText = await readFile(Uri.file(filepath));
 
   const file = ts.createSourceFile(
     filepath,

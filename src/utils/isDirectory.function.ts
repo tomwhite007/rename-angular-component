@@ -1,7 +1,7 @@
 import { FileType, Uri, workspace } from 'vscode';
 
 /**
- * Check file exists using vscode fs wrapper
+ * Check is directory using vscode fs wrapper
  * @param uri
  * @returns
  */

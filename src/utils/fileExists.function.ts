@@ -1,4 +1,4 @@
-import { Uri, workspace } from 'vscode';
+import { FileType, Uri, workspace } from 'vscode';
 
 /**
  * Check file exists using vscode fs wrapper
@@ -7,8 +7,8 @@ import { Uri, workspace } from 'vscode';
  */
 export async function fileExists(uri: Uri) {
   try {
-    await workspace.fs.readFile(uri);
-    return true;
+    const stat = await workspace.fs.stat(uri);
+    return stat.type === FileType.File;
   } catch {
     return false;
   }

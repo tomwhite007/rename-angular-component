@@ -11,7 +11,7 @@ Currently works with these Angular features:
 - directives
 - services
 - guards
-- coming soon: modules
+- modules
 
 ## How to use
 
@@ -51,7 +51,8 @@ This extension contributes the following settings:
 ## Known Issues
 
 1. [Add flow for unexpected Selector name](https://github.com/tomwhite007/rename-angular-component/issues/13)
-1. [Add renamer process for Angular modules](https://github.com/tomwhite007/rename-angular-component/issues/26)
+1. [Naming Convention Problem (cannot reproduce)](https://github.com/tomwhite007/rename-angular-component/issues/29)
+1. [Extension does not support WSL](https://github.com/tomwhite007/rename-angular-component/issues/28)
 
 ## Support
 
@@ -69,10 +70,6 @@ Thanks to you for reading this.
 
 ## Release Notes
 
-Latest version: [2.0.0] - 2022-03-29
+Latest version: [2.1.0] - 2022-07-07
 
-- Feature: Add lazy loaded route imports to renamer process
-- Feature: Rename selectors in .spec files, inline component templates and Storybook .stories files
-- Fix: Rename directive input attribute if it matches the current selector
-- Fix: Tsmove bug; handle fixed path rules in get relative path
-- Feature: Add integration testing capability using Git diff snapshots
+- Feature: Add Rename Modules option

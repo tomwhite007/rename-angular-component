@@ -70,6 +70,6 @@ Thanks to you for reading this.
 
 ## Release Notes
 
-Latest version: [2.1.0] - 2022-07-07
+Latest version: [2.1.1] - 2022-07-08
 
-- Feature: Add Rename Modules option
+- Logging: Extra debug logging for issue 29

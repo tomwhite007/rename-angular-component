@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.1.1] - 2022-07-08
+
+- Logging: Extra debug logging for issue 29
+
 ## [2.1.0] - 2022-07-07
 
 - Feature: Add Rename Modules option

@@ -198,10 +198,18 @@ export class Renamer {
     const filesToMove = filesRelatedToStub.getFilesToMove(
       this.newStub as string
     );
+
+    this.debugLogger.log(
+      'renameFolder: ' + this.renameFolder,
+      '',
+      'filesToMove: ',
+      JSON.stringify(filesToMove)
+    );
+
     if (!filesToMove.find((f) => f.isCoreConstruct)) {
-      this.userMessage.popupMessage(
-        `The ${this.construct} class file must use the same file naming convention as '${this.originalFileDetails.file}' for this process to run.`
-      );
+      const errMsg = `The ${this.construct} class file must use the same file naming convention as '${this.originalFileDetails.file}' for this process to run.`;
+      this.userMessage.popupMessage(errMsg);
+      this.debugLogger.log(errMsg);
       return false;
     }
 
@@ -244,15 +252,7 @@ export class Renamer {
       );
     });
 
-    this.debugLogger.log(
-      'renameFolder: ' + this.renameFolder,
-      '',
-      'filesToMove: ',
-      JSON.stringify(filesToMove),
-      '',
-      'fileMoveJobs: ',
-      JSON.stringify(this.fileMoveJobs)
-    );
+    this.debugLogger.log('fileMoveJobs: ', JSON.stringify(this.fileMoveJobs));
 
     if (this.fileMoveJobs.some((l) => l.exists())) {
       vscode.window.showErrorMessage('Not allowed to overwrite existing files');

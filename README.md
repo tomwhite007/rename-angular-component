@@ -70,6 +70,6 @@ Thanks to you for reading this.
 
 ## Release Notes
 
-Latest version: [2.1.1] - 2022-07-08
+Latest version: [2.1.2] - 2022-07-11
 
-- Logging: Extra debug logging for issue 29
+- Logging: Add debug logging of glob for issue 29 (all logging is optional)

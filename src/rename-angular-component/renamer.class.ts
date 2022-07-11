@@ -188,6 +188,14 @@ export class Renamer {
   }
 
   private async prepFileMoveJobs(): Promise<boolean> {
+    this.debugLogger.log(
+      'find related glob: ',
+      `${this.originalFileDetails.path.replace(
+        this.projectRoot + '/',
+        ''
+      )}/**/*`
+    );
+
     const filesRelatedToStub = await FilesRelatedToStub.init(
       this.originalFileDetails,
       this.projectRoot,

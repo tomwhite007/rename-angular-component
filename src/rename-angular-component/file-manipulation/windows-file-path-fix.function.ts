@@ -1,5 +1,5 @@
 export function windowsFilePathFix(path: string, backSlash = false) {
-  const windowsDriveMatch = path.match(/^\/[a-z]:/) || path.match(/^[a-z]:/i);
+  const windowsDriveMatch = path.match(/^\/[a-z]:/i) || path.match(/^[a-z]:/i);
   if (windowsDriveMatch) {
     path = path.replace(/^\//, '');
     if (backSlash) {

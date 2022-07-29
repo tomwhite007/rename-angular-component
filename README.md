@@ -70,6 +70,6 @@ Thanks to you for reading this.
 
 ## Release Notes
 
-Latest version: [2.1.2] - 2022-07-11
+Latest version: [2.1.3] - 2022-07-29
 
-- Logging: Add debug logging of glob for issue 29 (all logging is optional)
+- Fix: Case insensitive drive letter for Windows (for non default)

@@ -1,6 +1,6 @@
 # Change Log
 
-## [2.1.3] - 2022-07-29
+## [2.1.3] - 2022-08-08
 
 - Fix: Case insensitive drive letter for Windows (for non default)
 

@@ -51,8 +51,8 @@ This extension contributes the following settings:
 ## Known Issues
 
 1. [Add flow for unexpected Selector name](https://github.com/tomwhite007/rename-angular-component/issues/13)
-1. [Naming Convention Problem (cannot reproduce)](https://github.com/tomwhite007/rename-angular-component/issues/29)
 1. [Extension does not support WSL](https://github.com/tomwhite007/rename-angular-component/issues/28)
+1. [Rename service class names inside test files](https://github.com/tomwhite007/rename-angular-component/issues/34)
 
 ## Support
 
@@ -70,6 +70,6 @@ Thanks to you for reading this.
 
 ## Release Notes
 
-Latest version: [2.1.3] - 2022-07-29
+Latest version: [2.1.3] - 2022-08-08
 
 - Fix: Case insensitive drive letter for Windows (for non default)

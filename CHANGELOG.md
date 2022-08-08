@@ -1,5 +1,9 @@
 # Change Log
 
+## [2.1.3] - 2022-08-08
+
+- Fix: Case insensitive drive letter for Windows (for non default)
+
 ## [2.1.2] - 2022-07-11
 
 - Logging: Add debug logging of glob for issue 29 (all logging is optional)

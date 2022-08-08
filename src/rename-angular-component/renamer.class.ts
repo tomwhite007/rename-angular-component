@@ -82,15 +82,17 @@ export class Renamer {
 
           /* TODO 
 
-          fix up import identifier in core module for routing.module
+          Windows: replacement ts wildcard path seems to fail in some jest unit tests
+
+          replace selector inside snapshot files
+
+          replace class name in all strings in test files - Aris issue
 
           ---- v2 ----- 
   
           limit rename selector in templates to current workspace multi-folder root
   
           refactor for clean classes, functions and pure async await
-  
-          fix up / remove tsmove conf() configuration
   
           ---- v3 -----
         */

@@ -11,8 +11,7 @@ suite('Suite Scenario 1', () => {
     */
 
     await genericTestScenario({
-      projectRoot:
-        '/Users/tom/Development/vscode-ext/_rename-test-spas/simple-reactive-viewmodel-example',
+      projectRoot: 'C:/Development/my-stuff/simple-reactive-viewmodel-example',
       renames: [
         {
           filePath:

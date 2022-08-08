@@ -11,8 +11,7 @@ suite('Suite Scenario 5', () => {
     */
 
     await genericTestScenario({
-      projectRoot:
-        '/Users/tom/Development/vscode-ext/_rename-test-spas/test-rename-spa',
+      projectRoot: 'C:/Development/my-stuff/test-rename-spa',
       renames: [
         {
           filePath: './src/app/products/products.component.spec.ts',

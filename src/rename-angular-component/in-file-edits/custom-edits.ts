@@ -152,7 +152,10 @@ function getCoreClassFoundItems(
         const decoratorName = classify(construct);
 
         // get decorator props for decoratorName
-        node.decorators?.find((decorator: ts.Decorator) => {
+        node.modifiers?.find((decorator) => {
+          if (!ts.isDecorator(decorator)) {
+            return false;
+          }
           if (
             ts.isCallExpression(decorator.expression) &&
             ts.isIdentifier(decorator.expression.expression) &&
@@ -219,7 +222,10 @@ function getCoreClassFoundItems(
         ts.forEachChild(node, (childNode) => {
           if (ts.isPropertyDeclaration(childNode)) {
             // Input property name is different to template property
-            childNode.decorators?.find((dec) => {
+            childNode.modifiers?.find((dec) => {
+              if (!ts.isDecorator(dec)) {
+                return false;
+              }
               if (
                 ts.isCallExpression(dec.expression) &&
                 ts.isIdentifier(dec.expression.expression) &&

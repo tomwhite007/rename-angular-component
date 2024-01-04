@@ -8,7 +8,7 @@ import {
   GenericEdit,
   GenericEditsCallback,
 } from './apply-generic-edits';
-import * as minimatch from 'minimatch';
+import { minimatch } from 'minimatch';
 import {
   isPathToAnotherDir,
   mergeReferenceArrays,

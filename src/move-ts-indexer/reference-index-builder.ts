@@ -23,14 +23,16 @@ const BATCH_SIZE = 50;
 
 type Replacement = [string, string];
 
-interface FoundItem {
+export interface FoundItem {
   itemType:
     | 'importPath'
     | 'exportPath'
     | 'class'
     | 'selector'
     | 'templateUrl'
-    | 'styleUrls';
+    | 'styleUrl'
+    | 'styleUrls'
+    | 'attributeInput';
   itemText: string;
   specifiers?: string[];
   location: { start: number; end: number };

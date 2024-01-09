@@ -9,19 +9,9 @@ import { AngularConstruct } from '../definitions/file.interfaces';
 import { generateNewSelector } from './generate-new-selector.function';
 import { getSelectorType } from './get-selector-type.function';
 import { stripSelectorBraces } from './strip-selector-braces.function';
+import { FoundItem } from '../../move-ts-indexer/reference-index-builder';
 
-interface FoundItem {
-  itemType:
-    | 'class'
-    | 'selector'
-    | 'templateUrl'
-    | 'styleUrls'
-    | 'attributeInput';
-  itemText: string;
-  location: { start: number; end: number };
-}
-
-type SelectorOrTemplateUrl = 'selector' | 'templateUrl';
+type StringLiteralAttributesInScope = 'selector' | 'templateUrl' | 'styleUrl';
 
 export class SelectorTransfer {
   oldSelector?: string;
@@ -67,6 +57,7 @@ export function getCoreClassEdits(
             replacement = `'${selectorTransfer.newSelector}'`;
             break;
           case 'templateUrl':
+          case 'styleUrl':
           case 'styleUrls':
             replacement = `'${foundItem.itemText.replace(
               new RegExp(
@@ -146,6 +137,7 @@ function getCoreClassFoundItems(
         const decoratorPropertiesRequired = [
           'selector',
           'templateUrl',
+          'styleUrl',
           'styleUrls',
         ];
 
@@ -169,10 +161,11 @@ function getCoreClassFoundItems(
                   ts.isIdentifier(prop.name) &&
                   decoratorPropertiesRequired.includes(prop.name.text)
                 ) {
-                  // 'selector' and 'templateUrl' are StringLiteral
+                  // 'selector', 'templateUrl' and 'styleUrl' are StringLiteral
                   if (ts.isStringLiteral(prop.initializer)) {
                     result.push({
-                      itemType: prop.name.text as SelectorOrTemplateUrl,
+                      itemType: prop.name
+                        .text as StringLiteralAttributesInScope,
                       itemText: prop.initializer.text,
                       location: {
                         start: prop.initializer.pos + 1,

@@ -9,7 +9,7 @@ import { AngularConstruct } from '../definitions/file.interfaces';
 import { generateNewSelector } from './generate-new-selector.function';
 import { getSelectorType } from './get-selector-type.function';
 import { stripSelectorBraces } from './strip-selector-braces.function';
-import { FoundItem } from '../../move-ts-indexer/reference-index-builder';
+import { FoundItem } from '../../move-ts-indexer/util/shared-interfaces';
 
 type StringLiteralAttributesInScope = 'selector' | 'templateUrl' | 'styleUrl';
 
@@ -350,7 +350,7 @@ function getClassNameFoundItems(
         node.expression.forEachChild((arg) => {
           if (ts.isStringLiteral(arg)) {
             const argIndex = arg.text.search(
-              new RegExp(`(?<!\\w)${className}(?!\\w)`)
+              new RegExp(`(?<!\\w)${escapeRegex(className)}(?!\\w)`)
             );
 
             if (argIndex >= 0) {

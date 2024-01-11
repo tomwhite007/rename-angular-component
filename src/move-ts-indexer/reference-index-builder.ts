@@ -17,26 +17,11 @@ import {
   conf,
   flattenArray,
 } from './util/helper-functions';
-import { Reference } from './util/shared-interfaces';
+import { FoundItem, Reference } from './util/shared-interfaces';
 
 const BATCH_SIZE = 50;
 
 type Replacement = [string, string];
-
-export interface FoundItem {
-  itemType:
-    | 'importPath'
-    | 'exportPath'
-    | 'class'
-    | 'selector'
-    | 'templateUrl'
-    | 'styleUrl'
-    | 'styleUrls'
-    | 'attributeInput';
-  itemText: string;
-  specifiers?: string[];
-  location: { start: number; end: number };
-}
 
 type ConfigProp = object | string | undefined;
 

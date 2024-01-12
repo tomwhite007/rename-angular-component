@@ -340,10 +340,11 @@ function getClassNameFoundItems(
       sourceText,
       ts.ScriptTarget.Latest
     );
+    const isTestFile = Boolean(fileName.match(/\.spec\.ts$/));
 
     const result: FoundItem[] = [];
     const recurseThroughNodeTree = (() =>
-      getTreeRecursor(className, sourceText, result))();
+      getTreeRecursor(className, sourceText, result, isTestFile))();
 
     file.statements.forEach((node: ts.Node) => {
       if (ts.isExpressionStatement(node)) {
@@ -379,7 +380,8 @@ function getClassNameFoundItems(
 function getTreeRecursor(
   className: string,
   sourceText: string,
-  result: FoundItem[]
+  result: FoundItem[],
+  replaceStringClassNames?: boolean
 ) {
   const recurseThroughNodeTree = (node: ts.Node) => {
     if (ts.isIdentifier(node)) {
@@ -397,6 +399,29 @@ function getTreeRecursor(
         });
       }
     } else {
+      if (replaceStringClassNames && ts.isExpression(node)) {
+        node.forEachChild((expressionProp) => {
+          if (
+            ts.isStringLiteral(expressionProp) &&
+            expressionProp.text === className
+          ) {
+            const realString = sourceText.substring(
+              expressionProp.pos,
+              expressionProp.end
+            );
+
+            result.push({
+              itemType: 'class',
+              itemText: className,
+              location: {
+                start: expressionProp.pos + 1,
+                end: expressionProp.end - 1, // inside quotes
+              },
+            });
+          }
+        });
+      }
+
       ts.forEachChild(node, recurseThroughNodeTree);
     }
   };

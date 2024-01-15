@@ -80,23 +80,6 @@ export class Renamer {
 
           await this.updateSelectorsInTemplates();
 
-          /* TODO 
-
-          Windows: replacement ts wildcard path seems to fail in some jest unit tests
-
-          replace selector inside snapshot files
-
-          replace class name in all strings in test files - Aris issue
-
-          ---- v2 ----- 
-  
-          limit rename selector in templates to current workspace multi-folder root
-  
-          refactor for clean classes, functions and pure async await
-  
-          ---- v3 -----
-        */
-
           // delete original folder
           if (this.renameFolder) {
             fs.remove(this.originalFileDetails.path);

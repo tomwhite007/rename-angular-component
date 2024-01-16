@@ -50,13 +50,11 @@ This extension contributes the following settings:
 
 ## Known Issues
 
-1. [Add flow for unexpected Selector name](https://github.com/tomwhite007/rename-angular-component/issues/13)
+1. [Feature request: Limit rename selector in templates to current workspace multi-folder root](https://github.com/tomwhite007/rename-angular-component/issues/48)
+1. [Feature request: Delete component](https://github.com/tomwhite007/rename-angular-component/issues/36)
 1. [Extension does not support WSL](https://github.com/tomwhite007/rename-angular-component/issues/28)
-1. [Rename service class names inside test files](https://github.com/tomwhite007/rename-angular-component/issues/34)
 
 ## Support
-
-This extension is under active development.
 
 If you have a problem using the extension or you find a bug, please [raise an issue](https://github.com/tomwhite007/rename-angular-component/issues), and we'll get back to you asap.
 
@@ -68,8 +66,13 @@ Thanks to [Aristeidis Bampakos](https://github.com/bampakoa) for feature guidanc
 
 Thanks to you for reading this.
 
+As we pass 20,000 users of this extension on this release, I think it's fairly safe to say a few of you consider this extension worth adding to [John Papa's Angular Essentials](https://marketplace.visualstudio.com/items?itemName=johnpapa.angular-essentials) collection. I would be grateful if you could comment or leave an emoji on [this issue I raised on his repo](https://github.com/johnpapa/vscode-angular-essentials/issues/45) a while back. Any reviews are also very welcome. Thank you.
+
 ## Release Notes
 
-Latest version: [2.1.3] - 2022-08-08
+Latest version: [3.0.0] - 2024-01-20
 
-- Fix: Case insensitive drive letter for Windows (for non default)
+- Update to latest VSCode extension lib deps
+- Add `styleUrl` decorator attribute to import edits
+- Replace string class names in test files per issue 34
+- Create new extension icon using latest ng 17 logo

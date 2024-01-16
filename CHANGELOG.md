@@ -2,7 +2,7 @@
 
 ## [3.0.0] - 2024-01-20
 
-- Update latest VSCode extension lib deps
+- Update to latest VSCode extension lib deps
 - Add `styleUrl` decorator attribute to import edits
 - Replace string class names in test files per issue 34
 - Create new extension icon using latest ng 17 logo

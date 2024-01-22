@@ -409,15 +409,19 @@ function getTreeRecursor(
               expressionProp.pos,
               expressionProp.end
             );
+            const shim = realString.indexOf(className);
+            const start = expressionProp.pos + shim;
 
-            result.push({
-              itemType: 'class',
-              itemText: className,
-              location: {
-                start: expressionProp.pos + 1,
-                end: expressionProp.end - 1, // inside quotes
-              },
-            });
+            if (!result.find((item) => item.location.start === start)) {
+              result.push({
+                itemType: 'class',
+                itemText: className,
+                location: {
+                  start,
+                  end: start + className.length, // inside quotes
+                },
+              });
+            }
           }
         });
       }

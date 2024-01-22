@@ -32,13 +32,6 @@
     "relative",
     "paths"
   ],
-  "activationEvents": [
-    "onCommand:rename-angular-component.renameComponent",
-    "onCommand:rename-angular-component.renameDirective",
-    "onCommand:rename-angular-component.renameService",
-    "onCommand:rename-angular-component.renameGuard",
-    "onCommand:rename-angular-component.renameModule"
-  ],
   "extensionKind": [
     "ui",
     "workspace"

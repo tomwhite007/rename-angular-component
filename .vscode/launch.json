@@ -14,7 +14,7 @@
       "preLaunchTask": "${defaultBuildTask}"
     },
     {
-      "name": "Extension Tests 1",
+      "name": "Extension Tests 1 Windows",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
@@ -27,7 +27,7 @@
       "preLaunchTask": "tasks: watch-tests"
     },
     {
-      "name": "Extension Tests 2",
+      "name": "Extension Tests 2 Mac",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
@@ -40,7 +40,7 @@
       "preLaunchTask": "tasks: watch-tests"
     },
     {
-      "name": "Extension Tests 3",
+      "name": "Extension Tests 3 Mac",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
@@ -53,7 +53,7 @@
       "preLaunchTask": "tasks: watch-tests"
     },
     {
-      "name": "Extension Tests 4",
+      "name": "Extension Tests 4 Mac",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
@@ -66,7 +66,7 @@
       "preLaunchTask": "tasks: watch-tests"
     },
     {
-      "name": "Extension Tests 5",
+      "name": "Extension Tests 5 Windows",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",

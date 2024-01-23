@@ -156,9 +156,7 @@ export class Renamer {
         } else {
           this.userMessage.logInfoToChannel([
             ``,
-            `Original Selector doesn't match naming convention. Unexpected Selector not replaced.`,
-            `There is a feature request to 'Add flow for unexpected Selector'.`,
-            `You can up-vote it here: https://github.com/tomwhite007/rename-angular-component/issues/13`,
+            `Original Selector doesn't match Angular CLI naming convention for a ${this.construct}. Unexpected Selector not replaced.`,
           ]);
         }
 

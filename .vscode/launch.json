@@ -77,6 +77,19 @@
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests"
+    },
+    {
+      "name": "Extension Tests 6 Mac",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index6",
+        "/Users/tom/Development/vscode-ext/_rename-test-spas/test-ng17-css"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "tasks: watch-tests"
     }
   ]
 }

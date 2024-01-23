@@ -3,7 +3,7 @@
   "displayName": "Rename Angular Component",
   "description": "Rename Angular Components, Directives and Services",
   "publisher": "tomwhite007",
-  "version": "3.0.0-alpha-1",
+  "version": "3.0.0-alpha-2",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -116,7 +116,6 @@
     "pretest": "npm run compile-tests && npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
     "test": "vscode-test",
-    "test-old": "node ./out/test/runTest.js",
     "build": "mkdir -p build && vsce package --out build/"
   },
   "devDependencies": {

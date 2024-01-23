@@ -21,7 +21,7 @@
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}",
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/index1",
-        "/Users/tom/Development/vscode-ext/_rename-test-spas/simple-reactive-viewmodel-example"
+        "C:\\Development\\my-stuff\\simple-reactive-viewmodel-example"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests"
@@ -73,7 +73,7 @@
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}",
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/index5",
-        "/Users/tom/Development/vscode-ext/_rename-test-spas/test-rename-spa"
+        "C:\\Development\\my-stuff\\test-rename-spa"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests"

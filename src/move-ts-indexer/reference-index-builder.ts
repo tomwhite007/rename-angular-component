@@ -8,7 +8,7 @@ import {
   GenericEdit,
   GenericEditsCallback,
 } from './apply-generic-edits';
-import { minimatch } from 'minimatch';
+import * as minimatch from 'minimatch';
 import {
   isPathToAnotherDir,
   mergeReferenceArrays,
@@ -1047,7 +1047,7 @@ export class ReferenceIndexBuilder {
             },
           });
         }
-      } else if (fileName.match(/routing|module/)) {
+      } else if (fileName.match(/routing|module|route/)) {
         // index lazy loaded routes in Angular router modules
         recurseForAngularRouterImport(node);
       }
@@ -1104,8 +1104,11 @@ export class ReferenceIndexBuilder {
         if (!referenced.endsWith(ext)) {
           if (fs.existsSync(referenced + ext)) {
             referenced += ext;
-          } else if (fs.existsSync(referenced + '/index' + ext)) {
-            referenced += '/index' + ext;
+          } else {
+            const pathWithIndexFile = path.join(referenced, 'index' + ext);
+            if (fs.existsSync(pathWithIndexFile)) {
+              referenced = pathWithIndexFile;
+            }
           }
         }
       }

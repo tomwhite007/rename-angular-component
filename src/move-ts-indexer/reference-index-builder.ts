@@ -574,9 +574,8 @@ export class ReferenceIndexBuilder {
   }
 
   removeIndexSuffix(filePath: string): string {
-    const indexSuffix = '/index';
-    if (filePath.endsWith(indexSuffix)) {
-      return filePath.slice(0, -indexSuffix.length);
+    if (/(\/|\\)index$/.test(filePath)) {
+      return filePath.slice(0, -6);
     }
     return filePath;
   }

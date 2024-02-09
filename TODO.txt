@@ -1,0 +1,6 @@
+
+
+1. resize new logo from 500 to 256px
+2. Undo regex slash agnostic code
+2. Make all Windows indexes store with forward slashes
+3. Make all get index checkers use forward slashes

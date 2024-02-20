@@ -1,4 +1,4 @@
-1. Undo regex slash agnostic code
-2. Make all Windows indexes store with forward slashes
-3. Make all get index checkers use forward slashes
+1. make all test scenarios run on windows and mac
+2. attempt to remove nx console from test scenarios to stop noise in results
+3. fix module rename
 4. Clean up old branches after merge

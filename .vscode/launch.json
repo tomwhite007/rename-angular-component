@@ -19,6 +19,7 @@
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [
+        "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/index1",
         "C:\\Development\\my-stuff\\simple-reactive-viewmodel-example"
@@ -32,6 +33,7 @@
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [
+        "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/index2",
         "/Users/tom/Development/vscode-ext/_rename-test-spas/shp-wild-paths"
@@ -45,6 +47,7 @@
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [
+        "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/index3",
         "/Users/tom/Development/vscode-ext/_rename-test-spas/dsls-spa"
@@ -58,6 +61,7 @@
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [
+        "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/index4",
         "/Users/tom/Development/vscode-ext/_rename-test-spas/test-paths-app"
@@ -71,6 +75,7 @@
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [
+        "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/index5",
         "C:\\Development\\my-stuff\\test-rename-spa"
@@ -84,6 +89,7 @@
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [
+        "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/index6",
         "/Users/tom/Development/vscode-ext/_rename-test-spas/test-ng17-css"

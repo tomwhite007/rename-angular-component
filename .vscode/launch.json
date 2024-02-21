@@ -84,6 +84,20 @@
       "preLaunchTask": "tasks: watch-tests"
     },
     {
+      "name": "Extension Tests 5 Mac",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index5mac",
+        "/Users/tom/Development/vscode-ext/_rename-test-spas/test-rename-spa"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "tasks: watch-tests"
+    },
+    {
       "name": "Extension Tests 6 Mac",
       "type": "extensionHost",
       "request": "launch",

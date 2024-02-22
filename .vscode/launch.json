@@ -14,6 +14,20 @@
       "preLaunchTask": "${defaultBuildTask}"
     },
     {
+      "name": "Extension Tests 1 Mac",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index1mac",
+        "/Users/tom/Development/vscode-ext/_rename-test-spas/simple-reactive-viewmodel-example"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "tasks: watch-tests"
+    },
+    {
       "name": "Extension Tests 1 Windows",
       "type": "extensionHost",
       "request": "launch",
@@ -21,7 +35,7 @@
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index1",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index1windows",
         "C:\\Development\\my-stuff\\simple-reactive-viewmodel-example"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
@@ -35,7 +49,21 @@
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index2",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index2mac",
+        "/Users/tom/Development/vscode-ext/_rename-test-spas/shp-wild-paths"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "tasks: watch-tests"
+    },
+    {
+      "name": "Extension Tests 2 Windows TBD",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index2windows",
         "/Users/tom/Development/vscode-ext/_rename-test-spas/shp-wild-paths"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
@@ -49,7 +77,21 @@
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index3",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index3mac",
+        "/Users/tom/Development/vscode-ext/_rename-test-spas/dsls-spa"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "tasks: watch-tests"
+    },
+    {
+      "name": "Extension Tests 3 Windows TBD",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index3windows",
         "/Users/tom/Development/vscode-ext/_rename-test-spas/dsls-spa"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
@@ -63,22 +105,22 @@
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index4",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index4mac",
         "/Users/tom/Development/vscode-ext/_rename-test-spas/test-paths-app"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests"
     },
     {
-      "name": "Extension Tests 5 Windows",
+      "name": "Extension Tests 4 Windows TBD",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index5",
-        "C:\\Development\\my-stuff\\test-rename-spa"
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index4windows",
+        "/Users/tom/Development/vscode-ext/_rename-test-spas/test-paths-app"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests"
@@ -98,6 +140,20 @@
       "preLaunchTask": "tasks: watch-tests"
     },
     {
+      "name": "Extension Tests 5 Windows",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index5windows",
+        "C:\\Development\\my-stuff\\test-rename-spa"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "tasks: watch-tests"
+    },
+    {
       "name": "Extension Tests 6 Mac",
       "type": "extensionHost",
       "request": "launch",
@@ -105,7 +161,21 @@
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index6",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index6mac",
+        "/Users/tom/Development/vscode-ext/_rename-test-spas/test-ng17-css"
+      ],
+      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
+      "preLaunchTask": "tasks: watch-tests"
+    },
+    {
+      "name": "Extension Tests 6 Windows TBD",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--disable-extensions",
+        "--extensionDevelopmentPath=${workspaceFolder}",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index6windows",
         "/Users/tom/Development/vscode-ext/_rename-test-spas/test-ng17-css"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],

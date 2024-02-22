@@ -8,7 +8,7 @@ import {
   GenericEdit,
   GenericEditsCallback,
 } from './apply-generic-edits';
-import * as minimatch from 'minimatch';
+import { minimatch } from 'minimatch';
 import {
   isPathToAnotherDir,
   mergeReferenceArrays,
@@ -1050,7 +1050,6 @@ export class ReferenceIndexBuilder {
         // index lazy loaded routes in Angular router modules
         recurseForAngularRouterImport(node);
       }
-      // console.log(fileName);
     });
 
     return result;

@@ -11,7 +11,7 @@ suite('Suite Scenario 2', () => {
     */
 
     await genericTestScenario({
-      projectRoot: 'C:\\Development\\my-stuff\\rename-in-shop-test',
+      projectRoot: 'C:\\Development\\my-stuff\\shp-wild-paths',
       renames: [
         {
           filePath:

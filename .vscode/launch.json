@@ -64,7 +64,7 @@
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/index2windows",
-        "C:\\Development\\my-stuff\\rename-in-shop-test"
+        "C:\\Development\\my-stuff\\shp-wild-paths"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests"
@@ -84,7 +84,7 @@
       "preLaunchTask": "tasks: watch-tests"
     },
     {
-      "name": "Extension Tests 3 Windows TBD",
+      "name": "Extension Tests 3 Windows",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
@@ -92,7 +92,7 @@
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/index3windows",
-        "/Users/tom/Development/vscode-ext/_rename-test-spas/dsls-spa"
+        "C:\\Development\\my-stuff\\dsls-spa"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests"

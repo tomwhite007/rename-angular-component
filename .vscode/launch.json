@@ -56,7 +56,7 @@
       "preLaunchTask": "tasks: watch-tests"
     },
     {
-      "name": "Extension Tests 2 Windows TBD",
+      "name": "Extension Tests 2 Windows",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
@@ -64,7 +64,7 @@
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/index2windows",
-        "/Users/tom/Development/vscode-ext/_rename-test-spas/shp-wild-paths"
+        "C:\\Development\\my-stuff\\rename-in-shop-test"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests"

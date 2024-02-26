@@ -51,12 +51,11 @@ This extension contributes the following settings:
 ## Known Issues
 
 1. [Feature request: Limit rename selector in templates to current workspace multi-folder root](https://github.com/tomwhite007/rename-angular-component/issues/48)
-1. [Feature request: Delete component](https://github.com/tomwhite007/rename-angular-component/issues/36)
 1. [Extension does not support WSL](https://github.com/tomwhite007/rename-angular-component/issues/28)
 
 ## Support
 
-If you have a problem using the extension or you find a bug, please [raise an issue](https://github.com/tomwhite007/rename-angular-component/issues), and we'll get back to you asap.
+If you have a problem using the extension or you find a bug, please [raise an issue](https://github.com/tomwhite007/rename-angular-component/issues)
 
 ## Thanks
 
@@ -66,7 +65,7 @@ Thanks to [Aristeidis Bampakos](https://github.com/bampakoa) for feature guidanc
 
 Thanks to you for reading this.
 
-As we pass 20,000 users of this extension on this release, I think it's fairly safe to say a few of you consider this extension worth adding to [John Papa's Angular Essentials](https://marketplace.visualstudio.com/items?itemName=johnpapa.angular-essentials) collection. I would be grateful if you could comment or leave an emoji on [this issue I raised on his repo](https://github.com/johnpapa/vscode-angular-essentials/issues/45) a while back. Any reviews are also very welcome. Thank you.
+As we have passed 20,000 users of this extension on this release, I think it's fairly safe to say a few of you consider this extension worth adding to [John Papa's Angular Essentials](https://marketplace.visualstudio.com/items?itemName=johnpapa.angular-essentials) collection. I would be grateful if you could comment or leave an emoji on [this issue I raised on his repo](https://github.com/johnpapa/vscode-angular-essentials/issues/45) a while back. Any VSCode Extension reviews are also very welcome. Thank you.
 
 ## Release Notes
 

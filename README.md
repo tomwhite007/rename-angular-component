@@ -65,7 +65,7 @@ Thanks to [Aristeidis Bampakos](https://github.com/bampakoa) for feature guidanc
 
 Thanks to you for reading this.
 
-As we have passed 20,000 users of this extension on this release, I think it's fairly safe to say a few of you consider this extension worth adding to [John Papa's Angular Essentials](https://marketplace.visualstudio.com/items?itemName=johnpapa.angular-essentials) collection. I would be grateful if you could comment or leave an emoji on [this issue I raised on his repo](https://github.com/johnpapa/vscode-angular-essentials/issues/45) a while back. Any VSCode Extension reviews are also very welcome. Thank you.
+As we have passed 20,000 users of this extension on this release, I think it's fairly safe to say a few of you consider this extension worth adding to [John Papa's Angular Essentials](https://marketplace.visualstudio.com/items?itemName=johnpapa.angular-essentials) collection. I would be grateful if you could comment or leave an emoji on [this request I raised on his repo](https://github.com/johnpapa/vscode-angular-essentials/issues/45) a while back. Any VSCode Extension reviews are also very welcome. Thank you.
 
 ## Release Notes
 

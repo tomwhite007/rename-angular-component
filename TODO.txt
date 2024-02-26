@@ -1,4 +1,0 @@
-1. make all test scenarios run on windows and mac
-2. attempt to remove nx console from test scenarios to stop noise in results
-3. fix module rename
-4. Clean up old branches after merge

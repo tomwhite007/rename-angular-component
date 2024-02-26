@@ -168,7 +168,7 @@
       "preLaunchTask": "tasks: watch-tests"
     },
     {
-      "name": "Extension Tests 6 Windows TBD",
+      "name": "Extension Tests 6 Windows",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
@@ -176,7 +176,7 @@
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/index6windows",
-        "/Users/tom/Development/vscode-ext/_rename-test-spas/test-ng17-css"
+        "C:\\Development\\my-stuff\\test-ng17-css"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests"

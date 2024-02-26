@@ -112,7 +112,7 @@
       "preLaunchTask": "tasks: watch-tests"
     },
     {
-      "name": "Extension Tests 4 Windows TBD",
+      "name": "Extension Tests 4 Windows",
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
@@ -120,7 +120,7 @@
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/index4windows",
-        "/Users/tom/Development/vscode-ext/_rename-test-spas/test-paths-app"
+        "C:\\Development\\my-stuff\\test-paths-app"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests"

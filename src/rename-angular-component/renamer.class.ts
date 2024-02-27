@@ -80,23 +80,6 @@ export class Renamer {
 
           await this.updateSelectorsInTemplates();
 
-          /* TODO 
-
-          Windows: replacement ts wildcard path seems to fail in some jest unit tests
-
-          replace selector inside snapshot files
-
-          replace class name in all strings in test files - Aris issue
-
-          ---- v2 ----- 
-  
-          limit rename selector in templates to current workspace multi-folder root
-  
-          refactor for clean classes, functions and pure async await
-  
-          ---- v3 -----
-        */
-
           // delete original folder
           if (this.renameFolder) {
             fs.remove(this.originalFileDetails.path);
@@ -173,9 +156,7 @@ export class Renamer {
         } else {
           this.userMessage.logInfoToChannel([
             ``,
-            `Original Selector doesn't match naming convention. Unexpected Selector not replaced.`,
-            `There is a feature request to 'Add flow for unexpected Selector'.`,
-            `You can up-vote it here: https://github.com/tomwhite007/rename-angular-component/issues/13`,
+            `Original Selector doesn't match Angular CLI naming convention for a ${this.construct}. Unexpected Selector not replaced.`,
           ]);
         }
 

@@ -8,7 +8,7 @@ import {
   GenericEdit,
   GenericEditsCallback,
 } from './apply-generic-edits';
-import * as minimatch from 'minimatch';
+import { minimatch } from 'minimatch';
 import {
   isPathToAnotherDir,
   mergeReferenceArrays,
@@ -17,24 +17,11 @@ import {
   conf,
   flattenArray,
 } from './util/helper-functions';
-import { Reference } from './util/shared-interfaces';
+import { FoundItem, Reference } from './util/shared-interfaces';
 
 const BATCH_SIZE = 50;
 
 type Replacement = [string, string];
-
-interface FoundItem {
-  itemType:
-    | 'importPath'
-    | 'exportPath'
-    | 'class'
-    | 'selector'
-    | 'templateUrl'
-    | 'styleUrls';
-  itemText: string;
-  specifiers?: string[];
-  location: { start: number; end: number };
-}
 
 type ConfigProp = object | string | undefined;
 
@@ -587,9 +574,8 @@ export class ReferenceIndexBuilder {
   }
 
   removeIndexSuffix(filePath: string): string {
-    const indexSuffix = '/index';
-    if (filePath.endsWith(indexSuffix)) {
-      return filePath.slice(0, -indexSuffix.length);
+    if (/(\/|\\)index$/.test(filePath)) {
+      return filePath.slice(0, -6);
     }
     return filePath;
   }
@@ -1060,11 +1046,10 @@ export class ReferenceIndexBuilder {
             },
           });
         }
-      } else if (fileName.match(/routing|module/)) {
+      } else if (fileName.match(/routing|module|route/)) {
         // index lazy loaded routes in Angular router modules
         recurseForAngularRouterImport(node);
       }
-      // console.log(fileName);
     });
 
     return result;
@@ -1117,8 +1102,11 @@ export class ReferenceIndexBuilder {
         if (!referenced.endsWith(ext)) {
           if (fs.existsSync(referenced + ext)) {
             referenced += ext;
-          } else if (fs.existsSync(referenced + '/index' + ext)) {
-            referenced += '/index' + ext;
+          } else {
+            const pathWithIndexFile = path.join(referenced, 'index' + ext);
+            if (fs.existsSync(pathWithIndexFile)) {
+              referenced = pathWithIndexFile;
+            }
           }
         }
       }

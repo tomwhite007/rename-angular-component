@@ -1,5 +1,12 @@
 # Change Log
 
+## [3.0.0] - 2024-02-27
+
+- Update to latest VSCode extension lib deps
+- Add `styleUrl` decorator attribute to import edits
+- Replace string class names in test files per issue 34
+- Create new extension icon using latest ng 17 logo
+
 ## [2.1.3] - 2022-08-08
 
 - Fix: Case insensitive drive letter for Windows (for non default)

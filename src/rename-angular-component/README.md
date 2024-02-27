@@ -4,4 +4,4 @@ This extension uses a heavily adapted version of the Indexer feature from [Move 
 
 Once running, the process then uses Angular CLI's Selector validation, and string manipulators; classify and dasherize, to define the new file, class and Selectors.
 
-More code documentation will appear here in due course.
+The core file to follow the processes is `renamer.class.ts` in this folder. The extension shell triggers the method, `rename()` in this class file.

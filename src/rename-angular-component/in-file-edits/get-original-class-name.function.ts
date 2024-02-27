@@ -30,7 +30,10 @@ export async function getOriginalClassName(
         return expectedOldClassName;
       } else {
         // check decorator matches construct
-        node.decorators?.find((decorator: ts.Decorator) => {
+        node.modifiers?.find((decorator) => {
+          if (!ts.isDecorator(decorator)) {
+            return false;
+          }
           if (
             ts.isCallExpression(decorator.expression) &&
             ts.isIdentifier(decorator.expression.expression) &&

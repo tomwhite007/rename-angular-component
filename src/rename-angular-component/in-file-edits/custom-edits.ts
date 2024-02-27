@@ -9,19 +9,9 @@ import { AngularConstruct } from '../definitions/file.interfaces';
 import { generateNewSelector } from './generate-new-selector.function';
 import { getSelectorType } from './get-selector-type.function';
 import { stripSelectorBraces } from './strip-selector-braces.function';
+import { FoundItem } from '../../move-ts-indexer/util/shared-interfaces';
 
-interface FoundItem {
-  itemType:
-    | 'class'
-    | 'selector'
-    | 'templateUrl'
-    | 'styleUrls'
-    | 'attributeInput';
-  itemText: string;
-  location: { start: number; end: number };
-}
-
-type SelectorOrTemplateUrl = 'selector' | 'templateUrl';
+type StringLiteralAttributesInScope = 'selector' | 'templateUrl' | 'styleUrl';
 
 export class SelectorTransfer {
   oldSelector?: string;
@@ -67,6 +57,7 @@ export function getCoreClassEdits(
             replacement = `'${selectorTransfer.newSelector}'`;
             break;
           case 'templateUrl':
+          case 'styleUrl':
           case 'styleUrls':
             replacement = `'${foundItem.itemText.replace(
               new RegExp(
@@ -146,13 +137,17 @@ function getCoreClassFoundItems(
         const decoratorPropertiesRequired = [
           'selector',
           'templateUrl',
+          'styleUrl',
           'styleUrls',
         ];
 
         const decoratorName = classify(construct);
 
         // get decorator props for decoratorName
-        node.decorators?.find((decorator: ts.Decorator) => {
+        node.modifiers?.find((decorator) => {
+          if (!ts.isDecorator(decorator)) {
+            return false;
+          }
           if (
             ts.isCallExpression(decorator.expression) &&
             ts.isIdentifier(decorator.expression.expression) &&
@@ -166,10 +161,11 @@ function getCoreClassFoundItems(
                   ts.isIdentifier(prop.name) &&
                   decoratorPropertiesRequired.includes(prop.name.text)
                 ) {
-                  // 'selector' and 'templateUrl' are StringLiteral
+                  // 'selector', 'templateUrl' and 'styleUrl' are StringLiteral
                   if (ts.isStringLiteral(prop.initializer)) {
                     result.push({
-                      itemType: prop.name.text as SelectorOrTemplateUrl,
+                      itemType: prop.name
+                        .text as StringLiteralAttributesInScope,
                       itemText: prop.initializer.text,
                       location: {
                         start: prop.initializer.pos + 1,
@@ -219,7 +215,10 @@ function getCoreClassFoundItems(
         ts.forEachChild(node, (childNode) => {
           if (ts.isPropertyDeclaration(childNode)) {
             // Input property name is different to template property
-            childNode.decorators?.find((dec) => {
+            childNode.modifiers?.find((dec) => {
+              if (!ts.isDecorator(dec)) {
+                return false;
+              }
               if (
                 ts.isCallExpression(dec.expression) &&
                 ts.isIdentifier(dec.expression.expression) &&
@@ -341,17 +340,18 @@ function getClassNameFoundItems(
       sourceText,
       ts.ScriptTarget.Latest
     );
+    const isTestFile = Boolean(fileName.match(/\.spec\.ts$/));
 
     const result: FoundItem[] = [];
     const recurseThroughNodeTree = (() =>
-      getTreeRecursor(className, sourceText, result))();
+      getTreeRecursor(className, sourceText, result, isTestFile))();
 
     file.statements.forEach((node: ts.Node) => {
       if (ts.isExpressionStatement(node)) {
         node.expression.forEachChild((arg) => {
           if (ts.isStringLiteral(arg)) {
             const argIndex = arg.text.search(
-              new RegExp(`(?<!\\w)${className}(?!\\w)`)
+              new RegExp(`(?<!\\w)${escapeRegex(className)}(?!\\w)`)
             );
 
             if (argIndex >= 0) {
@@ -380,7 +380,8 @@ function getClassNameFoundItems(
 function getTreeRecursor(
   className: string,
   sourceText: string,
-  result: FoundItem[]
+  result: FoundItem[],
+  replaceStringClassNames?: boolean
 ) {
   const recurseThroughNodeTree = (node: ts.Node) => {
     if (ts.isIdentifier(node)) {
@@ -398,6 +399,33 @@ function getTreeRecursor(
         });
       }
     } else {
+      if (replaceStringClassNames && ts.isExpression(node)) {
+        node.forEachChild((expressionProp) => {
+          if (
+            ts.isStringLiteral(expressionProp) &&
+            expressionProp.text === className
+          ) {
+            const realString = sourceText.substring(
+              expressionProp.pos,
+              expressionProp.end
+            );
+            const shim = realString.indexOf(className);
+            const start = expressionProp.pos + shim;
+
+            if (!result.find((item) => item.location.start === start)) {
+              result.push({
+                itemType: 'class',
+                itemText: className,
+                location: {
+                  start,
+                  end: start + className.length, // inside quotes
+                },
+              });
+            }
+          }
+        });
+      }
+
       ts.forEachChild(node, recurseThroughNodeTree);
     }
   };

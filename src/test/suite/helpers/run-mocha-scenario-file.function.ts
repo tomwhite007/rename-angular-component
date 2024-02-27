@@ -19,7 +19,7 @@ export function runMochaScenarioFile(scenarioFile: string): Promise<void> {
 
     try {
       // Run the mocha test
-      mocha.run((failures) => {
+      mocha.run((failures: number) => {
         if (failures > 0) {
           e(new Error(`${failures} tests failed.`));
         } else {

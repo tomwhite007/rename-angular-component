@@ -6,6 +6,7 @@ import { AngularConstruct } from '../../../rename-angular-component/definitions/
 import { DebugLogger } from '../../../rename-angular-component/logging/debug-logger.class';
 import { UserMessage } from '../../../rename-angular-component/logging/user-message.class';
 import { Renamer } from '../../../rename-angular-component/renamer.class';
+import { timeoutPause } from '../../../utils/timeout-pause';
 
 export interface RenameCallConfig {
   filePath: string;
@@ -47,5 +48,7 @@ export async function runRenamerScenario(
       rename.construct,
       vscode.Uri.file(path.join(projectRoot, rename.filePath))
     );
+    // allow indexer to finish re-indexing in the background
+    await timeoutPause(1000);
   }
 }

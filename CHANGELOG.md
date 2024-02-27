@@ -1,6 +1,6 @@
 # Change Log
 
-## [3.0.0] - 2024-01-20
+## [3.0.0] - 2024-02-27
 
 - Update to latest VSCode extension lib deps
 - Add `styleUrl` decorator attribute to import edits

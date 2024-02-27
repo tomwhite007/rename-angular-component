@@ -5,7 +5,7 @@
 
 Rename Angular components, directives, and services - including their filenames, class names and selectors all in one go
 
-Currently works with these Angular features:
+Works with these Angular features:
 
 - components
 - directives
@@ -50,7 +50,7 @@ This extension contributes the following settings:
 
 ## Known Issues
 
-1. [Feature request: Limit rename selector in templates to current workspace multi-folder root](https://github.com/tomwhite007/rename-angular-component/issues/48)
+1. [Feature request: Limit rename selector in templates to VSCode's current workspace multi-folder root](https://github.com/tomwhite007/rename-angular-component/issues/48)
 1. [Extension does not support WSL](https://github.com/tomwhite007/rename-angular-component/issues/28)
 
 ## Support
@@ -65,11 +65,9 @@ Thanks to [Aristeidis Bampakos](https://github.com/bampakoa) for feature guidanc
 
 Thanks to you for reading this.
 
-As we have passed 20,000 users of this extension on this release, I think it's fairly safe to say a few of you consider this extension worth adding to [John Papa's Angular Essentials](https://marketplace.visualstudio.com/items?itemName=johnpapa.angular-essentials) collection. I would be grateful if you could comment or leave an emoji on [this request I raised on his repo](https://github.com/johnpapa/vscode-angular-essentials/issues/45) a while back. Any VSCode Extension reviews are also very welcome. Thank you.
-
 ## Release Notes
 
-Latest version: [3.0.0] - 2024-01-20
+Latest version: [3.0.0] - 2024-02-27
 
 - Update to latest VSCode extension lib deps
 - Add `styleUrl` decorator attribute to import edits

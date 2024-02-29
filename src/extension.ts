@@ -1,11 +1,13 @@
 import * as vscode from 'vscode';
 
 import { ReferenceIndexBuilder } from './move-ts-indexer/reference-index-builder';
-import { UserMessage } from './rename-angular-component/logging/user-message.class';
 import { EXTENSION_NAME } from './rename-angular-component/definitions/extension-name';
-import { Renamer } from './rename-angular-component/renamer.class';
-import { DebugLogger } from './rename-angular-component/logging/debug-logger.class';
 import { getConfig } from './rename-angular-component/definitions/getConfig.function';
+import { DebugLogger } from './rename-angular-component/logging/debug-logger.class';
+import { UserMessage } from './rename-angular-component/logging/user-message.class';
+import { Renamer } from './rename-angular-component/renamer.class';
+import { IsValid } from './utils/is-valid-uri';
+import { readFilePath } from './utils/read-file-path';
 
 export function activate(context: vscode.ExtensionContext) {
   const debugLogger = new DebugLogger(getConfig('debugLog', false));
@@ -44,7 +46,21 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand(
       'rename-angular-component.renameComponent',
-      async (uri: vscode.Uri) => renamer.rename('component', uri)
+      async (uri: vscode.Uri) => {
+        if (uri) {
+          return renamer.rename('component', uri);
+        }
+
+        const newUri = await readFilePath();
+
+        if (IsValid.componentUri(newUri)) {
+          return renamer.rename('component', vscode.Uri.file(newUri));
+        }
+
+        vscode.window.showInformationMessage(
+          'The selected file is not a component'
+        );
+      }
     )
   );
 

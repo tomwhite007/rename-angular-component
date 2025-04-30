@@ -1,8 +1,8 @@
 import * as fs from 'fs-extra-promise';
 import * as path from 'path';
 
-import { ReferenceIndexBuilder } from './reference-index-builder';
 import { GenericEditsCallback } from './apply-generic-edits';
+import { ReferenceIndexBuilder } from './reference-index-builder';
 
 export class FileItem {
   constructor(
@@ -55,7 +55,7 @@ export class FileItem {
     }
   }
 
-  private ensureDir(): Promise<any> {
+  private ensureDir() {
     return fs.ensureDirAsync(path.dirname(this.targetPath));
   }
 }

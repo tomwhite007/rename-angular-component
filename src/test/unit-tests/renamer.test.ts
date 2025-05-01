@@ -15,6 +15,7 @@ describe('Renamer', () => {
   let mockUserMessage: sinon.SinonStubbedInstance<UserMessage>;
   let mockDebugLogger: sinon.SinonStubbedInstance<DebugLogger>;
   let mockIndexerInitialisePromise: Promise<number>;
+  let mockWithProgress: sinon.SinonStub;
 
   beforeEach(() => {
     // Create mock objects using sinon
@@ -31,6 +32,26 @@ describe('Renamer', () => {
     mockDebugLogger.setWorkspaceRoot.returns();
 
     mockIndexerInitialisePromise = Promise.resolve(1);
+
+    // Mock vscode.window.withProgress
+    mockWithProgress = sinon.stub(vscode.window, 'withProgress').callsFake(
+      (
+        options: vscode.ProgressOptions,
+        task: (
+          progress: vscode.Progress<{
+            message?: string;
+            increment?: number;
+          }>,
+          token: vscode.CancellationToken
+        ) => Thenable<any>
+      ) =>
+        task(
+          {
+            report: sinon.stub(),
+          },
+          new vscode.CancellationTokenSource().token
+        )
+    );
 
     renamer = new Renamer(
       mockIndexerInitialisePromise,
@@ -65,28 +86,6 @@ describe('Renamer', () => {
       (renamer as any).originalFileDetails = { path: '/test/path' };
       (renamer as any).renameFolder = false;
 
-      // Mock vscode.window.withProgress
-      const mockWithProgress = sinon
-        .stub(vscode.window, 'withProgress')
-        .callsFake(
-          (
-            options: vscode.ProgressOptions,
-            task: (
-              progress: vscode.Progress<{
-                message?: string;
-                increment?: number;
-              }>,
-              token: vscode.CancellationToken
-            ) => Thenable<any>
-          ) =>
-            task(
-              {
-                report: sinon.stub(),
-              },
-              new vscode.CancellationTokenSource().token
-            )
-        );
-
       await renamer.rename('component', vscode.Uri.file('/test/path'));
 
       expect(
@@ -106,39 +105,43 @@ describe('Renamer', () => {
     });
 
     it('should handle errors during rename process', async () => {
-      // Mock the prepRenameDetails method to throw an error
+      // Mock the prepRenameDetails method
       const mockPrepRenameDetails = sinon
         .stub(renamer as any, 'prepRenameDetails')
+        .resolves(true);
+
+      // Mock the prepFileMoveJobs method
+      const mockPrepFileMoveJobs = sinon
+        .stub(renamer as any, 'prepFileMoveJobs')
         .rejects(new Error('Test error'));
 
-      // Mock vscode.window.withProgress
-      const mockWithProgress = sinon
-        .stub(vscode.window, 'withProgress')
-        .callsFake(
-          (
-            options: vscode.ProgressOptions,
-            task: (
-              progress: vscode.Progress<{
-                message?: string;
-                increment?: number;
-              }>,
-              token: vscode.CancellationToken
-            ) => Thenable<any>
-          ) =>
-            task(
-              {
-                report: sinon.stub(),
-              },
-              new vscode.CancellationTokenSource().token
-            )
-        );
+      // Mock the fileMoveJobs property
+      (renamer as any).fileMoveJobs = [
+        new FileItem('source', 'target', false, 'old', 'new'),
+      ];
+      (renamer as any).construct = 'component';
+      (renamer as any).selectorTransfer = new SelectorTransfer();
+      (renamer as any).originalFileDetails = { path: '/test/path' };
+      (renamer as any).renameFolder = false;
+      (renamer as any).title = 'Rename Angular Component';
 
       await renamer.rename('component', vscode.Uri.file('/test/path'));
+
+      expect(
+        mockPrepRenameDetails.calledWith(
+          'component',
+          sinon.match.instanceOf(vscode.Uri)
+        )
+      ).to.be.true;
+      expect(mockPrepFileMoveJobs.called).to.be.true;
 
       expect(
         mockUserMessage.logInfoToChannel.calledWith(
           sinon.match.array.contains([
             'Sorry, an error occurred during the Rename Angular Component process',
+            'We recommend reverting the changes made if there are any',
+            "If it looks like a new issue, we'd appreciate you raising it here: https://github.com/tomwhite007/rename-angular-component/issues",
+            "We're actively fixing any bugs reported.",
           ])
         )
       ).to.be.true;
@@ -149,28 +152,6 @@ describe('Renamer', () => {
       const mockPrepRenameDetails = sinon
         .stub(renamer as any, 'prepRenameDetails')
         .resolves(false);
-
-      // Mock vscode.window.withProgress
-      const mockWithProgress = sinon
-        .stub(vscode.window, 'withProgress')
-        .callsFake(
-          (
-            options: vscode.ProgressOptions,
-            task: (
-              progress: vscode.Progress<{
-                message?: string;
-                increment?: number;
-              }>,
-              token: vscode.CancellationToken
-            ) => Thenable<any>
-          ) =>
-            task(
-              {
-                report: sinon.stub(),
-              },
-              new vscode.CancellationTokenSource().token
-            )
-        );
 
       await renamer.rename('component', vscode.Uri.file('/test/path'));
 
@@ -188,28 +169,6 @@ describe('Renamer', () => {
       const mockPrepFileMoveJobs = sinon
         .stub(renamer as any, 'prepFileMoveJobs')
         .resolves(false);
-
-      // Mock vscode.window.withProgress
-      const mockWithProgress = sinon
-        .stub(vscode.window, 'withProgress')
-        .callsFake(
-          (
-            options: vscode.ProgressOptions,
-            task: (
-              progress: vscode.Progress<{
-                message?: string;
-                increment?: number;
-              }>,
-              token: vscode.CancellationToken
-            ) => Thenable<any>
-          ) =>
-            task(
-              {
-                report: sinon.stub(),
-              },
-              new vscode.CancellationTokenSource().token
-            )
-        );
 
       await renamer.rename('component', vscode.Uri.file('/test/path'));
 

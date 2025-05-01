@@ -14,6 +14,15 @@
       "preLaunchTask": "${defaultBuildTask}"
     },
     {
+      "name": "Unit Tests",
+      "type": "extensionHost",
+      "request": "launch",
+      "testConfiguration": "${workspaceFolder}/unit-tests.vscode-test.mjs",
+      "testConfigurationLabel": "unitTests",
+      "autoAttachChildProcesses": false,
+      "preLaunchTask": "tasks: watch-tests"
+    },
+    {
       "name": "Extension Tests 1 Mac",
       "type": "extensionHost",
       "request": "launch",

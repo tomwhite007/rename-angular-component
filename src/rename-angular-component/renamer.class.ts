@@ -1,32 +1,32 @@
+import * as fs from 'fs-extra-promise';
+import * as path from 'path';
 import * as vscode from 'vscode';
+import { classify, dasherize } from '../angular-cli/strings';
+import { validateHtmlSelector } from '../angular-cli/validation';
+import { FileItem } from '../move-ts-indexer/file-item';
+import { timeoutPause } from '../utils/timeout-pause';
 import {
   AngularConstruct,
   OriginalFileDetails,
 } from './definitions/file.interfaces';
 import { getProjectRoot } from './definitions/get-project-root-file-path.function';
-import { ReferenceIndexBuilder } from '../move-ts-indexer/reference-index-builder';
-import { FileItem } from '../move-ts-indexer/file-item';
-import * as fs from 'fs-extra-promise';
-import { getOriginalFileDetails } from './in-file-edits/get-original-file-details.function';
-import { windowsFilePathFix } from './file-manipulation/windows-file-path-fix.function';
+import { FileMoveHandler } from './file-manipulation/file-move-handler.class';
 import { FilesRelatedToStub } from './file-manipulation/files-related-to-stub.class';
-import { findReplaceSelectorsInTemplateFiles } from './file-manipulation/find-replace-selectors-in-template-files.function';
+import { updateSelectorsInTemplates } from './file-manipulation/selector-update-handler.function';
+import { windowsFilePathFix } from './file-manipulation/windows-file-path-fix.function';
 import {
   getClassNameEdits,
   getCoreClassEdits,
   SelectorTransfer,
 } from './in-file-edits/custom-edits';
-import { checkForOpenUnsavedEditors } from './window/check-for-open-unsaved-editors.function';
-import * as path from 'path';
+import { getCoreFilePath } from './in-file-edits/get-core-file-path.function';
+import { getOriginalClassName } from './in-file-edits/get-original-class-name.function';
+import { getOriginalFileDetails } from './in-file-edits/get-original-file-details.function';
+import { DebugLogger } from './logging/debug-logger.class';
+import { reportErrors } from './logging/error-handler.function';
 import { UserMessage } from './logging/user-message.class';
 import { noSelectedFileHandler } from './no-selected-file-handler/no-selected-file-handler.function';
-import { getOriginalClassName } from './in-file-edits/get-original-class-name.function';
-import { DebugLogger } from './logging/debug-logger.class';
-import { validateHtmlSelector } from '../angular-cli/validation';
-import { classify, dasherize } from '../angular-cli/strings';
-import { CONSTRUCTS_WITH_SELECTORS } from './definitions/constructs-with-selectors';
-import { timeoutPause } from '../utils/timeout-pause';
-import { getCoreFilePath } from './in-file-edits/get-core-file-path.function';
+import { checkForOpenUnsavedEditors } from './window/check-for-open-unsaved-editors.function';
 
 export class Renamer {
   private construct!: AngularConstruct;
@@ -41,10 +41,10 @@ export class Renamer {
   public testBypass?: { stub: string };
 
   constructor(
-    private indexer: ReferenceIndexBuilder,
     private indexerInitialisePromise: Thenable<any>,
     private userMessage: UserMessage,
-    private debugLogger: DebugLogger
+    private debugLogger: DebugLogger,
+    private fileMoveHandler: FileMoveHandler
   ) {}
 
   async rename(_construct: AngularConstruct, selectedUri: vscode.Uri) {
@@ -76,9 +76,17 @@ export class Renamer {
             return;
           }
 
-          await this.runFileMoveJobs(progress);
+          await this.fileMoveHandler.runFileMoveJobs(
+            this.fileMoveJobs,
+            progress
+          );
 
-          await this.updateSelectorsInTemplates();
+          await updateSelectorsInTemplates(
+            this.construct,
+            this.selectorTransfer,
+            this.userMessage,
+            this.debugLogger
+          );
 
           // delete original folder
           if (this.renameFolder) {
@@ -99,75 +107,11 @@ export class Renamer {
           await timeoutPause(50);
           console.log('Rename process end');
         } catch (e: any) {
-          this.reportErrors(e);
+          reportErrors(e, this.title, this.userMessage, this.debugLogger);
           console.log('Rename process ended with errors');
         }
       }
     );
-  }
-
-  private async runFileMoveJobs(
-    progress: vscode.Progress<{
-      message?: string | undefined;
-      increment?: number | undefined;
-    }>
-  ) {
-    progress.report({ increment: 20 });
-    await timeoutPause();
-    const progressIncrement = Math.floor(70 / this.fileMoveJobs.length);
-    let currentProgress = 20;
-    this.userMessage.logInfoToChannel(['File edits:'], false);
-    this.indexer.startNewMoves();
-    for await (const item of this.fileMoveJobs) {
-      currentProgress += progressIncrement;
-      progress.report({ increment: currentProgress });
-      await timeoutPause(10);
-      await item.move(this.indexer);
-    }
-    this.logFileEditsToOutput(this.indexer.endNewMoves());
-  }
-
-  private logFileEditsToOutput(files: string[]) {
-    files = files.map(
-      (file) =>
-        this.fileMoveJobs.find((job) => job.sourcePath === file)?.targetPath ??
-        file
-    );
-    files = [...new Set(files.sort())];
-    this.userMessage.logInfoToChannel(files);
-  }
-
-  private async updateSelectorsInTemplates() {
-    // update selectors for components and directives
-    if (CONSTRUCTS_WITH_SELECTORS.includes(this.construct)) {
-      if (
-        this.selectorTransfer.oldSelector &&
-        this.selectorTransfer.newSelector
-      ) {
-        if (
-          this.selectorTransfer.oldSelector !==
-          this.selectorTransfer.newSelector
-        ) {
-          await findReplaceSelectorsInTemplateFiles(
-            this.selectorTransfer.oldSelector,
-            this.selectorTransfer.newSelector,
-            this.userMessage
-          );
-        } else {
-          this.userMessage.logInfoToChannel([
-            ``,
-            `Original Selector doesn't match Angular CLI naming convention for a ${this.construct}. Unexpected Selector not replaced.`,
-          ]);
-        }
-
-        this.debugLogger.log(
-          'oldSelector: ' + this.selectorTransfer.oldSelector,
-          'newSelector: ' + this.selectorTransfer.newSelector
-        );
-      } else {
-        throw new Error("Selector edit not found. Couldn't amend selector.");
-      }
-    }
   }
 
   private async prepFileMoveJobs(): Promise<boolean> {
@@ -255,30 +199,6 @@ export class Renamer {
       return false;
     }
     return true;
-  }
-
-  private reportErrors(e: any) {
-    const raiseIssueMsgs = [
-      `If it looks like a new issue, we'd appreciate you raising it here: https://github.com/tomwhite007/rename-angular-component/issues`,
-      `We're actively fixing any bugs reported.`,
-    ];
-
-    const msg: string = e.message;
-    if (msg.startsWith('Class Name') || msg.startsWith('Selector')) {
-      this.userMessage.logInfoToChannel(['', msg, ...raiseIssueMsgs]);
-      return;
-    }
-
-    console.log('error in Renamer:', e);
-    this.userMessage.logInfoToChannel([
-      `Sorry, an error occurred during the ${this.title} process`,
-      `We recommend reverting the changes made if there are any`,
-      ...raiseIssueMsgs,
-    ]);
-    this.debugLogger.log(
-      'Renamer error: ',
-      JSON.stringify(e, Object.getOwnPropertyNames(e))
-    );
   }
 
   private async prepRenameDetails(

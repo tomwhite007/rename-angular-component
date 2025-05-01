@@ -3,6 +3,7 @@ import * as vscode from 'vscode';
 import { ReferenceIndexBuilder } from '../../../move-ts-indexer/reference-index-builder';
 import { EXTENSION_NAME } from '../../../rename-angular-component/definitions/extension-name';
 import { AngularConstruct } from '../../../rename-angular-component/definitions/file.interfaces';
+import { FileMoveHandler } from '../../../rename-angular-component/file-manipulation/file-move-handler.class';
 import { DebugLogger } from '../../../rename-angular-component/logging/debug-logger.class';
 import { UserMessage } from '../../../rename-angular-component/logging/user-message.class';
 import { Renamer } from '../../../rename-angular-component/renamer.class';
@@ -21,6 +22,11 @@ export async function runRenamerScenario(
   const debugLogger = new DebugLogger(false);
   const userMessage = new UserMessage(EXTENSION_NAME);
   const indexer: ReferenceIndexBuilder = new ReferenceIndexBuilder(debugLogger);
+  const fileMoveHandler = new FileMoveHandler(
+    indexer,
+    userMessage,
+    debugLogger
+  );
 
   const initWithProgress = () => {
     return vscode.window.withProgress(
@@ -36,10 +42,10 @@ export async function runRenamerScenario(
   await initWithProgress();
 
   const renamer = new Renamer(
-    indexer,
     Promise.resolve(),
     userMessage,
-    debugLogger
+    debugLogger,
+    fileMoveHandler
   );
 
   for (const rename of renames) {

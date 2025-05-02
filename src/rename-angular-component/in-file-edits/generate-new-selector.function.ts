@@ -1,4 +1,4 @@
-import { camelize, dasherize } from '../../angular-cli/strings';
+import { camelize, classify, dasherize } from '../../angular-cli/strings';
 import { getSelectorType } from './get-selector-type.function';
 
 export function generateNewSelector(
@@ -15,14 +15,16 @@ export function generateNewSelector(
   let newSelector = '';
   switch (type) {
     case 'element':
-      newSelector = oldSelector.replace(stub, newStub);
+    case 'class':
+      newSelector = dasherize(oldSelector).replace(
+        dasherize(stub),
+        dasherize(newStub)
+      );
       break;
     case 'attribute':
-      newSelector = camelize(dasherize(oldSelector).replace(stub, newStub));
-      break;
-    case 'class':
-      newSelector =
-        '.' + camelize(dasherize(oldSelector).replace(stub, newStub));
+      newSelector = camelize(
+        oldSelector.replace(classify(stub), classify(newStub))
+      );
       break;
   }
 

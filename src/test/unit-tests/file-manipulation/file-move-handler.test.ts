@@ -1,11 +1,12 @@
 const expect = require('chai').expect;
+import { afterEach, beforeEach, describe, it } from 'mocha';
 import sinon from 'sinon';
 import vscode from 'vscode';
-import { FileItem } from '../move-ts-indexer/file-item';
-import { ReferenceIndexBuilder } from '../move-ts-indexer/reference-index-builder';
-import { FileMoveHandler } from '../rename-angular-component/file-manipulation/file-move-handler.class';
-import { DebugLogger } from '../rename-angular-component/logging/debug-logger.class';
-import { UserMessage } from '../rename-angular-component/logging/user-message.class';
+import { FileItem } from '../../../move-ts-indexer/file-item';
+import { ReferenceIndexBuilder } from '../../../move-ts-indexer/reference-index-builder';
+import { FileMoveHandler } from '../../../rename-angular-component/file-manipulation/file-move-handler.class';
+import { DebugLogger } from '../../../rename-angular-component/logging/debug-logger.class';
+import { UserMessage } from '../../../rename-angular-component/logging/user-message.class';
 
 describe('FileMoveHandler', () => {
   let sandbox: sinon.SinonSandbox;
@@ -13,7 +14,9 @@ describe('FileMoveHandler', () => {
   let indexer: ReferenceIndexBuilder;
   let userMessage: UserMessage;
   let debugLogger: DebugLogger;
-  let progress: vscode.Progress<{ message?: string; increment?: number }>;
+  let progress: vscode.Progress<{ message?: string; increment?: number }> & {
+    report: sinon.SinonStub;
+  };
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
@@ -32,9 +35,13 @@ describe('FileMoveHandler', () => {
 
   describe('runFileMoveJobs', () => {
     it('should process file move jobs and update progress', async () => {
-      const fileMoveJobs: FileItem[] = [
-        { move: sandbox.stub().resolves() } as unknown as FileItem,
-        { move: sandbox.stub().resolves() } as unknown as FileItem,
+      const fileMoveJobs: (FileItem & { move: sinon.SinonStub })[] = [
+        { move: sandbox.stub().resolves() } as unknown as FileItem & {
+          move: sinon.SinonStub;
+        },
+        { move: sandbox.stub().resolves() } as unknown as FileItem & {
+          move: sinon.SinonStub;
+        },
       ];
 
       await fileMoveHandler.runFileMoveJobs(fileMoveJobs, progress);

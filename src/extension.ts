@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 
 import { ReferenceIndexBuilder } from './move-ts-indexer/reference-index-builder';
 import { EXTENSION_NAME } from './rename-angular-component/definitions/extension-name';

@@ -1,8 +1,8 @@
-import * as fs from 'fs-extra-promise';
+import fs from 'fs-extra-promise';
 import minimatch from 'minimatch';
-import * as path from 'path';
-import * as ts from 'typescript';
-import * as vscode from 'vscode';
+import path from 'path';
+import ts from 'typescript';
+import vscode from 'vscode';
 import {
   applyGenericEdits,
   GenericEdit,

@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 import { genericTestScenario } from './helpers/generic-test-scenario.function';
 
 suite('Suite Scenario 3', () => {

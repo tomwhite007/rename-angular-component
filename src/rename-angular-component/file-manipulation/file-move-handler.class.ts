@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 import { FileItem } from '../../move-ts-indexer/file-item';
 import { ReferenceIndexBuilder } from '../../move-ts-indexer/reference-index-builder';
 import { timeoutPause } from '../../utils/timeout-pause';

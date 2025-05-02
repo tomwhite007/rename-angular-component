@@ -1,5 +1,5 @@
-import * as fs from 'fs-extra-promise';
-import * as path from 'path';
+import fs from 'fs-extra-promise';
+import path from 'path';
 
 export class DebugLogger {
   private preSaveCash = '';

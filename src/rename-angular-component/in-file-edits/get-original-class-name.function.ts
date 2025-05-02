@@ -1,7 +1,7 @@
-import * as ts from 'typescript';
-import { AngularConstruct } from '../definitions/file.interfaces';
-import * as fs from 'fs-extra-promise';
+import fs from 'fs-extra-promise';
+import ts from 'typescript';
 import { classify } from '../../angular-cli/strings';
+import { AngularConstruct } from '../definitions/file.interfaces';
 import { getDecoratorName } from './get-decorator-name.function';
 
 export async function getOriginalClassName(

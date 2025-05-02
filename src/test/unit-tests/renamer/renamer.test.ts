@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, it } from 'mocha';
-import * as sinon from 'sinon';
-import * as vscode from 'vscode';
+import sinon from 'sinon';
+import vscode from 'vscode';
 import { FileItem } from '../../../move-ts-indexer/file-item';
 import { FileMoveHandler } from '../../../rename-angular-component/file-manipulation/file-move-handler.class';
 import { SelectorTransfer } from '../../../rename-angular-component/in-file-edits/custom-edits';

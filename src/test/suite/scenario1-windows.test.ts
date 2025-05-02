@@ -1,6 +1,6 @@
 import assert = require('assert');
 import path = require('path');
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 import { windowsFilePathFix } from '../../rename-angular-component/file-manipulation/windows-file-path-fix.function';
 import { genericTestScenario } from './helpers/generic-test-scenario.function';
 

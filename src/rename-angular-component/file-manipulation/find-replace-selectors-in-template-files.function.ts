@@ -1,5 +1,5 @@
-import { OutputChannel, workspace } from 'vscode';
-import * as fs from 'fs-extra-promise';
+import fs from 'fs-extra-promise';
+import { workspace } from 'vscode';
 import { renameSelectorInTemplate } from '../in-file-edits/rename-selector-in-template.function';
 import { UserMessage } from '../logging/user-message.class';
 

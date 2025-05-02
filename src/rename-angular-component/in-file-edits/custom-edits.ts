@@ -1,15 +1,15 @@
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { classify } from '../../angular-cli/strings';
 import {
-  GenericEditsCallback,
   GenericEdit,
+  GenericEditsCallback,
 } from '../../move-ts-indexer/apply-generic-edits';
+import { FoundItem } from '../../move-ts-indexer/util/shared-interfaces';
 import { escapeRegex } from '../../utils/escape-regex';
 import { AngularConstruct } from '../definitions/file.interfaces';
 import { generateNewSelector } from './generate-new-selector.function';
 import { getSelectorType } from './get-selector-type.function';
 import { stripSelectorBraces } from './strip-selector-braces.function';
-import { FoundItem } from '../../move-ts-indexer/util/shared-interfaces';
 
 type StringLiteralAttributesInScope = 'selector' | 'templateUrl' | 'styleUrl';
 

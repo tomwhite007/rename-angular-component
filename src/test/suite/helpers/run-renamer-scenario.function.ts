@@ -1,5 +1,5 @@
 import path = require('path');
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 import { ReferenceIndexBuilder } from '../../../move-ts-indexer/reference-index-builder';
 import { EXTENSION_NAME } from '../../../rename-angular-component/definitions/extension-name';
 import { AngularConstruct } from '../../../rename-angular-component/definitions/file.interfaces';

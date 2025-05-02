@@ -1,6 +1,6 @@
-import * as fs from 'fs-extra-promise';
-import * as path from 'path';
-import * as vscode from 'vscode';
+import fs from 'fs-extra-promise';
+import path from 'path';
+import vscode from 'vscode';
 import { classify, dasherize } from '../angular-cli/strings';
 import { validateHtmlSelector } from '../angular-cli/validation';
 import { FileItem } from '../move-ts-indexer/file-item';

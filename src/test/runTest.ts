@@ -3,7 +3,7 @@ NOTE: this initialiser has been commented out because 'npm run test' fails to pr
 for workspace root and find files within workspace on which this extension relies.
 I intend to raise an Issue on this but for now, I'm just disabling this entry point.
 
-import * as path from 'path';
+import  path from 'path';
 
 import { runTests } from '@vscode/test-electron';
 

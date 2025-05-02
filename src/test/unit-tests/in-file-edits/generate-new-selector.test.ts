@@ -2,7 +2,7 @@ const expect = require('chai').expect;
 import { describe, it } from 'mocha';
 import { generateNewSelector } from '../../../rename-angular-component/in-file-edits/generate-new-selector.function';
 
-describe.only('generateNewSelector', () => {
+describe('generateNewSelector', () => {
   it('should generate new element selector', () => {
     const result = generateNewSelector('app-old', 'Old', 'New');
     expect(result).to.equal('app-new');

@@ -1,11 +1,11 @@
 const expect = require('chai').expect;
 const sinon = require('sinon');
-const {
+import { describe, it } from 'mocha';
+import {
   getClassNameEdits,
   getCoreClassEdits,
   SelectorTransfer,
-} = require('../../rename-angular-component/in-file-edits/custom-edits');
-import { describe, it } from 'mocha';
+} from '../../../rename-angular-component/in-file-edits/custom-edits';
 
 describe('Custom Edits', () => {
   describe('getCoreClassEdits', () => {

@@ -22,8 +22,9 @@ export function generateNewSelector(
       );
       break;
     case 'attribute':
-      newSelector = camelize(
-        oldSelector.replace(classify(stub), classify(newStub))
+      newSelector = camelize(oldSelector).replace(
+        classify(stub),
+        classify(newStub)
       );
       break;
   }

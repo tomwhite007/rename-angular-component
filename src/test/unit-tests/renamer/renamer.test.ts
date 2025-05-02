@@ -1,12 +1,12 @@
 import { afterEach, beforeEach, describe, it } from 'mocha';
 import * as sinon from 'sinon';
 import * as vscode from 'vscode';
-import { FileItem } from '../../move-ts-indexer/file-item';
-import { FileMoveHandler } from '../../rename-angular-component/file-manipulation/file-move-handler.class';
-import { SelectorTransfer } from '../../rename-angular-component/in-file-edits/custom-edits';
-import { DebugLogger } from '../../rename-angular-component/logging/debug-logger.class';
-import { UserMessage } from '../../rename-angular-component/logging/user-message.class';
-import { Renamer } from '../../rename-angular-component/renamer.class';
+import { FileItem } from '../../../move-ts-indexer/file-item';
+import { FileMoveHandler } from '../../../rename-angular-component/file-manipulation/file-move-handler.class';
+import { SelectorTransfer } from '../../../rename-angular-component/in-file-edits/custom-edits';
+import { DebugLogger } from '../../../rename-angular-component/logging/debug-logger.class';
+import { UserMessage } from '../../../rename-angular-component/logging/user-message.class';
+import { Renamer } from '../../../rename-angular-component/renamer.class';
 const expect = require('chai').expect;
 
 describe('Renamer', () => {

@@ -1,5 +1,4 @@
 const expect = require('chai').expect;
-const sinon = require('sinon');
 import { describe, it } from 'mocha';
 import {
   getClassNameEdits,

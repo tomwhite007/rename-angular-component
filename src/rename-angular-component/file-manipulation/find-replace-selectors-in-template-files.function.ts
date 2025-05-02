@@ -26,6 +26,7 @@ export async function findReplaceSelectorsInTemplateFiles(
       html = renameSelectorInTemplate(html, originalSelector, newSelector);
     }
     if (html) {
+      console.log(uri.fsPath, html, 'utf-8');
       await fs.writeFileAsync(uri.fsPath, html, 'utf-8');
       userMessage.logInfoToChannel([uri.fsPath], false);
       changed++;

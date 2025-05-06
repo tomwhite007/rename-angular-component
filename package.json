@@ -58,6 +58,10 @@
       {
         "command": "rename-angular-component.renameModule",
         "title": "Rename Angular Module"
+      },
+      {
+        "command": "rename-angular-component.renameFile",
+        "title": "Rename Angular file"
       }
     ],
     "menus": {
@@ -85,6 +89,11 @@
         {
           "when": "resourceFilename =~ /^.+\\.module\\.(spec.ts|ts)$/",
           "command": "rename-angular-component.renameModule",
+          "group": "navigation"
+        },
+        {
+          "when": "resourceFilename =~ /^.+\\.(spec.ts|scss|css|sass|less|html|ts)$/",
+          "command": "rename-angular-component.renameFile",
           "group": "navigation"
         }
       ]

@@ -47,9 +47,19 @@ export class Renamer {
     private fileMoveHandler: FileMoveHandler
   ) {}
 
-  async rename(_construct: AngularConstruct, selectedUri: vscode.Uri) {
+  async rename(_construct: AngularConstruct | 'file', selectedUri: vscode.Uri) {
     console.log('Rename process start');
     this.debugLogger.log('## Debug Rename Start ##');
+
+    if (_construct === 'file') {
+      this.title = 'Rename File';
+      this.userMessage.logInfoToChannel([
+        '',
+        `Rename generic file '${selectedUri.fsPath}'`,
+        'Stopping now as this is not supported.',
+      ]);
+      return;
+    }
 
     const detailsLoaded = await this.prepRenameDetails(_construct, selectedUri);
     if (!detailsLoaded) {

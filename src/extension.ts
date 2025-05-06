@@ -81,6 +81,13 @@ export function activate(context: vscode.ExtensionContext) {
       (uri: vscode.Uri) => renamer.rename('module', uri)
     )
   );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'rename-angular-component.renameFile',
+      (uri: vscode.Uri) => renamer.rename('file', uri)
+    )
+  );
 }
 
 export function deactivate() {}

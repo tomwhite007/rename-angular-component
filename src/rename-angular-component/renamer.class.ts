@@ -19,7 +19,9 @@ import {
   getCoreClassEdits,
   SelectorTransfer,
 } from './in-file-edits/custom-edits';
+import { getClassName } from './in-file-edits/get-class-name.function';
 import { getCoreFilePath } from './in-file-edits/get-core-file-path.function';
+import { getNewStubFromFileWithoutExtension } from './in-file-edits/get-new-stub-from-file-without-extension';
 import { getOriginalClassName } from './in-file-edits/get-original-class-name.function';
 import { getOriginalFileDetails } from './in-file-edits/get-original-file-details.function';
 import { DebugLogger } from './logging/debug-logger.class';
@@ -34,6 +36,7 @@ export class Renamer {
   private originalFileDetails!: Readonly<OriginalFileDetails>;
   private projectRoot!: string;
   private newStub!: string;
+  private newFilenameInput!: string;
   private processTimerStart!: number;
   private renameFolder!: boolean;
   private fileMoveJobs!: FileItem[];
@@ -118,7 +121,7 @@ export class Renamer {
           console.log('Rename process end');
         } catch (e: any) {
           reportErrors(e, this.title, this.userMessage, this.debugLogger);
-          console.log('Rename process ended with errors');
+          console.log('Rename process ended with errors', e);
         }
       }
     );
@@ -141,7 +144,8 @@ export class Renamer {
     this.renameFolder = filesRelatedToStub.folderNameSameAsStub;
 
     const filesToMove = filesRelatedToStub.getFilesToMove(
-      this.newStub as string
+      this.newStub,
+      this.newFilenameInput
     );
 
     this.debugLogger.log(
@@ -151,7 +155,7 @@ export class Renamer {
       JSON.stringify(filesToMove)
     );
 
-    if (!filesToMove.find((f) => f.isCoreConstruct)) {
+    if (!filesToMove.some((f) => f.isCoreConstruct)) {
       const errMsg = `The ${this.construct} class file must use the same file naming convention as '${this.originalFileDetails.file}' for this process to run.`;
       this.userMessage.popupMessage(errMsg);
       this.debugLogger.log(errMsg);
@@ -164,7 +168,7 @@ export class Renamer {
       coreFilePath as string,
       this.construct
     );
-    const newClassName = `${classify(this.newStub)}${classify(this.construct)}`;
+    const newClassName = getClassName(this.newStub, this.construct);
 
     this.selectorTransfer = new SelectorTransfer();
 
@@ -246,36 +250,37 @@ export class Renamer {
         return false;
       }
 
-      const inputResult =
+      this.newFilenameInput =
         this.testBypass?.stub ?? // test harness input text
         (await vscode.window.showInputBox({
           title: this.title,
-          prompt: `Enter the new ${this.construct} name.`,
-          value: this.originalFileDetails.stub,
-        }));
+          prompt: `Enter the new ${this.construct} filename.`,
+          value: this.originalFileDetails.fileWithoutType,
+        })) ??
+        '';
       this.processTimerStart = Date.now();
 
-      if (!inputResult) {
+      if (!this.newFilenameInput) {
         this.userMessage.popupMessage(
           `New ${this.construct} name not entered. Stopped.`
         );
         return false;
       }
-      if (this.originalFileDetails.stub === inputResult) {
+      if (this.originalFileDetails.fileWithoutType === this.newFilenameInput) {
         this.userMessage.popupMessage(
           `${classify(this.construct)} name same as original. Stopped.`
         );
         return false;
       }
-      if (!validateHtmlSelector('app-' + dasherize(inputResult))) {
+
+      this.newStub = getNewStubFromFileWithoutExtension(this.newFilenameInput);
+      if (!validateHtmlSelector('app-' + dasherize(this.newStub))) {
         this.userMessage.popupMessage(
           `Please enter a name that formats to a valid Selector name (W3C standards). \n
           Must start name with a letter, then letters, numbers, full stop, dash or underscore, ending with a letter or number.`
         );
         return false;
       }
-      // make sure it's kebab, and lose the dots
-      this.newStub = dasherize(inputResult.replace('.', '-') ?? '');
 
       this.userMessage.setOperationTitle(this.title);
 
@@ -297,7 +302,7 @@ export class Renamer {
         'originalFileDetails:',
         JSON.stringify(this.originalFileDetails),
         '',
-        'inputResult: ' + inputResult,
+        'inputResult: ' + this.newFilenameInput,
         '',
         'newStub: ' + this.newStub
       );

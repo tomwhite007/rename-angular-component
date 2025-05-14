@@ -1,10 +1,15 @@
 import { workspace } from 'vscode';
 import { escapeRegex } from '../../utils/escape-regex';
-import { likeFilesRegexPartialLookup } from '../definitions/file-regex.constants';
 import {
-  OriginalFileDetails,
+  likeFilesRegexPartialLookup,
+  tsFileButNotSpec,
+} from '../definitions/file-regex.constants';
+import {
   AngularConstruct,
+  OriginalFileDetails,
 } from '../definitions/file.interfaces';
+import { getConstructFromDecorator } from '../in-file-edits/get-construct-from-decorator.function';
+import { getCoreFileDecorator } from '../in-file-edits/get-core-file-decorator.function';
 import { windowsFilePathFix } from './windows-file-path-fix.function';
 
 interface FileDetails {
@@ -55,8 +60,9 @@ export class FilesRelatedToStub {
     const glob = `${fileDetails.path.replace(projectRoot + '/', '')}/**/*`;
     const uris = await workspace.findFiles(glob, '**/node_modules/**', 10000);
 
+    // TODO: need more login here to match stub PLUS construct postfix if originally present
     this.constructFilesRegex = RegExp(
-      `${escapeRegex(fileDetails.stub)}${
+      `${escapeRegex(fileDetails.fileWithoutType)}${
         likeFilesRegexPartialLookup[construct]
       }`
     );
@@ -66,18 +72,27 @@ export class FilesRelatedToStub {
 
     const isCoreConstructRegex = new RegExp(`\\.${construct}\\.ts$`);
 
-    uris.forEach((uri) => {
+    for (const uri of uris) {
       const filePath = windowsFilePathFix(uri.fsPath);
+      const sameConstruct = !!filePath.match(this.constructFilesRegex);
+      const sameStub = !!filePath.match(this.relatedFilesRegex);
+      const isTsFileButNotSpec = !!filePath.match(tsFileButNotSpec);
+
       this.fileDetails.push({
         filePath,
-        sameConstruct: !!filePath.match(this.constructFilesRegex),
-        sameStub: !!filePath.match(this.relatedFilesRegex),
-        isCoreConstruct: !!filePath.match(isCoreConstructRegex),
+        sameConstruct,
+        sameStub,
+        isCoreConstruct:
+          sameConstruct &&
+          sameStub &&
+          isTsFileButNotSpec &&
+          (await this.getIsCoreConstruct(filePath, fileDetails.stub)),
       });
-    });
+    }
   }
 
-  getFilesToMove(newStub: string) {
+  getFilesToMove(newStub: string, newFilenameInput: string) {
+    // TODO: use newFilenameInput to override the stub
     const folderReplaceRegex = new RegExp(
       `(?<=\/)${escapeRegex(this.originalFileDetails.stub)}$`
     );
@@ -99,6 +114,13 @@ export class FilesRelatedToStub {
         newFilePath: replaceStub(fd.filePath),
         isCoreConstruct: fd.isCoreConstruct,
       }));
+  }
+
+  async getIsCoreConstruct(filePath: string, stub: string) {
+    const decorator = await getCoreFileDecorator(filePath, stub);
+    const construct = getConstructFromDecorator(decorator);
+    console.log('getIsCoreConstruct', filePath, stub, decorator, construct);
+    return !!construct;
   }
 
   private sortFileDetails(a: FileDetails, b: FileDetails) {

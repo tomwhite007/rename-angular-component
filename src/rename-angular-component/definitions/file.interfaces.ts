@@ -3,11 +3,13 @@ export type AngularConstruct =
   | 'directive'
   | 'service'
   | 'module'
-  | 'guard';
+  | 'guard'
+  | 'pipe';
 
 export interface OriginalFileDetails {
   path: string;
   file: string;
+  fileWithoutType: string;
   stub: string;
   filePath: string;
 }

@@ -1,6 +1,6 @@
 import { AngularConstruct } from './file.interfaces';
 
-const componentRegexPartial = `(?=\\.(spetsFileButNotSpecc\\.ts|scss|css|sass|less|html|ts)$)`;
+const componentRegexPartial = `(?=\\.(spec\\.ts|scss|css|sass|less|html|ts)$)`;
 const generalRegexPartial = `(?=\\.(spec.ts|ts)$)`;
 const generalRegexPartialWithConstruct = (construct: AngularConstruct) =>
   `(?=\\.${construct}\\.(spec.ts|ts)$)`;

@@ -23,6 +23,7 @@ export function getCoreClassEdits(
   newClassName: string,
   originalFileStub: string,
   newFileStub: string,
+  newFilenameInput: string,
   construct: AngularConstruct,
   selectorTransfer: SelectorTransfer,
   debugLogToFile?: (...args: string[]) => void
@@ -63,9 +64,9 @@ export function getCoreClassEdits(
               new RegExp(
                 `(?<=\\/|^)${escapeRegex(
                   originalFileStub
-                )}(?=.${construct}.(html|scss|css|sass|less)$)`
+                )}(\\.${construct})?(?=\\.(html|scss|css|sass|less)$)`
               ),
-              newFileStub
+              newFilenameInput
             )}'`;
             break;
           case 'attributeInput':

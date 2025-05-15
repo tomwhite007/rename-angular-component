@@ -92,7 +92,6 @@ export class FilesRelatedToStub {
   }
 
   getFilesToMove(newStub: string, newFilenameInput: string) {
-    // TODO: use newFilenameInput to override the stub
     const folderReplaceRegex = new RegExp(
       `(?<=\/)${escapeRegex(this.originalFileDetails.stub)}$`
     );
@@ -103,7 +102,7 @@ export class FilesRelatedToStub {
           this.originalFileDetails.path.replace(folderReplaceRegex, newStub)
         );
       }
-      return filePath.replace(this.constructFilesRegex, newStub);
+      return filePath.replace(this.constructFilesRegex, newFilenameInput);
     };
 
     return this.fileDetails
@@ -119,7 +118,6 @@ export class FilesRelatedToStub {
   async getIsCoreConstruct(filePath: string, stub: string) {
     const decorator = await getCoreFileDecorator(filePath, stub);
     const construct = getConstructFromDecorator(decorator);
-    console.log('getIsCoreConstruct', filePath, stub, decorator, construct);
     return !!construct;
   }
 

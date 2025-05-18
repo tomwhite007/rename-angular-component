@@ -26,6 +26,7 @@ describe('Custom Edits', () => {
         'NewComponent',
         'old',
         'new',
+        'new.component',
         'component',
         selectorTransfer
       )('test.ts', sourceText);
@@ -54,6 +55,7 @@ describe('Custom Edits', () => {
         'NewComponent',
         'old',
         'new',
+        'new.component',
         'component',
         selectorTransfer
       )('test.ts', sourceText);
@@ -79,6 +81,7 @@ describe('Custom Edits', () => {
         'NewComponent',
         'old',
         'new',
+        'new.component',
         'component',
         selectorTransfer
       )('test.ts', sourceText);
@@ -157,6 +160,7 @@ describe('Custom Edits', () => {
         'NewComponent',
         'old',
         'new',
+        'new.component',
         'component',
         selectorTransfer
       )('test.ts', sourceText);

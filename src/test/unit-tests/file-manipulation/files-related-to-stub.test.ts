@@ -1,16 +1,26 @@
 const expect = require('chai').expect;
+import fs from 'fs-extra-promise';
 import { afterEach, beforeEach, describe, it } from 'mocha';
 import sinon from 'sinon';
 import vscode from 'vscode';
 import { OriginalFileDetails } from '../../../rename-angular-component/definitions/file.interfaces';
 import { FilesRelatedToStub } from '../../../rename-angular-component/file-manipulation/files-related-to-stub.class';
 
+const componentFileContent = `
+  @Component({
+    selector: 'app-component',
+    template: 'test',
+  })
+  export class ComponentComponent {}
+`;
 describe('FilesRelatedToStub', () => {
   let sandbox: sinon.SinonSandbox;
   let workspaceFindFilesStub: sinon.SinonStub;
+  let readFileStub: sinon.SinonStub;
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
+    readFileStub = sandbox.stub(fs, 'readFileAsync');
     workspaceFindFilesStub = sandbox.stub(vscode.workspace, 'findFiles');
   });
 
@@ -23,6 +33,7 @@ describe('FilesRelatedToStub', () => {
       const fileDetails: OriginalFileDetails = {
         path: '/project/src/app/component',
         stub: 'component',
+        fileWithoutType: 'component.component',
         filePath: '/project/src/app/component/component.component.ts',
         file: 'component.component.ts',
       };
@@ -34,6 +45,7 @@ describe('FilesRelatedToStub', () => {
       ];
 
       workspaceFindFilesStub.resolves(mockUris);
+      readFileStub.resolves(componentFileContent);
 
       const instance = await FilesRelatedToStub.init(
         fileDetails,
@@ -52,6 +64,7 @@ describe('FilesRelatedToStub', () => {
       const fileDetails: OriginalFileDetails = {
         path: '/project/src/app/component',
         stub: 'component',
+        fileWithoutType: 'component.component',
         filePath: '/project/src/app/component/component.component.ts',
         file: 'component.component.ts',
       };
@@ -62,13 +75,17 @@ describe('FilesRelatedToStub', () => {
       ];
 
       workspaceFindFilesStub.resolves(mockUris);
+      readFileStub.resolves(componentFileContent);
 
       const instance = await FilesRelatedToStub.init(
         fileDetails,
         '/project',
         'component'
       );
-      const filesToMove = instance.getFilesToMove('new-component');
+      const filesToMove = instance.getFilesToMove(
+        'new-component',
+        'new-component.component'
+      );
 
       expect(filesToMove).to.have.length(2);
       expect(filesToMove[0].filePath).to.equal(
@@ -84,6 +101,7 @@ describe('FilesRelatedToStub', () => {
       const fileDetails: OriginalFileDetails = {
         path: '/project/src/app/feature',
         stub: 'component',
+        fileWithoutType: 'component.component',
         filePath: '/project/src/app/feature/component.component.ts',
         file: 'component.component.ts',
       };
@@ -94,13 +112,17 @@ describe('FilesRelatedToStub', () => {
       ];
 
       workspaceFindFilesStub.resolves(mockUris);
+      readFileStub.resolves(componentFileContent);
 
       const instance = await FilesRelatedToStub.init(
         fileDetails,
         '/project',
         'component'
       );
-      const filesToMove = instance.getFilesToMove('new-component');
+      const filesToMove = instance.getFilesToMove(
+        'new-component',
+        'new-component.component'
+      );
 
       expect(filesToMove).to.deep.equal([
         {
@@ -117,6 +139,7 @@ describe('FilesRelatedToStub', () => {
       const fileDetails: OriginalFileDetails = {
         path: '/project/src/app/component',
         stub: 'component',
+        fileWithoutType: 'component.component',
         filePath: '/project/src/app/component/component.component.ts',
         file: 'component.component.ts',
       };
@@ -128,13 +151,17 @@ describe('FilesRelatedToStub', () => {
       ];
 
       workspaceFindFilesStub.resolves(mockUris);
+      readFileStub.resolves(componentFileContent);
 
       const instance = await FilesRelatedToStub.init(
         fileDetails,
         '/project',
         'component'
       );
-      const filesToMove = instance.getFilesToMove('new-component');
+      const filesToMove = instance.getFilesToMove(
+        'new-component',
+        'new-component.component'
+      );
 
       expect(filesToMove[0].filePath).to.equal(
         '/project/src/app/component/component.component.ts'

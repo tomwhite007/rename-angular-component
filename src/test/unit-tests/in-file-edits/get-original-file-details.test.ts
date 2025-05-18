@@ -11,6 +11,7 @@ describe('getOriginalFileDetails', () => {
       path: '/path/to',
       file: 'test.component.ts',
       stub: 'test',
+      fileWithoutType: 'test.component',
       filePath: '/path/to/test.component.ts',
     });
   });
@@ -22,6 +23,7 @@ describe('getOriginalFileDetails', () => {
       path: '/path/to',
       file: 'test.service.ts',
       stub: 'test',
+      fileWithoutType: 'test.service',
       filePath: '/path/to/test.service.ts',
     });
   });
@@ -33,6 +35,7 @@ describe('getOriginalFileDetails', () => {
       path: '/path/to',
       file: 'test.directive.ts',
       stub: 'test',
+      fileWithoutType: 'test.directive',
       filePath: '/path/to/test.directive.ts',
     });
   });
@@ -44,6 +47,7 @@ describe('getOriginalFileDetails', () => {
       path: '/path/to',
       file: 'test.component.spec.ts',
       stub: 'test',
+      fileWithoutType: 'test.component',
       filePath: '/path/to/test.component.spec.ts',
     });
   });
@@ -55,6 +59,7 @@ describe('getOriginalFileDetails', () => {
       path: '/path/to',
       file: 'test.component.scss',
       stub: 'test',
+      fileWithoutType: 'test.component',
       filePath: '/path/to/test.component.scss',
     });
   });
@@ -66,6 +71,7 @@ describe('getOriginalFileDetails', () => {
       path: 'c:/path/to',
       file: 'test.component.ts',
       stub: 'test',
+      fileWithoutType: 'test.component',
       filePath: 'c:/path/to/test.component.ts',
     });
   });

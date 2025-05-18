@@ -17,24 +17,24 @@ suite('Suite Scenario 5', () => {
         {
           filePath: './src/app/products/products.component.spec.ts',
           construct: 'component',
-          newStub: 'tom-test',
+          newFilenameInput: 'tom-test',
         },
         {
           filePath:
             './projects/shared/src/lib/multiply-by-ten/multiply-by-ten.directive.ts',
           construct: 'directive',
-          newStub: 'dir-prop',
+          newFilenameInput: 'dir-prop',
         },
         {
           filePath:
             './projects/shared/src/lib/multiply-by-twenty/multiply-by-twenty.directive.spec.ts',
           construct: 'directive',
-          newStub: 'dir-identifier',
+          newFilenameInput: 'dir-identifier',
         },
         {
           filePath: './src/app/tom-test/products.module.ts',
           construct: 'module',
-          newStub: 'tom-test',
+          newFilenameInput: 'tom-test',
         },
       ],
       fileDiffPath: './src/test/suite/diffs/test-rename-spa.txt',

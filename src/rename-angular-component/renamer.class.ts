@@ -41,7 +41,7 @@ export class Renamer {
   private renameFolder!: boolean;
   private fileMoveJobs!: FileItem[];
   private selectorTransfer!: SelectorTransfer;
-  public testBypass?: { stub: string };
+  public testBypass?: { newFilenameInput: string };
 
   constructor(
     private indexerInitialisePromise: Thenable<any>,
@@ -252,7 +252,7 @@ export class Renamer {
       }
 
       this.newFilenameInput =
-        this.testBypass?.stub ?? // test harness input text
+        this.testBypass?.newFilenameInput ?? // test harness input text
         (await vscode.window.showInputBox({
           title: this.title,
           prompt: `Enter the new ${this.construct} filename.`,

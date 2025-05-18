@@ -17,7 +17,7 @@ suite('Suite Scenario 2', () => {
           filePath:
             './apps/Shop/src/app/registration/registration.component.scss',
           construct: 'component',
-          newStub: 'tom-test',
+          newFilenameInput: 'tom-test',
         },
       ],
       fileDiffPath: './src/test/suite/diffs/shp-wild-paths.txt',

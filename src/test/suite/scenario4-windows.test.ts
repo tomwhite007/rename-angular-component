@@ -17,7 +17,7 @@ suite('Suite Scenario 4', () => {
           filePath:
             './projects/my-service-lib/src/lib/my-service-lib.component.ts',
           construct: 'service',
-          newStub: 'tom-test',
+          newFilenameInput: 'tom-test',
         },
       ],
       fileDiffPath: './src/test/suite/diffs/test-paths-app.txt',

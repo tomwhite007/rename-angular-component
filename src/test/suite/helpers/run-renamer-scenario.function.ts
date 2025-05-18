@@ -12,7 +12,7 @@ import { timeoutPause } from '../../../utils/timeout-pause';
 export interface RenameCallConfig {
   filePath: string;
   construct: AngularConstruct;
-  newStub: string;
+  newFilenameInput: string;
 }
 
 export async function runRenamerScenario(
@@ -49,7 +49,7 @@ export async function runRenamerScenario(
   );
 
   for (const rename of renames) {
-    renamer.testBypass = { stub: rename.newStub };
+    renamer.testBypass = { newFilenameInput: rename.newFilenameInput };
     await renamer.rename(
       rename.construct,
       vscode.Uri.file(path.join(projectRoot, rename.filePath))

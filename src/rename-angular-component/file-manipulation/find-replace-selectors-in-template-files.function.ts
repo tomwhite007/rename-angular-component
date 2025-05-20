@@ -26,13 +26,12 @@ export async function findReplaceSelectorsInTemplateFiles(
       html = renameSelectorInTemplate(html, originalSelector, newSelector);
     }
     if (html) {
-      console.log(uri.fsPath, html, 'utf-8');
       await fs.writeFileAsync(uri.fsPath, html, 'utf-8');
       userMessage.logInfoToChannel([uri.fsPath], false);
       changed++;
     }
   }
-  console.log(
-    `Processed template files. Replaced selectors in ${changed} files`
-  );
+  const logMsg = `Processed template files. Replaced selectors in ${changed} files`;
+  console.log(logMsg);
+  userMessage.logInfoToChannel([logMsg], false);
 }

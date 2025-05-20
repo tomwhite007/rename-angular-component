@@ -41,7 +41,6 @@ export async function getCoreFileDecorator(
     }
   }
 
-  // console.log('sourceText', sourceText);
   throw new Error(
     classOrFunction
       ? `${classOrFunction} Name found but no decorator. Stopping.`

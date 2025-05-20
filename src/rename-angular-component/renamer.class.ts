@@ -24,6 +24,7 @@ import { getCoreFilePath } from './in-file-edits/get-core-file-path.function';
 import { getNewStubFromFileWithoutExtension } from './in-file-edits/get-new-stub-from-file-without-extension';
 import { getOriginalClassName } from './in-file-edits/get-original-class-name.function';
 import { getOriginalFileDetails } from './in-file-edits/get-original-file-details.function';
+import { removeExtension } from './in-file-edits/remove-extension';
 import { DebugLogger } from './logging/debug-logger.class';
 import { reportErrors } from './logging/error-handler.function';
 import { UserMessage } from './logging/user-message.class';
@@ -263,6 +264,7 @@ export class Renamer {
           value: this.originalFileDetails.fileWithoutType,
         })) ??
         '';
+      this.newFilenameInput = removeExtension(this.newFilenameInput); // remove extension if any
       this.processTimerStart = Date.now();
 
       if (!this.newFilenameInput) {

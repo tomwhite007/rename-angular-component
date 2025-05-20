@@ -168,7 +168,11 @@ export class Renamer {
       coreFilePath as string,
       this.construct
     );
-    const newClassName = getClassName(this.newStub, this.construct);
+    const newClassName = getClassName(
+      this.newStub,
+      this.newFilenameInput,
+      this.construct
+    );
 
     this.selectorTransfer = new SelectorTransfer();
 

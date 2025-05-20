@@ -256,11 +256,17 @@ export class Renamer {
         return false;
       }
 
+      const inputSuffixNote = this.originalFileDetails.fileWithoutType.endsWith(
+        `.${this.construct}`
+      )
+        ? `(Angular '.${this.construct}' suffix is optional)`
+        : '';
+
       this.newFilenameInput =
         this.testBypass?.newFilenameInput ?? // test harness input text
         (await vscode.window.showInputBox({
           title: this.title,
-          prompt: `Enter the new ${this.construct} filename.`,
+          prompt: `Enter the new ${this.construct} filename. ${inputSuffixNote}`,
           value: this.originalFileDetails.fileWithoutType,
         })) ??
         '';

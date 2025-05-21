@@ -17,7 +17,7 @@ suite('Suite Scenario 6', () => {
         {
           filePath: './src/app/app.component.css',
           construct: 'component',
-          newFilenameInput: 'tom-test',
+          newFilenameInput: 'tom-test.component',
         },
       ],
       fileDiffPath:

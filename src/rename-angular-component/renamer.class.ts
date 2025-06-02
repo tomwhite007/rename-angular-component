@@ -19,8 +19,8 @@ import {
   getCoreClassEdits,
   SelectorTransfer,
 } from './in-file-edits/custom-edits';
-import { getClassName } from './in-file-edits/get-class-name.function';
 import { getCoreFilePath } from './in-file-edits/get-core-file-path.function';
+import { getNewClassName } from './in-file-edits/get-new-class-name.function';
 import { getNewStubFromFileWithoutExtension } from './in-file-edits/get-new-stub-from-file-without-extension';
 import { getOriginalClassName } from './in-file-edits/get-original-class-name.function';
 import { getOriginalFileDetails } from './in-file-edits/get-original-file-details.function';
@@ -169,7 +169,7 @@ export class Renamer {
       coreFilePath as string,
       this.construct
     );
-    const newClassName = getClassName(
+    const newClassName = getNewClassName(
       this.newStub,
       this.newFilenameInput,
       this.construct

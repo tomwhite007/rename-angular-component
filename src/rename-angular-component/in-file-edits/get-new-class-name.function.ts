@@ -1,7 +1,7 @@
 import { classify } from '../../angular-cli/strings';
 import { AngularConstruct } from '../definitions/file.interfaces';
 
-export function getClassName(
+export function getNewClassName(
   newStub: string,
   newFilenameInput: string,
   construct: AngularConstruct

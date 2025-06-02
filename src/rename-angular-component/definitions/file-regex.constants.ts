@@ -1,9 +1,5 @@
-import { AngularConstruct } from './file.interfaces';
-
 const componentRegexPartial = `(?=\\.(spec\\.ts|scss|css|sass|less|html|ts)$)`;
 const generalRegexPartial = `(?=\\.(spec.ts|ts)$)`;
-const generalRegexPartialWithConstruct = (construct: AngularConstruct) =>
-  `(?=\\.${construct}\\.(spec.ts|ts)$)`;
 
 const anyConstructRegexPartial = `(?=\\.[\\w\\-_]+\\.(spec\\.ts|scss|css|sass|less|html|ts)$)`;
 export const likeFilesRegexPartialLookup: { [key: string]: string } = {
@@ -11,8 +7,8 @@ export const likeFilesRegexPartialLookup: { [key: string]: string } = {
   directive: generalRegexPartial,
   service: generalRegexPartial,
   guard: generalRegexPartial,
-  module: generalRegexPartialWithConstruct('module'),
-  pipe: generalRegexPartialWithConstruct('pipe'),
+  module: generalRegexPartial,
+  pipe: generalRegexPartial,
   any: anyConstructRegexPartial,
 };
 

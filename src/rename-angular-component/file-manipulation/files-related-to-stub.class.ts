@@ -60,7 +60,6 @@ export class FilesRelatedToStub {
     const glob = `${fileDetails.path.replace(projectRoot + '/', '')}/**/*`;
     const uris = await workspace.findFiles(glob, '**/node_modules/**', 10000);
 
-    // TODO: need more login here to match stub PLUS construct postfix if originally present
     this.constructFilesRegex = RegExp(
       `${escapeRegex(fileDetails.fileWithoutType)}${
         likeFilesRegexPartialLookup[construct]

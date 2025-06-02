@@ -25,7 +25,7 @@ index e1f79e9..d8e3853 100644
      <app-book-stuff *ngSwitchCase="1"></app-book-stuff>
    </app-tabs>
 diff --git a/src/app/shared/book-ui/book-ui.module.ts b/src/app/shared/book-ui/book-ui.module.ts
-index c162a7b..582a24f 100644
+index c162a7b..cadc033 100644
 --- a/src/app/shared/book-ui/book-ui.module.ts
 +++ b/src/app/shared/book-ui/book-ui.module.ts
 @@ -1,7 +1,7 @@
@@ -33,7 +33,7 @@ index c162a7b..582a24f 100644
  import { CommonModule } from '@angular/common';
  import { AddBookFormComponent } from './add-book-form/add-book-form.component';
 -import { BookListComponent } from './book-list/book-list.component';
-+import { TomTestComponent } from './tom-test/tom-test.component';
++import { TomTest } from './tom-test/tom-test';
  import { BookStuffComponent } from './book-stuff/book-stuff.component';
  import { ShowFormCheckboxComponent } from './show-form-checkbox/show-form-checkbox.component';
  import { TabsComponent } from './tabs/tabs.component';
@@ -42,7 +42,7 @@ index c162a7b..582a24f 100644
  @NgModule({
    declarations: [
 -    BookListComponent,
-+    TomTestComponent,
++    TomTest,
      AddBookFormComponent,
      BookStuffComponent,
      ShowFormCheckboxComponent,
@@ -51,58 +51,58 @@ index c162a7b..582a24f 100644
    imports: [CommonModule, FormsModule, ReactiveFormsModule],
    exports: [
 -    BookListComponent,
-+    TomTestComponent,
++    TomTest,
      AddBookFormComponent,
      BookStuffComponent,
      ShowFormCheckboxComponent,
-diff --git a/src/app/shared/book-ui/book-list/book-list.component.html b/src/app/shared/book-ui/tom-test/tom-test.component.html
+diff --git a/src/app/shared/book-ui/book-list/book-list.component.html b/src/app/shared/book-ui/tom-test/tom-test.html
 similarity index 100%
 rename from src/app/shared/book-ui/book-list/book-list.component.html
-rename to src/app/shared/book-ui/tom-test/tom-test.component.html
-diff --git a/src/app/shared/book-ui/book-list/book-list.component.scss b/src/app/shared/book-ui/tom-test/tom-test.component.scss
+rename to src/app/shared/book-ui/tom-test/tom-test.html
+diff --git a/src/app/shared/book-ui/book-list/book-list.component.scss b/src/app/shared/book-ui/tom-test/tom-test.scss
 similarity index 100%
 rename from src/app/shared/book-ui/book-list/book-list.component.scss
-rename to src/app/shared/book-ui/tom-test/tom-test.component.scss
-diff --git a/src/app/shared/book-ui/book-list/book-list.component.spec.ts b/src/app/shared/book-ui/tom-test/tom-test.component.spec.ts
+rename to src/app/shared/book-ui/tom-test/tom-test.scss
+diff --git a/src/app/shared/book-ui/book-list/book-list.component.spec.ts b/src/app/shared/book-ui/tom-test/tom-test.spec.ts
 similarity index 55%
 rename from src/app/shared/book-ui/book-list/book-list.component.spec.ts
-rename to src/app/shared/book-ui/tom-test/tom-test.component.spec.ts
-index ae9736b..4101a7b 100644
+rename to src/app/shared/book-ui/tom-test/tom-test.spec.ts
+index ae9736b..58b3866 100644
 --- a/src/app/shared/book-ui/book-list/book-list.component.spec.ts
-+++ b/src/app/shared/book-ui/tom-test/tom-test.component.spec.ts
++++ b/src/app/shared/book-ui/tom-test/tom-test.spec.ts
 @@ -1,19 +1,19 @@
  import { ComponentFixture, TestBed } from '@angular/core/testing';
  
 -import { BookListComponent } from './book-list.component';
-+import { TomTestComponent } from './tom-test.component';
++import { TomTest } from './tom-test';
  
 -describe('BookListComponent', () => {
 -  let component: BookListComponent;
 -  let fixture: ComponentFixture<BookListComponent>;
-+describe('TomTestComponent', () => {
-+  let component: TomTestComponent;
-+  let fixture: ComponentFixture<TomTestComponent>;
++describe('TomTest', () => {
++  let component: TomTest;
++  let fixture: ComponentFixture<TomTest>;
  
    beforeEach(async () => {
      await TestBed.configureTestingModule({
 -      declarations: [BookListComponent],
-+      declarations: [TomTestComponent],
++      declarations: [TomTest],
      }).compileComponents();
    });
  
    beforeEach(() => {
 -    fixture = TestBed.createComponent(BookListComponent);
-+    fixture = TestBed.createComponent(TomTestComponent);
++    fixture = TestBed.createComponent(TomTest);
      component = fixture.componentInstance;
      fixture.detectChanges();
    });
-diff --git a/src/app/shared/book-ui/book-list/book-list.component.ts b/src/app/shared/book-ui/tom-test/tom-test.component.ts
+diff --git a/src/app/shared/book-ui/book-list/book-list.component.ts b/src/app/shared/book-ui/tom-test/tom-test.ts
 similarity index 67%
 rename from src/app/shared/book-ui/book-list/book-list.component.ts
-rename to src/app/shared/book-ui/tom-test/tom-test.component.ts
-index 730e54b..59cdfa8 100644
+rename to src/app/shared/book-ui/tom-test/tom-test.ts
+index 730e54b..be10976 100644
 --- a/src/app/shared/book-ui/book-list/book-list.component.ts
-+++ b/src/app/shared/book-ui/tom-test/tom-test.component.ts
++++ b/src/app/shared/book-ui/tom-test/tom-test.ts
 @@ -2,12 +2,12 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
  import { BooksEntity } from '../../../+state/books.models';
  
@@ -111,12 +111,12 @@ index 730e54b..59cdfa8 100644
 -  templateUrl: './book-list.component.html',
 -  styleUrls: ['./book-list.component.scss'],
 +  selector: 'app-tom-test',
-+  templateUrl: './tom-test.component.html',
-+  styleUrls: ['./tom-test.component.scss'],
++  templateUrl: './tom-test.html',
++  styleUrls: ['./tom-test.scss'],
    changeDetection: ChangeDetectionStrategy.OnPush,
  })
 -export class BookListComponent {
-+export class TomTestComponent {
++export class TomTest {
    @Input() books?: BooksEntity[];
  
    trackByFn(index: number, item: BooksEntity) {

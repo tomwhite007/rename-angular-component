@@ -7,6 +7,7 @@ import { FileItem } from '../move-ts-indexer/file-item';
 import { timeoutPause } from '../utils/timeout-pause';
 import {
   AngularConstruct,
+  AngularConstructOrUnknownFile,
   OriginalFileDetails,
 } from './definitions/file.interfaces';
 import { getProjectRoot } from './definitions/get-project-root-file-path.function';
@@ -35,6 +36,7 @@ export class Renamer {
   private construct!: AngularConstruct;
   private title!: string;
   private originalFileDetails!: Readonly<OriginalFileDetails>;
+  private filesRelatedToStub?: FilesRelatedToStub;
   private projectRoot!: string;
   private newStub!: string;
   private newFilenameInput!: string;
@@ -51,19 +53,11 @@ export class Renamer {
     private fileMoveHandler: FileMoveHandler
   ) {}
 
-  async rename(_construct: AngularConstruct | 'file', selectedUri: vscode.Uri) {
-    console.log('Rename process start');
-    this.debugLogger.log('## Debug Rename Start ##');
-
-    if (_construct === 'file') {
-      this.title = 'Rename File';
-      this.userMessage.logInfoToChannel([
-        '',
-        `Rename generic file '${selectedUri.fsPath}'`,
-        'Stopping now as this is not supported.',
-      ]);
-      return;
-    }
+  async rename(
+    _construct: AngularConstructOrUnknownFile,
+    selectedUri: vscode.Uri
+  ) {
+    this.debugLogger.logToConsole('## Debug Rename Start ##');
 
     const detailsLoaded = await this.prepRenameDetails(_construct, selectedUri);
     if (!detailsLoaded) {
@@ -129,6 +123,11 @@ export class Renamer {
   }
 
   private async prepFileMoveJobs(): Promise<boolean> {
+    if (!this.filesRelatedToStub) {
+      this.debugLogger.log('filesRelatedToStub is not set, stopping.');
+      return false;
+    }
+
     this.debugLogger.log(
       'find related glob: ',
       `${this.originalFileDetails.path.replace(
@@ -137,14 +136,9 @@ export class Renamer {
       )}/**/*`
     );
 
-    const filesRelatedToStub = await FilesRelatedToStub.init(
-      this.originalFileDetails,
-      this.projectRoot,
-      this.construct
-    );
-    this.renameFolder = filesRelatedToStub.folderNameSameAsStub;
+    this.renameFolder = this.filesRelatedToStub.folderNameSameAsStub;
 
-    const filesToMove = filesRelatedToStub.getFilesToMove(
+    const filesToMove = this.filesRelatedToStub.getFilesToMove(
       this.newStub,
       this.newFilenameInput
     );
@@ -222,17 +216,14 @@ export class Renamer {
   }
 
   private async prepRenameDetails(
-    _construct: AngularConstruct,
+    _construct: AngularConstructOrUnknownFile,
     selectedUri: vscode.Uri
   ): Promise<boolean> {
     try {
-      this.construct = _construct;
-      this.title = `Rename Angular ${classify(this.construct)}`;
-
       // Handle if called from command menu
       if (!selectedUri) {
         const userEntered = await noSelectedFileHandler(
-          this.construct,
+          _construct,
           this.title,
           this.userMessage
         );
@@ -248,6 +239,23 @@ export class Renamer {
         getProjectRoot(selectedUri) as string
       );
       this.debugLogger.setWorkspaceRoot(this.projectRoot);
+
+      this.filesRelatedToStub = await FilesRelatedToStub.init(
+        this.originalFileDetails,
+        this.projectRoot,
+        _construct
+      );
+
+      if (
+        !this.filesRelatedToStub.derivedConstruct ||
+        (_construct !== 'file' &&
+          _construct !== this.filesRelatedToStub.derivedConstruct)
+      ) {
+        this.debugLogger.logToConsole('Construct could not be derived');
+        return false;
+      }
+      this.construct = this.filesRelatedToStub.derivedConstruct;
+      this.title = `Rename Angular ${classify(this.construct)}`;
 
       if (checkForOpenUnsavedEditors()) {
         this.userMessage.popupMessage(

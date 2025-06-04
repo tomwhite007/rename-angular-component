@@ -2,7 +2,7 @@ import { AngularConstruct } from '../definitions/file.interfaces';
 
 export function getConstructFromDecorator(
   decoratorName: string
-): AngularConstruct {
+): AngularConstruct | undefined {
   switch (decoratorName) {
     case 'Component':
       return 'component';
@@ -17,6 +17,6 @@ export function getConstructFromDecorator(
     case 'Guard':
       return 'guard';
     default:
-      throw new Error(`Unknown decorator name: ${decoratorName}`);
+      return undefined;
   }
 }

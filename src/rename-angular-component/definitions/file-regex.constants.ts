@@ -1,7 +1,7 @@
 const componentRegexPartial = `(?=\\.(spec\\.ts|scss|css|sass|less|html|ts)$)`;
 const generalRegexPartial = `(?=\\.(spec.ts|ts)$)`;
 
-const anyConstructRegexPartial = `(?=\\.[\\w\\-_]+\\.(spec\\.ts|scss|css|sass|less|html|ts)$)`;
+const anyConstructRegexPartial = `(?=(\\.[\\w\\-_]+)?\\.(spec\\.ts|scss|css|sass|less|html|ts)$)`;
 export const likeFilesRegexPartialLookup: { [key: string]: string } = {
   component: componentRegexPartial,
   directive: generalRegexPartial,
@@ -9,6 +9,7 @@ export const likeFilesRegexPartialLookup: { [key: string]: string } = {
   guard: generalRegexPartial,
   module: generalRegexPartial,
   pipe: generalRegexPartial,
+  file: generalRegexPartial,
   any: anyConstructRegexPartial,
 };
 

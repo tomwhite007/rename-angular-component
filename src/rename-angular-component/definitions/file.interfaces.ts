@@ -13,3 +13,5 @@ export interface OriginalFileDetails {
   stub: string;
   filePath: string;
 }
+
+export type AngularConstructOrUnknownFile = AngularConstruct | 'file';

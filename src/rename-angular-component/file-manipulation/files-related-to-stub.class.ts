@@ -6,6 +6,7 @@ import {
 } from '../definitions/file-regex.constants';
 import {
   AngularConstruct,
+  AngularConstructOrUnknownFile,
   OriginalFileDetails,
 } from '../definitions/file.interfaces';
 import { getConstructFromDecorator } from '../in-file-edits/get-construct-from-decorator.function';
@@ -31,11 +32,12 @@ export class FilesRelatedToStub {
   fileDetails: FileDetails[] = [];
   constructFilesRegex!: RegExp;
   relatedFilesRegex!: RegExp;
+  derivedConstruct?: AngularConstruct;
 
   static async init(
     fileDetails: OriginalFileDetails,
     projectRoot: string,
-    construct: AngularConstruct
+    construct: AngularConstructOrUnknownFile
   ) {
     const instance = new FilesRelatedToStub();
     await instance.catalogueFilesInCurrentFolder(
@@ -49,7 +51,7 @@ export class FilesRelatedToStub {
   private async catalogueFilesInCurrentFolder(
     fileDetails: OriginalFileDetails,
     projectRoot: string,
-    construct: AngularConstruct
+    construct: AngularConstructOrUnknownFile
   ) {
     this.originalFileDetails = fileDetails;
 
@@ -77,6 +79,13 @@ export class FilesRelatedToStub {
       const sameStub = !!filePath.match(this.relatedFilesRegex);
       const isTsFileButNotSpec = !!filePath.match(tsFileButNotSpec);
 
+      if (sameConstruct && sameStub && isTsFileButNotSpec) {
+        this.derivedConstruct = await this.deriveConstructFromFileContent(
+          filePath,
+          fileDetails.stub
+        );
+      }
+
       this.fileDetails.push({
         filePath,
         sameConstruct,
@@ -85,7 +94,7 @@ export class FilesRelatedToStub {
           sameConstruct &&
           sameStub &&
           isTsFileButNotSpec &&
-          (await this.getIsCoreConstruct(filePath, fileDetails.stub)),
+          !!this.derivedConstruct,
       });
     }
   }
@@ -114,10 +123,13 @@ export class FilesRelatedToStub {
       }));
   }
 
-  async getIsCoreConstruct(filePath: string, stub: string) {
+  async deriveConstructFromFileContent(
+    filePath: string,
+    stub: string
+  ): Promise<AngularConstruct | undefined> {
     const decorator = await getCoreFileDecorator(filePath, stub);
     const construct = getConstructFromDecorator(decorator);
-    return !!construct;
+    return construct;
   }
 
   private sortFileDetails(a: FileDetails, b: FileDetails) {

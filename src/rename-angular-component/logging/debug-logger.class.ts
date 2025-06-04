@@ -7,6 +7,11 @@ export class DebugLogger {
 
   constructor(private logToFile: boolean) {}
 
+  logToConsole(...text: string[]) {
+    console.log(...text);
+    this.log(...text);
+  }
+
   log(...text: string[]) {
     let fileContents = this.getCurrentFileContents();
 

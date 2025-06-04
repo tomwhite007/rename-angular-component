@@ -1,10 +1,10 @@
 import fs from 'fs-extra-promise';
 import { Uri, window } from 'vscode';
-import { AngularConstruct } from '../definitions/file.interfaces';
+import { AngularConstructOrUnknownFile } from '../definitions/file.interfaces';
 import { UserMessage } from '../logging/user-message.class';
 
 export async function noSelectedFileHandler(
-  construct: AngularConstruct,
+  construct: AngularConstructOrUnknownFile,
   title: string,
   userMessage: UserMessage
 ): Promise<Uri | null> {

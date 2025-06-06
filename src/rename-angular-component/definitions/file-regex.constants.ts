@@ -9,7 +9,7 @@ export const likeFilesRegexPartialLookup: { [key: string]: string } = {
   guard: generalRegexPartial,
   module: generalRegexPartial,
   pipe: generalRegexPartial,
-  file: generalRegexPartial,
+  file: componentRegexPartial,
   any: anyConstructRegexPartial,
 };
 

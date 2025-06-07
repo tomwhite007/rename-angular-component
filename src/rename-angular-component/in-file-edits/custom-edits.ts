@@ -1,10 +1,13 @@
 import ts from 'typescript';
-import { classify } from '../../angular-cli/strings';
+import { camelize, classify } from '../../angular-cli/strings';
 import {
   GenericEdit,
   GenericEditsCallback,
 } from '../../move-ts-indexer/apply-generic-edits';
-import { FoundItem } from '../../move-ts-indexer/util/shared-interfaces';
+import {
+  FoundItem,
+  FoundItemType,
+} from '../../move-ts-indexer/util/shared-interfaces';
 import { escapeRegex } from '../../utils/escape-regex';
 import { AngularConstruct } from '../definitions/file.interfaces';
 import { generateNewSelector } from './generate-new-selector.function';
@@ -56,6 +59,13 @@ export function getCoreClassEdits(
               newFileStub
             );
             replacement = `'${selectorTransfer.newSelector}'`;
+            break;
+          case 'name':
+            if (construct === 'pipe') {
+              selectorTransfer.oldSelector = foundItem.itemText;
+              selectorTransfer.newSelector = camelize(newFileStub);
+              replacement = `'${selectorTransfer.newSelector}'`;
+            }
             break;
           case 'templateUrl':
           case 'styleUrl':
@@ -135,11 +145,12 @@ function getCoreClassFoundItems(
         node.name?.escapedText === originalClassName ||
         classNameChangedAlready
       ) {
-        const decoratorPropertiesRequired = [
+        const decoratorPropertiesRequired: FoundItem['itemType'][] = [
           'selector',
           'templateUrl',
           'styleUrl',
           'styleUrls',
+          'name',
         ];
 
         const decoratorName = classify(construct);
@@ -160,7 +171,9 @@ function getCoreClassFoundItems(
                 if (
                   ts.isPropertyAssignment(prop) &&
                   ts.isIdentifier(prop.name) &&
-                  decoratorPropertiesRequired.includes(prop.name.text)
+                  decoratorPropertiesRequired.includes(
+                    prop.name.text as FoundItemType
+                  )
                 ) {
                   // 'selector', 'templateUrl' and 'styleUrl' are StringLiteral
                   if (ts.isStringLiteral(prop.initializer)) {

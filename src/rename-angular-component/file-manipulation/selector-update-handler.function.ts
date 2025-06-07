@@ -1,11 +1,12 @@
 import { CONSTRUCTS_WITH_SELECTORS } from '../definitions/constructs-with-selectors';
+import { AngularConstruct } from '../definitions/file.interfaces';
 import { SelectorTransfer } from '../in-file-edits/custom-edits';
 import { DebugLogger } from '../logging/debug-logger.class';
 import { UserMessage } from '../logging/user-message.class';
 import { findReplaceSelectorsInTemplateFiles } from './find-replace-selectors-in-template-files.function';
 
 export async function updateSelectorsInTemplates(
-  construct: string,
+  construct: AngularConstruct,
   selectorTransfer: SelectorTransfer,
   userMessage: UserMessage,
   debugLogger: DebugLogger
@@ -16,7 +17,8 @@ export async function updateSelectorsInTemplates(
         await findReplaceSelectorsInTemplateFiles(
           selectorTransfer.oldSelector,
           selectorTransfer.newSelector,
-          userMessage
+          userMessage,
+          construct
         );
       } else {
         userMessage.logInfoToChannel([
@@ -25,7 +27,7 @@ export async function updateSelectorsInTemplates(
         ]);
       }
 
-      debugLogger.log(
+      debugLogger.logToConsole(
         'oldSelector: ' + selectorTransfer.oldSelector,
         'newSelector: ' + selectorTransfer.newSelector
       );

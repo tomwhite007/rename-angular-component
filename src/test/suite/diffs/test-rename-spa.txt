@@ -189,15 +189,17 @@ index a81169d..e1ed888 100644
  
 diff --git a/src/app/products/products.component.html b/src/app/products/products.component.html
 deleted file mode 100644
-index bec9393..0000000
+index d43afff..0000000
 --- a/src/app/products/products.component.html
 +++ /dev/null
-@@ -1,5 +0,0 @@
+@@ -1,7 +0,0 @@
 -<p>products works!</p>
 -
 -<p [libMultiplyByTen]="99"></p>
 -
 -<p [libMultiplyByTwenty]="99"></p>
+-
+-<p>product: {{ 99 | product }}</p>
 diff --git a/src/app/products/products.component.ts b/src/app/products/products.component.ts
 deleted file mode 100644
 index b42ad70..0000000
@@ -219,6 +221,14 @@ index b42ad70..0000000
 -  }
 -
 -}
+diff --git a/src/app/products/product.pipe.spec.ts b/src/app/tom-test/product.pipe.spec.ts
+similarity index 100%
+rename from src/app/products/product.pipe.spec.ts
+rename to src/app/tom-test/product.pipe.spec.ts
+diff --git a/src/app/products/product.pipe.ts b/src/app/tom-test/product.pipe.ts
+similarity index 100%
+rename from src/app/products/product.pipe.ts
+rename to src/app/tom-test/product.pipe.ts
 diff --git a/src/app/products/products-routing.module.ts b/src/app/tom-test/products-routing.module.ts
 similarity index 63%
 rename from src/app/products/products-routing.module.ts
@@ -239,15 +249,17 @@ index 72d8bd3..0bd5c33 100644
    imports: [RouterModule.forChild(routes)],
 diff --git a/src/app/tom-test/tom-test.component.html b/src/app/tom-test/tom-test.component.html
 new file mode 100644
-index 0000000..014f286
+index 0000000..a35a869
 --- /dev/null
 +++ b/src/app/tom-test/tom-test.component.html
-@@ -0,0 +1,5 @@
+@@ -0,0 +1,7 @@
 +<p>products works!</p>
 +
 +<p [libDirProp]="99"></p>
 +
 +<p [libDirIdentifier]="99"></p>
++
++<p>product: {{ 99 | product }}</p>
 diff --git a/src/app/products/products.component.scss b/src/app/tom-test/tom-test.component.scss
 similarity index 100%
 rename from src/app/products/products.component.scss
@@ -307,23 +319,24 @@ index 0000000..c4a0e53
 +
 +}
 diff --git a/src/app/products/products.module.ts b/src/app/tom-test/tom-test.module.ts
-similarity index 68%
+similarity index 69%
 rename from src/app/products/products.module.ts
 rename to src/app/tom-test/tom-test.module.ts
-index a2fe432..090ba81 100644
+index ee94bd8..88e3900 100644
 --- a/src/app/products/products.module.ts
 +++ b/src/app/tom-test/tom-test.module.ts
-@@ -2,11 +2,11 @@ import { NgModule } from '@angular/core';
+@@ -2,12 +2,12 @@ import { NgModule } from '@angular/core';
  import { CommonModule } from '@angular/common';
  
  import { ProductsRoutingModule } from './products-routing.module';
 -import { ProductsComponent } from './products.component';
 +import { TomTestComponent } from './tom-test.component';
  import { SharedModule } from '@shared';
+ import { ProductPipe } from './product.pipe';
  
  @NgModule({
--  declarations: [ProductsComponent],
-+  declarations: [TomTestComponent],
+-  declarations: [ProductsComponent, ProductPipe],
++  declarations: [TomTestComponent, ProductPipe],
    imports: [CommonModule, ProductsRoutingModule, SharedModule],
  })
 -export class ProductsModule {}

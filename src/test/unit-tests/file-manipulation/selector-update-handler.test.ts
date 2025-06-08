@@ -46,7 +46,7 @@ describe('updateSelectorsInTemplates', () => {
     expect(findReplaceSelectorsInTemplateFilesStub.calledOnce).to.be.true;
     expect(
       findReplaceSelectorsInTemplateFilesStub.firstCall.args
-    ).to.deep.equal(['app-old', 'app-new', userMessage]);
+    ).to.deep.equal(['app-old', 'app-new', userMessage, 'component']);
   });
 
   it('should not update selectors when they are the same', async () => {

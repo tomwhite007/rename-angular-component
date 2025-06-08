@@ -26,7 +26,12 @@ describe('findReplaceSelectorsInTemplateFiles', () => {
   });
 
   it('should not process files when original and new selectors are the same', async () => {
-    await findReplaceSelectorsInTemplateFiles('same', 'same', userMessage);
+    await findReplaceSelectorsInTemplateFiles(
+      'same',
+      'same',
+      userMessage,
+      'component'
+    );
     expect(workspaceFindFilesStub.called).to.be.false;
   });
 
@@ -42,7 +47,8 @@ describe('findReplaceSelectorsInTemplateFiles', () => {
     await findReplaceSelectorsInTemplateFiles(
       'app-old-selector',
       'app-new-selector',
-      userMessage
+      userMessage,
+      'component'
     );
 
     expect(workspaceFindFilesStub.calledOnce).to.be.true;
@@ -61,7 +67,8 @@ describe('findReplaceSelectorsInTemplateFiles', () => {
     await findReplaceSelectorsInTemplateFiles(
       'app-old-selector',
       'app-new-selector',
-      userMessage
+      userMessage,
+      'component'
     );
 
     expect(workspaceFindFilesStub.calledOnce).to.be.true;

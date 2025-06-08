@@ -36,6 +36,11 @@ suite('Suite Scenario 5', () => {
           construct: 'module',
           newFilenameInput: 'tom-test.module',
         },
+        {
+          filePath: './src/app/tom-test/product.pipe.ts',
+          construct: 'file',
+          newFilenameInput: 'formatter',
+        },
       ],
       fileDiffPath: './src/test/suite/diffs/test-rename-spa.txt',
     });

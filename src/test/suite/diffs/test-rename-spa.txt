@@ -187,6 +187,20 @@ index a81169d..e1ed888 100644
    },
  ];
  
+diff --git a/src/app/products/product.pipe.spec.ts b/src/app/products/product.pipe.spec.ts
+deleted file mode 100644
+index 98309a8..0000000
+--- a/src/app/products/product.pipe.spec.ts
++++ /dev/null
+@@ -1,8 +0,0 @@
+-import { ProductPipe } from './product.pipe';
+-
+-describe('ProductPipe', () => {
+-  it('create an instance', () => {
+-    const pipe = new ProductPipe();
+-    expect(pipe).toBeTruthy();
+-  });
+-});
 diff --git a/src/app/products/products.component.html b/src/app/products/products.component.html
 deleted file mode 100644
 index d43afff..0000000
@@ -221,14 +235,39 @@ index b42ad70..0000000
 -  }
 -
 -}
-diff --git a/src/app/products/product.pipe.spec.ts b/src/app/tom-test/product.pipe.spec.ts
-similarity index 100%
-rename from src/app/products/product.pipe.spec.ts
-rename to src/app/tom-test/product.pipe.spec.ts
-diff --git a/src/app/products/product.pipe.ts b/src/app/tom-test/product.pipe.ts
-similarity index 100%
+diff --git a/src/app/tom-test/formatter.spec.ts b/src/app/tom-test/formatter.spec.ts
+new file mode 100644
+index 0000000..8fa674c
+--- /dev/null
++++ b/src/app/tom-test/formatter.spec.ts
+@@ -0,0 +1,8 @@
++import { FormatterPipe } from './formatter';
++
++describe('FormatterPipe', () => {
++  it('create an instance', () => {
++    const pipe = new FormatterPipe();
++    expect(pipe).toBeTruthy();
++  });
++});
+diff --git a/src/app/products/product.pipe.ts b/src/app/tom-test/formatter.ts
+similarity index 66%
 rename from src/app/products/product.pipe.ts
-rename to src/app/tom-test/product.pipe.ts
+rename to src/app/tom-test/formatter.ts
+index 03aadfa..eedf0c3 100644
+--- a/src/app/products/product.pipe.ts
++++ b/src/app/tom-test/formatter.ts
+@@ -1,9 +1,9 @@
+ import { Pipe, PipeTransform } from '@angular/core';
+ 
+ @Pipe({
+-  name: 'product'
++  name: 'formatter'
+ })
+-export class ProductPipe implements PipeTransform {
++export class FormatterPipe implements PipeTransform {
+ 
+   transform(value: unknown, ...args: unknown[]): unknown {
+     return null;
 diff --git a/src/app/products/products-routing.module.ts b/src/app/tom-test/products-routing.module.ts
 similarity index 63%
 rename from src/app/products/products-routing.module.ts
@@ -249,7 +288,7 @@ index 72d8bd3..0bd5c33 100644
    imports: [RouterModule.forChild(routes)],
 diff --git a/src/app/tom-test/tom-test.component.html b/src/app/tom-test/tom-test.component.html
 new file mode 100644
-index 0000000..a35a869
+index 0000000..adc8101
 --- /dev/null
 +++ b/src/app/tom-test/tom-test.component.html
 @@ -0,0 +1,7 @@
@@ -259,7 +298,7 @@ index 0000000..a35a869
 +
 +<p [libDirIdentifier]="99"></p>
 +
-+<p>product: {{ 99 | product }}</p>
++<p>product: {{ 99 | formatter }}</p>
 diff --git a/src/app/products/products.component.scss b/src/app/tom-test/tom-test.component.scss
 similarity index 100%
 rename from src/app/products/products.component.scss
@@ -319,10 +358,10 @@ index 0000000..c4a0e53
 +
 +}
 diff --git a/src/app/products/products.module.ts b/src/app/tom-test/tom-test.module.ts
-similarity index 69%
+similarity index 60%
 rename from src/app/products/products.module.ts
 rename to src/app/tom-test/tom-test.module.ts
-index ee94bd8..88e3900 100644
+index ee94bd8..3a17f60 100644
 --- a/src/app/products/products.module.ts
 +++ b/src/app/tom-test/tom-test.module.ts
 @@ -2,12 +2,12 @@ import { NgModule } from '@angular/core';
@@ -332,11 +371,12 @@ index ee94bd8..88e3900 100644
 -import { ProductsComponent } from './products.component';
 +import { TomTestComponent } from './tom-test.component';
  import { SharedModule } from '@shared';
- import { ProductPipe } from './product.pipe';
+-import { ProductPipe } from './product.pipe';
++import { FormatterPipe } from './formatter';
  
  @NgModule({
 -  declarations: [ProductsComponent, ProductPipe],
-+  declarations: [TomTestComponent, ProductPipe],
++  declarations: [TomTestComponent, FormatterPipe],
    imports: [CommonModule, ProductsRoutingModule, SharedModule],
  })
 -export class ProductsModule {}

@@ -5,7 +5,7 @@ import { dasherize } from '../../angular-cli/strings';
 export async function getCoreFileDecorator(
   filepath: string,
   stub: string
-): Promise<string> {
+): Promise<string | null> {
   const sourceText = await fs.readFileAsync(filepath, 'utf-8');
 
   const file = ts.createSourceFile(
@@ -41,11 +41,13 @@ export async function getCoreFileDecorator(
     }
   }
 
-  throw new Error(
+  console.log(
     classOrFunction
-      ? `${classOrFunction} Name found but no decorator. Stopping.`
-      : 'No Class or Function Name found. Stopping.'
+      ? `${classOrFunction} Name found but no decorator.`
+      : 'No Class or Function Name found.'
   );
+
+  return null;
 }
 
 function classOrFunctionStartsWithStub(

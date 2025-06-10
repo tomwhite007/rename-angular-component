@@ -259,7 +259,9 @@ export class Renamer {
         return false;
       }
       this.construct = this.filesRelatedToStub.derivedConstruct;
-      this.title = `Rename Angular ${classify(this.construct)}`;
+      this.title = `Rename ${
+        this.construct ? `Angular ${classify(this.construct)}` : 'file'
+      }`;
 
       if (checkForOpenUnsavedEditors()) {
         this.userMessage.popupMessage(
@@ -268,11 +270,11 @@ export class Renamer {
         return false;
       }
 
-      const inputSuffixNote = this.originalFileDetails.fileWithoutType.endsWith(
-        `.${this.construct}`
-      )
-        ? `(Angular '.${this.construct}' suffix is optional)`
-        : '';
+      const inputSuffixNote =
+        !!this.construct &&
+        this.originalFileDetails.fileWithoutType.endsWith(`.${this.construct}`)
+          ? `(Angular '.${this.construct}' suffix is optional)`
+          : '';
 
       this.newFilenameInput =
         this.testBypass?.newFilenameInput ?? // test harness input text

@@ -1,7 +1,7 @@
 import { AngularConstruct } from '../definitions/file.interfaces';
 
 export function getConstructFromDecorator(
-  decoratorName: string
+  decoratorName: string | null
 ): AngularConstruct | undefined {
   switch (decoratorName) {
     case 'Component':

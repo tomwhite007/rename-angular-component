@@ -136,7 +136,9 @@ export class Renamer {
       )}/**/*`
     );
 
-    this.renameFolder = this.filesRelatedToStub.folderNameSameAsStub;
+    this.renameFolder =
+      this.filesRelatedToStub.folderNameSameAsStub &&
+      this.originalFileDetails.stub !== this.newStub; // makes sure construct suffix is not the only thing being changed
 
     const filesToMove = this.filesRelatedToStub.getFilesToMove(
       this.newStub,
@@ -203,10 +205,12 @@ export class Renamer {
 
     this.debugLogger.log('fileMoveJobs: ', JSON.stringify(this.fileMoveJobs));
 
-    if (this.fileMoveJobs.some((l) => l.exists())) {
+    if (
+      this.fileMoveJobs.some((l) => l.sourcePath !== l.targetPath && l.exists())
+    ) {
       vscode.window.showErrorMessage('Not allowed to overwrite existing files');
 
-      this.debugLogger.log(
+      this.debugLogger.logToConsole(
         'l.exists(): Not allowed to overwrite existing files'
       );
 

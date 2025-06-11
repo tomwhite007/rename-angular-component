@@ -1,8 +1,8 @@
 const expect = require('chai').expect;
 import { describe, it } from 'mocha';
 import {
+  getAngularCoreClassEdits,
   getClassNameEdits,
-  getCoreClassEdits,
   SelectorTransfer,
 } from '../../../rename-angular-component/in-file-edits/custom-edits';
 
@@ -21,7 +21,7 @@ describe('Custom Edits', () => {
       `;
 
       const selectorTransfer = new SelectorTransfer();
-      const edits = getCoreClassEdits(
+      const edits = getAngularCoreClassEdits(
         'OldComponent',
         'NewComponent',
         'old',
@@ -50,7 +50,7 @@ describe('Custom Edits', () => {
       `;
 
       const selectorTransfer = new SelectorTransfer();
-      const edits = getCoreClassEdits(
+      const edits = getAngularCoreClassEdits(
         'OldComponent',
         'NewComponent',
         'old',
@@ -76,7 +76,7 @@ describe('Custom Edits', () => {
       `;
 
       const selectorTransfer = new SelectorTransfer();
-      const edits = getCoreClassEdits(
+      const edits = getAngularCoreClassEdits(
         'OldComponent',
         'NewComponent',
         'old',
@@ -155,7 +155,7 @@ describe('Custom Edits', () => {
       `;
 
       const selectorTransfer = new SelectorTransfer();
-      getCoreClassEdits(
+      getAngularCoreClassEdits(
         'OldComponent',
         'NewComponent',
         'old',

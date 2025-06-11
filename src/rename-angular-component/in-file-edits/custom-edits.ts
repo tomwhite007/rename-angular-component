@@ -21,17 +21,20 @@ export class SelectorTransfer {
   newSelector?: string;
 }
 
-export function getCoreClassEdits(
+export function getAngularCoreClassEdits(
   originalClassName: string,
   newClassName: string,
   originalFileStub: string,
   newFileStub: string,
   newFilenameInput: string,
-  construct: AngularConstruct,
+  construct: AngularConstruct | undefined,
   selectorTransfer: SelectorTransfer,
   debugLogToFile?: (...args: string[]) => void
 ): GenericEditsCallback {
   return (fileName: string, sourceText: string) => {
+    if (!construct) {
+      return [];
+    }
     const foundItems = getCoreClassFoundItems(
       fileName,
       sourceText,

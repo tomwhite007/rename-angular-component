@@ -4,12 +4,12 @@ import { classify } from '../../angular-cli/strings';
 import { AngularConstruct } from '../definitions/file.interfaces';
 import { getDecoratorName } from './get-decorator-name.function';
 
-export async function getOriginalClassName(
+export async function getOriginalDefinitionName(
   stub: string,
   filepath: string,
-  construct: AngularConstruct
+  construct: AngularConstruct | undefined
 ) {
-  const expectedOldClassName = `${classify(stub)}${classify(construct)}`;
+  const expectedOldClassName = `${classify(stub)}${classify(construct ?? '')}`;
   const sourceText = await fs.readFileAsync(filepath, 'utf-8');
 
   const file = ts.createSourceFile(

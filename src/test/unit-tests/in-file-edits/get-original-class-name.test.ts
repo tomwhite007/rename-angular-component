@@ -3,7 +3,7 @@ const sinon = require('sinon');
 
 import fs from 'fs-extra-promise';
 import { afterEach, beforeEach, describe, it } from 'mocha';
-import { getOriginalClassName } from '../../../rename-angular-component/in-file-edits/get-original-class-name.function';
+import { getOriginalDefinitionName } from '../../../rename-angular-component/in-file-edits/get-original-definition-name.function';
 
 describe('getOriginalClassName', () => {
   let readFileStub: sinon.SinonStub;
@@ -26,7 +26,7 @@ describe('getOriginalClassName', () => {
 
     readFileStub.resolves(sourceText);
 
-    const className = await getOriginalClassName(
+    const className = await getOriginalDefinitionName(
       'test',
       'test.component.ts',
       'component'
@@ -47,7 +47,7 @@ describe('getOriginalClassName', () => {
 
     readFileStub.resolves(sourceText);
 
-    const className = await getOriginalClassName(
+    const className = await getOriginalDefinitionName(
       'test',
       'test.component.ts',
       'component'
@@ -64,7 +64,7 @@ describe('getOriginalClassName', () => {
     readFileStub.resolves(sourceText);
 
     try {
-      await getOriginalClassName('test', 'test.component.ts', 'component');
+      await getOriginalDefinitionName('test', 'test.component.ts', 'component');
       expect.fail('Should have thrown an error');
     } catch (error: any) {
       expect(error.message).to.equal(
@@ -89,7 +89,7 @@ describe('getOriginalClassName', () => {
     readFileStub.resolves(sourceText);
 
     try {
-      await getOriginalClassName('test', 'test.component.ts', 'component');
+      await getOriginalDefinitionName('test', 'test.component.ts', 'component');
       expect.fail('Should have thrown an error');
     } catch (error: any) {
       expect(error.message).to.equal(

@@ -6,12 +6,12 @@ import { UserMessage } from '../logging/user-message.class';
 import { findReplaceSelectorsInTemplateFiles } from './find-replace-selectors-in-template-files.function';
 
 export async function updateSelectorsInTemplates(
-  construct: AngularConstruct,
+  construct: AngularConstruct | undefined,
   selectorTransfer: SelectorTransfer,
   userMessage: UserMessage,
   debugLogger: DebugLogger
 ): Promise<void> {
-  if (CONSTRUCTS_WITH_SELECTORS.includes(construct)) {
+  if (construct && CONSTRUCTS_WITH_SELECTORS.includes(construct)) {
     if (selectorTransfer.oldSelector && selectorTransfer.newSelector) {
       if (selectorTransfer.oldSelector !== selectorTransfer.newSelector) {
         await findReplaceSelectorsInTemplateFiles(

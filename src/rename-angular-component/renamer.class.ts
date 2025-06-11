@@ -16,14 +16,14 @@ import { FilesRelatedToStub } from './file-manipulation/files-related-to-stub.cl
 import { updateSelectorsInTemplates } from './file-manipulation/selector-update-handler.function';
 import { windowsFilePathFix } from './file-manipulation/windows-file-path-fix.function';
 import {
+  getAngularCoreClassEdits,
   getClassNameEdits,
-  getCoreClassEdits,
   SelectorTransfer,
 } from './in-file-edits/custom-edits';
 import { getCoreFilePath } from './in-file-edits/get-core-file-path.function';
-import { getNewClassName } from './in-file-edits/get-new-class-name.function';
+import { getNewDefinitionName } from './in-file-edits/get-new-class-name.function';
 import { getNewStubFromFileWithoutExtension } from './in-file-edits/get-new-stub-from-file-without-extension';
-import { getOriginalClassName } from './in-file-edits/get-original-class-name.function';
+import { getOriginalDefinitionName } from './in-file-edits/get-original-definition-name.function';
 import { getOriginalFileDetails } from './in-file-edits/get-original-file-details.function';
 import { removeExtension } from './in-file-edits/remove-extension';
 import { DebugLogger } from './logging/debug-logger.class';
@@ -33,7 +33,7 @@ import { noSelectedFileHandler } from './no-selected-file-handler/no-selected-fi
 import { checkForOpenUnsavedEditors } from './window/check-for-open-unsaved-editors.function';
 
 export class Renamer {
-  private construct!: AngularConstruct;
+  private construct?: AngularConstruct;
   private title!: string;
   private originalFileDetails!: Readonly<OriginalFileDetails>;
   private filesRelatedToStub?: FilesRelatedToStub;
@@ -160,12 +160,12 @@ export class Renamer {
     }
 
     const coreFilePath = getCoreFilePath(filesToMove);
-    const oldClassName = await getOriginalClassName(
+    const oldClassName = await getOriginalDefinitionName(
       this.originalFileDetails.stub,
       coreFilePath as string,
       this.construct
     );
-    const newClassName = getNewClassName(
+    const newClassName = getNewDefinitionName(
       this.newStub,
       this.newFilenameInput,
       this.construct
@@ -181,7 +181,7 @@ export class Renamer {
             : undefined,
         movedFileEdits: f.isCoreConstruct
           ? (() =>
-              getCoreClassEdits(
+              getAngularCoreClassEdits(
                 oldClassName,
                 newClassName,
                 this.originalFileDetails.stub,
@@ -256,7 +256,6 @@ export class Renamer {
           _construct !== this.filesRelatedToStub.derivedConstruct)
       ) {
         this.debugLogger.logToConsole('Construct could not be derived');
-        return false;
       }
       this.construct = this.filesRelatedToStub.derivedConstruct;
       this.title = `Rename ${
@@ -295,7 +294,9 @@ export class Renamer {
       }
       if (this.originalFileDetails.fileWithoutType === this.newFilenameInput) {
         this.userMessage.popupMessage(
-          `${classify(this.construct)} name same as original. Stopped.`
+          `${classify(
+            this.construct ?? 'New file'
+          )} name same as original. Stopped.`
         );
         return false;
       }

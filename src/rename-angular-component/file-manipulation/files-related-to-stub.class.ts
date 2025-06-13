@@ -7,10 +7,11 @@ import {
 import {
   AngularConstruct,
   AngularConstructOrUnknownFile,
+  DefinitionType,
   OriginalFileDetails,
 } from '../definitions/file.interfaces';
 import { getConstructFromDecorator } from '../in-file-edits/get-construct-from-decorator.function';
-import { getCoreFileDecorator } from '../in-file-edits/get-core-file-decorator.function';
+import { getCoreFileDefinitionDetails } from '../in-file-edits/get-core-file-decorator.function';
 import { windowsFilePathFix } from './windows-file-path-fix.function';
 
 interface FileDetails {
@@ -33,6 +34,8 @@ export class FilesRelatedToStub {
   constructFilesRegex!: RegExp;
   relatedFilesRegex!: RegExp;
   derivedConstruct?: AngularConstruct;
+  originalDefinitionName?: string;
+  definitionType: DefinitionType = null;
 
   static async init(
     fileDetails: OriginalFileDetails,
@@ -70,8 +73,6 @@ export class FilesRelatedToStub {
     this.relatedFilesRegex = new RegExp(
       `${escapeRegex(fileDetails.stub)}${likeFilesRegexPartialLookup.any}`
     );
-
-    const isCoreConstructRegex = new RegExp(`\\.${construct}\\.ts$`);
 
     for (const uri of uris) {
       const filePath = windowsFilePathFix(uri.fsPath);
@@ -127,8 +128,18 @@ export class FilesRelatedToStub {
     filePath: string,
     stub: string
   ): Promise<AngularConstruct | undefined> {
-    const decorator = await getCoreFileDecorator(filePath, stub);
-    const construct = getConstructFromDecorator(decorator);
+    const coreFileDefinitionDetails = await getCoreFileDefinitionDetails(
+      filePath,
+      stub
+    );
+    if (!coreFileDefinitionDetails) {
+      return undefined;
+    }
+    const { decoratorName, definitionType, definitionName } =
+      coreFileDefinitionDetails;
+    this.originalDefinitionName = definitionName;
+    this.definitionType = definitionType;
+    const construct = getConstructFromDecorator(decoratorName);
     return construct;
   }
 

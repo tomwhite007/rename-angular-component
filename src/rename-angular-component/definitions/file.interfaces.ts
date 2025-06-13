@@ -6,6 +6,8 @@ export type AngularConstruct =
   | 'guard'
   | 'pipe';
 
+export type DefinitionType = 'class' | 'function' | null; // TODO: support more definitions later
+
 export interface OriginalFileDetails {
   path: string;
   file: string;
@@ -15,3 +17,9 @@ export interface OriginalFileDetails {
 }
 
 export type AngularConstructOrUnknownFile = AngularConstruct | 'file';
+
+export interface CoreFileDefinitionDetails {
+  definitionName: string;
+  definitionType: DefinitionType;
+  decoratorName: string;
+}

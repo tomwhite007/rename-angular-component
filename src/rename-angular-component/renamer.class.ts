@@ -21,9 +21,8 @@ import {
   SelectorTransfer,
 } from './in-file-edits/custom-edits';
 import { getCoreFilePath } from './in-file-edits/get-core-file-path.function';
-import { getNewDefinitionName } from './in-file-edits/get-new-class-name.function';
+import { getNewDefinitionName } from './in-file-edits/get-new-definition-name.function';
 import { getNewStubFromFileWithoutExtension } from './in-file-edits/get-new-stub-from-file-without-extension';
-import { getOriginalDefinitionName } from './in-file-edits/get-original-definition-name.function';
 import { getOriginalFileDetails } from './in-file-edits/get-original-file-details.function';
 import { removeExtension } from './in-file-edits/remove-extension';
 import { DebugLogger } from './logging/debug-logger.class';
@@ -160,11 +159,7 @@ export class Renamer {
     }
 
     const coreFilePath = getCoreFilePath(filesToMove);
-    const oldClassName = await getOriginalDefinitionName(
-      this.originalFileDetails.stub,
-      coreFilePath as string,
-      this.construct
-    );
+    const oldClassName = this.filesRelatedToStub.originalDefinitionName!;
     const newClassName = getNewDefinitionName(
       this.newStub,
       this.newFilenameInput,
@@ -249,6 +244,20 @@ export class Renamer {
         this.projectRoot,
         _construct
       );
+
+      if (
+        !['class', 'function'].includes(
+          this.filesRelatedToStub?.definitionType ?? ''
+        )
+      ) {
+        this.debugLogger.logToConsole(
+          `Definition type is not a class or function`
+        );
+        this.userMessage.popupMessage(
+          `This extension currently only supports renaming Angular classes and functions. \n`
+        );
+        return false;
+      }
 
       if (
         !this.filesRelatedToStub.derivedConstruct ||

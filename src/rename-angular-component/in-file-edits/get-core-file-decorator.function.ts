@@ -1,11 +1,15 @@
 import fs from 'fs-extra-promise';
 import ts from 'typescript';
-import { dasherize } from '../../angular-cli/strings';
+import { classify, dasherize } from '../../angular-cli/strings';
+import {
+  CoreFileDefinitionDetails,
+  DefinitionType,
+} from '../definitions/file.interfaces';
 
-export async function getCoreFileDecorator(
+export async function getCoreFileDefinitionDetails(
   filepath: string,
   stub: string
-): Promise<string | null> {
+): Promise<CoreFileDefinitionDetails | null> {
   const sourceText = await fs.readFileAsync(filepath, 'utf-8');
 
   const file = ts.createSourceFile(
@@ -14,11 +18,11 @@ export async function getCoreFileDecorator(
     ts.ScriptTarget.Latest
   );
 
-  let classOrFunction = '';
+  let classOrFunction: DefinitionType = null;
 
   for (const node of file.statements) {
     if (ts.isClassDeclaration(node) || ts.isFunctionDeclaration(node)) {
-      classOrFunction = ts.isClassDeclaration(node) ? 'Class' : 'Function';
+      classOrFunction = ts.isClassDeclaration(node) ? 'class' : 'function';
       const coreClassOrFunctionName = node.name?.escapedText ?? '';
       const decorator: any = node.modifiers?.find((decorator) => {
         if (ts.isDecorator(decorator)) {
@@ -35,15 +39,25 @@ export async function getCoreFileDecorator(
       ) {
         const decoratorName = decorator.expression.expression.text;
         if (classOrFunctionStartsWithStub(coreClassOrFunctionName, stub)) {
-          return decoratorName;
+          return {
+            definitionName: coreClassOrFunctionName.toString(),
+            definitionType: classOrFunction,
+            decoratorName,
+          };
         }
+      } else {
+        return {
+          definitionName: coreClassOrFunctionName.toString(),
+          definitionType: classOrFunction,
+          decoratorName: '',
+        };
       }
     }
   }
 
   console.log(
     classOrFunction
-      ? `${classOrFunction} Name found but no decorator.`
+      ? `${classify(classOrFunction)} Name found but no decorator.`
       : 'No Class or Function Name found.'
   );
 
@@ -54,5 +68,12 @@ function classOrFunctionStartsWithStub(
   coreClassOrFunctionName: string,
   stub: string
 ): boolean {
-  return dasherize(coreClassOrFunctionName).startsWith(stub);
+  const dasherizedName = dasherize(coreClassOrFunctionName);
+  const stubDashCount = stub.split('-').length;
+  const nameDashCount = dasherizedName.split('-').length;
+  return (
+    dasherize(coreClassOrFunctionName).startsWith(stub) &&
+    // allow one extra word for construct
+    nameDashCount - stubDashCount < 2
+  );
 }

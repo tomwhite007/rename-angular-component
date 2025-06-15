@@ -1,10 +1,14 @@
-import { classify } from '../../angular-cli/strings';
-import { AngularConstruct } from '../definitions/file.interfaces';
+import { camelize, classify } from '../../angular-cli/strings';
+import {
+  AngularConstructOrPlainFile,
+  DefinitionType,
+} from '../definitions/file.interfaces';
 
 export function getNewDefinitionName(
   newStub: string,
   newFilenameInput: string,
-  construct: AngularConstruct | undefined
+  construct: AngularConstructOrPlainFile | null,
+  definitionType: DefinitionType
 ): string {
   const newFileEndsWithConstruct = newFilenameInput.endsWith(`.${construct}`);
   const constructPostfix =
@@ -12,7 +16,9 @@ export function getNewDefinitionName(
       ? construct ?? ''
       : '';
 
-  const newClassName = `${classify(newStub)}${classify(constructPostfix)}`;
+  const newStubName =
+    definitionType === 'class' ? classify(newStub) : camelize(newStub);
+  const newName = `${newStubName}${classify(constructPostfix)}`;
 
-  return newClassName;
+  return newName;
 }

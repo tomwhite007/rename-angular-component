@@ -1,6 +1,6 @@
-import { AngularConstruct } from './file.interfaces';
+import { AngularConstructOrPlainFile } from './file.interfaces';
 
-export const CONSTRUCTS_WITH_SELECTORS: AngularConstruct[] = [
+export const CONSTRUCTS_WITH_SELECTORS: AngularConstructOrPlainFile[] = [
   'component',
   'directive',
   'pipe',

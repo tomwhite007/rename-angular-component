@@ -6,7 +6,6 @@ import { validateHtmlSelector } from '../angular-cli/validation';
 import { FileItem } from '../move-ts-indexer/file-item';
 import { timeoutPause } from '../utils/timeout-pause';
 import {
-  AngularConstruct,
   AngularConstructOrPlainFile,
   OriginalFileDetails,
 } from './definitions/file.interfaces';
@@ -32,7 +31,7 @@ import { noSelectedFileHandler } from './no-selected-file-handler/no-selected-fi
 import { checkForOpenUnsavedEditors } from './window/check-for-open-unsaved-editors.function';
 
 export class Renamer {
-  private construct?: AngularConstruct;
+  private construct: AngularConstructOrPlainFile | null = null; // will be set to 'file' if not an Angular construct
   private title!: string;
   private originalFileDetails!: Readonly<OriginalFileDetails>;
   private filesRelatedToStub?: FilesRelatedToStub;
@@ -163,7 +162,8 @@ export class Renamer {
     const newClassName = getNewDefinitionName(
       this.newStub,
       this.newFilenameInput,
-      this.construct
+      this.construct,
+      this.filesRelatedToStub.definitionType
     );
 
     this.selectorTransfer = new SelectorTransfer();

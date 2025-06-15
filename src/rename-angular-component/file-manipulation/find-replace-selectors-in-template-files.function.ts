@@ -1,6 +1,6 @@
 import fs from 'fs-extra-promise';
 import { workspace } from 'vscode';
-import { AngularConstruct } from '../definitions/file.interfaces';
+import { AngularConstructOrPlainFile } from '../definitions/file.interfaces';
 import { renameSelectorInTemplate } from '../in-file-edits/rename-selector-in-template.function';
 import { UserMessage } from '../logging/user-message.class';
 
@@ -8,7 +8,7 @@ export async function findReplaceSelectorsInTemplateFiles(
   originalSelector: string,
   newSelector: string,
   userMessage: UserMessage,
-  construct: AngularConstruct
+  construct: AngularConstructOrPlainFile | null
 ) {
   if (originalSelector === newSelector) {
     return;

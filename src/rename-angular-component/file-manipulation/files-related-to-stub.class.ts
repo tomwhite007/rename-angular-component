@@ -5,7 +5,6 @@ import {
   tsFileButNotSpec,
 } from '../definitions/file-regex.constants';
 import {
-  AngularConstruct,
   AngularConstructOrPlainFile,
   DefinitionType,
   OriginalFileDetails,
@@ -33,7 +32,7 @@ export class FilesRelatedToStub {
   fileDetails: FileDetails[] = [];
   constructFilesRegex!: RegExp;
   relatedFilesRegex!: RegExp;
-  derivedConstruct?: AngularConstruct;
+  derivedConstruct: AngularConstructOrPlainFile | null = null;
   originalDefinitionName?: string;
   definitionType: DefinitionType = null;
 
@@ -127,20 +126,19 @@ export class FilesRelatedToStub {
   async deriveConstructFromFileContent(
     filePath: string,
     stub: string
-  ): Promise<AngularConstruct | undefined> {
+  ): Promise<AngularConstructOrPlainFile | null> {
     const coreFileDefinitionDetails = await getCoreFileDefinitionDetails(
       filePath,
       stub
     );
     if (!coreFileDefinitionDetails) {
-      return undefined;
+      return null;
     }
     const { decoratorName, definitionType, definitionName } =
       coreFileDefinitionDetails;
     this.originalDefinitionName = definitionName;
     this.definitionType = definitionType;
-    const construct = getConstructFromDecorator(decoratorName);
-    return construct;
+    return getConstructFromDecorator(decoratorName, definitionType);
   }
 
   private sortFileDetails(a: FileDetails, b: FileDetails) {

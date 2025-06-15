@@ -1,8 +1,12 @@
-import { AngularConstruct } from '../definitions/file.interfaces';
+import {
+  AngularConstructOrPlainFile,
+  DefinitionType,
+} from '../definitions/file.interfaces';
 
 export function getConstructFromDecorator(
-  decoratorName: string | null
-): AngularConstruct | undefined {
+  decoratorName: string | null,
+  definitionType: DefinitionType
+): AngularConstructOrPlainFile | null {
   switch (decoratorName) {
     case 'Component':
       return 'component';
@@ -17,6 +21,9 @@ export function getConstructFromDecorator(
     case 'Guard':
       return 'guard';
     default:
-      return undefined;
+      if (definitionType) {
+        return 'file';
+      }
+      return null;
   }
 }

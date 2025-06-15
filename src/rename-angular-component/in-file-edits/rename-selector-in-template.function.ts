@@ -1,11 +1,11 @@
 import { escapeRegex } from '../../utils/escape-regex';
-import { AngularConstruct } from '../definitions/file.interfaces';
+import { AngularConstructOrPlainFile } from '../definitions/file.interfaces';
 
 export function renameSelectorInTemplate(
   html: string,
   originalSelector: string,
   newSelector: string,
-  construct: AngularConstruct
+  construct: AngularConstructOrPlainFile | null
 ) {
   let regExBodyStr = '';
   if (construct === 'pipe') {

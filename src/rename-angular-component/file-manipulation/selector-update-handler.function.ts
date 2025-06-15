@@ -1,12 +1,12 @@
 import { CONSTRUCTS_WITH_SELECTORS } from '../definitions/constructs-with-selectors';
-import { AngularConstruct } from '../definitions/file.interfaces';
+import { AngularConstructOrPlainFile } from '../definitions/file.interfaces';
 import { SelectorTransfer } from '../in-file-edits/custom-edits';
 import { DebugLogger } from '../logging/debug-logger.class';
 import { UserMessage } from '../logging/user-message.class';
 import { findReplaceSelectorsInTemplateFiles } from './find-replace-selectors-in-template-files.function';
 
 export async function updateSelectorsInTemplates(
-  construct: AngularConstruct | undefined,
+  construct: AngularConstructOrPlainFile | null,
   selectorTransfer: SelectorTransfer,
   userMessage: UserMessage,
   debugLogger: DebugLogger

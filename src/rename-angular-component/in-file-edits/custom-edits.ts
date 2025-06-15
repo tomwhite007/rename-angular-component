@@ -9,7 +9,7 @@ import {
   FoundItemType,
 } from '../../move-ts-indexer/util/shared-interfaces';
 import { escapeRegex } from '../../utils/escape-regex';
-import { AngularConstruct } from '../definitions/file.interfaces';
+import { AngularConstructOrPlainFile } from '../definitions/file.interfaces';
 import { generateNewSelector } from './generate-new-selector.function';
 import { getSelectorType } from './get-selector-type.function';
 import { stripSelectorBraces } from './strip-selector-braces.function';
@@ -27,7 +27,7 @@ export function getAngularCoreClassEdits(
   originalFileStub: string,
   newFileStub: string,
   newFilenameInput: string,
-  construct: AngularConstruct | undefined,
+  construct: AngularConstructOrPlainFile | null,
   selectorTransfer: SelectorTransfer,
   debugLogToFile?: (...args: string[]) => void
 ): GenericEditsCallback {
@@ -119,7 +119,7 @@ function getCoreClassFoundItems(
   sourceText: string,
   originalClassName: string,
   newClassName: string,
-  construct: AngularConstruct
+  construct: AngularConstructOrPlainFile | null
 ): FoundItem[] {
   const file = ts.createSourceFile(
     fileName,
@@ -156,7 +156,7 @@ function getCoreClassFoundItems(
           'name',
         ];
 
-        const decoratorName = classify(construct);
+        const decoratorName = classify(construct ?? '');
 
         // get decorator props for decoratorName
         node.modifiers?.find((decorator) => {

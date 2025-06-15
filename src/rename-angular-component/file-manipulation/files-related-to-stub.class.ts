@@ -6,7 +6,7 @@ import {
 } from '../definitions/file-regex.constants';
 import {
   AngularConstruct,
-  AngularConstructOrUnknownFile,
+  AngularConstructOrPlainFile,
   DefinitionType,
   OriginalFileDetails,
 } from '../definitions/file.interfaces';
@@ -40,7 +40,7 @@ export class FilesRelatedToStub {
   static async init(
     fileDetails: OriginalFileDetails,
     projectRoot: string,
-    construct: AngularConstructOrUnknownFile
+    construct: AngularConstructOrPlainFile
   ) {
     const instance = new FilesRelatedToStub();
     await instance.catalogueFilesInCurrentFolder(
@@ -54,7 +54,7 @@ export class FilesRelatedToStub {
   private async catalogueFilesInCurrentFolder(
     fileDetails: OriginalFileDetails,
     projectRoot: string,
-    construct: AngularConstructOrUnknownFile
+    construct: AngularConstructOrPlainFile
   ) {
     this.originalFileDetails = fileDetails;
 

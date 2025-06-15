@@ -7,7 +7,7 @@ import { FileItem } from '../move-ts-indexer/file-item';
 import { timeoutPause } from '../utils/timeout-pause';
 import {
   AngularConstruct,
-  AngularConstructOrUnknownFile,
+  AngularConstructOrPlainFile,
   OriginalFileDetails,
 } from './definitions/file.interfaces';
 import { getProjectRoot } from './definitions/get-project-root-file-path.function';
@@ -53,7 +53,7 @@ export class Renamer {
   ) {}
 
   async rename(
-    _construct: AngularConstructOrUnknownFile,
+    _construct: AngularConstructOrPlainFile,
     selectedUri: vscode.Uri
   ) {
     this.debugLogger.logToConsole('## Debug Rename Start ##');
@@ -215,7 +215,7 @@ export class Renamer {
   }
 
   private async prepRenameDetails(
-    _construct: AngularConstructOrUnknownFile,
+    _construct: AngularConstructOrPlainFile,
     selectedUri: vscode.Uri
   ): Promise<boolean> {
     try {
@@ -245,27 +245,16 @@ export class Renamer {
         _construct
       );
 
-      if (
-        !['class', 'function'].includes(
-          this.filesRelatedToStub?.definitionType ?? ''
-        )
-      ) {
+      if (!this.filesRelatedToStub?.definitionType) {
         this.debugLogger.logToConsole(
-          `Definition type is not a class or function`
+          `Definition type is not a class, function or variable`
         );
         this.userMessage.popupMessage(
-          `This extension currently only supports renaming Angular classes and functions. \n`
+          `This extension currently only supports renaming Angular classes, functions and variables. \n`
         );
         return false;
       }
 
-      if (
-        !this.filesRelatedToStub.derivedConstruct ||
-        (_construct !== 'file' &&
-          _construct !== this.filesRelatedToStub.derivedConstruct)
-      ) {
-        this.debugLogger.logToConsole('Construct could not be derived');
-      }
       this.construct = this.filesRelatedToStub.derivedConstruct;
       this.title = `Rename ${
         this.construct ? `Angular ${classify(this.construct)}` : 'file'

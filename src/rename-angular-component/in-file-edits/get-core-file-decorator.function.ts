@@ -52,6 +52,18 @@ export async function getCoreFileDefinitionDetails(
           decoratorName: '',
         };
       }
+    } else if (ts.isVariableStatement(node)) {
+      const variable = node.declarationList.declarations[0];
+      if (variable.name && ts.isIdentifier(variable.name)) {
+        const variableName = variable.name.escapedText.toString();
+        if (classOrFunctionStartsWithStub(variableName, stub)) {
+          return {
+            definitionName: variableName,
+            definitionType: 'variable',
+            decoratorName: '',
+          };
+        }
+      }
     }
   }
 

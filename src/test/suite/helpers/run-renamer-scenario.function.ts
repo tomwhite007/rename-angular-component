@@ -2,7 +2,7 @@ import path = require('path');
 import vscode from 'vscode';
 import { ReferenceIndexBuilder } from '../../../move-ts-indexer/reference-index-builder';
 import { EXTENSION_NAME } from '../../../rename-angular-component/definitions/extension-name';
-import { AngularConstructOrUnknownFile } from '../../../rename-angular-component/definitions/file.interfaces';
+import { AngularConstructOrPlainFile } from '../../../rename-angular-component/definitions/file.interfaces';
 import { FileMoveHandler } from '../../../rename-angular-component/file-manipulation/file-move-handler.class';
 import { DebugLogger } from '../../../rename-angular-component/logging/debug-logger.class';
 import { UserMessage } from '../../../rename-angular-component/logging/user-message.class';
@@ -11,7 +11,7 @@ import { timeoutPause } from '../../../utils/timeout-pause';
 
 export interface RenameCallConfig {
   filePath: string;
-  construct: AngularConstructOrUnknownFile;
+  construct: AngularConstructOrPlainFile;
   newFilenameInput: string;
 }
 

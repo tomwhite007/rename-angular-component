@@ -11,8 +11,6 @@ export function getOriginalFileDetails(filePath: string): OriginalFileDetails {
 
   const file = filePath.substr(lastSlash + 1, filePath.length - lastSlash - 1);
   const fileWithoutType = getFileWithoutType(file);
-  const stub = file.split(
-    /(\.(component|directive|pipe|service|guard|module))?\.(spec.ts|scss|css|sass|less|html|ts)$/
-  )[0];
+  const stub = file.split(/(\.\S+)?\.(spec.ts|scss|css|sass|less|html|ts)$/)[0];
   return { path, file, fileWithoutType, stub, filePath };
 }

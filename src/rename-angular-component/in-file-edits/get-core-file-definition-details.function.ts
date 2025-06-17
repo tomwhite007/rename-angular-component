@@ -105,7 +105,7 @@ function definitionStartsWithStub(
   const stubDashCount = stub.split('-').length;
   const nameDashCount = dasherizedName.split('-').length;
   return (
-    dasherize(coreClassOrFunctionName).startsWith(stub) &&
+    dasherizedName.startsWith(stub) &&
     // allow one extra word for construct
     nameDashCount - stubDashCount < 2
   );

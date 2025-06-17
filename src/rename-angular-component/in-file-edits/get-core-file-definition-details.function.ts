@@ -18,11 +18,11 @@ export async function getCoreFileDefinitionDetails(
     ts.ScriptTarget.Latest
   );
 
-  let classOrFunction: DefinitionType = null;
+  let definitionType: DefinitionType = null;
 
   for (const node of file.statements) {
     if (ts.isClassDeclaration(node) || ts.isFunctionDeclaration(node)) {
-      classOrFunction = ts.isClassDeclaration(node) ? 'class' : 'function';
+      definitionType = ts.isClassDeclaration(node) ? 'class' : 'function';
       const coreClassOrFunctionName = node.name?.escapedText ?? '';
       const decorator: any = node.modifiers?.find((decorator) => {
         if (ts.isDecorator(decorator)) {
@@ -38,45 +38,66 @@ export async function getCoreFileDefinitionDetails(
         ts.isIdentifier(decorator.expression.expression)
       ) {
         const decoratorName = decorator.expression.expression.text;
-        if (classOrFunctionStartsWithStub(coreClassOrFunctionName, stub)) {
+        if (definitionStartsWithStub(coreClassOrFunctionName, stub)) {
           return {
             definitionName: coreClassOrFunctionName.toString(),
-            definitionType: classOrFunction,
+            definitionType,
             decoratorName,
           };
         }
       } else {
         return {
           definitionName: coreClassOrFunctionName.toString(),
-          definitionType: classOrFunction,
+          definitionType,
           decoratorName: '',
         };
       }
     } else if (ts.isVariableStatement(node)) {
+      definitionType = 'variable';
       const variable = node.declarationList.declarations[0];
       if (variable.name && ts.isIdentifier(variable.name)) {
         const variableName = variable.name.escapedText.toString();
-        if (classOrFunctionStartsWithStub(variableName, stub)) {
+        if (definitionStartsWithStub(variableName, stub)) {
           return {
             definitionName: variableName,
-            definitionType: 'variable',
+            definitionType,
             decoratorName: '',
           };
         }
+      }
+    } else if (ts.isInterfaceDeclaration(node)) {
+      definitionType = 'interface';
+      const interfaceName = node.name.escapedText.toString();
+      if (definitionStartsWithStub(interfaceName, stub)) {
+        return {
+          definitionName: interfaceName,
+          definitionType,
+          decoratorName: '',
+        };
+      }
+    } else if (ts.isEnumDeclaration(node)) {
+      definitionType = 'enum';
+      const enumName = node.name.escapedText.toString();
+      if (definitionStartsWithStub(enumName, stub)) {
+        return {
+          definitionName: enumName,
+          definitionType,
+          decoratorName: '',
+        };
       }
     }
   }
 
   console.log(
-    classOrFunction
-      ? `${classify(classOrFunction)} Name found but no decorator.`
+    definitionType
+      ? `${classify(definitionType)} Name found but no decorator.`
       : 'No Class or Function Name found.'
   );
 
   return null;
 }
 
-function classOrFunctionStartsWithStub(
+function definitionStartsWithStub(
   coreClassOrFunctionName: string,
   stub: string
 ): boolean {

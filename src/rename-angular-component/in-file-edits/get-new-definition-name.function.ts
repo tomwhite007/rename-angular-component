@@ -16,8 +16,12 @@ export function getNewDefinitionName(
       ? construct ?? ''
       : '';
 
-  const newStubName =
-    definitionType === 'class' ? classify(newStub) : camelize(newStub);
+  const definitionsWithCapitalFirstLetter = ['class', 'interface', 'enum'];
+  const newStubName = definitionsWithCapitalFirstLetter.includes(
+    definitionType ?? ''
+  )
+    ? classify(newStub)
+    : camelize(newStub);
   const newName = `${newStubName}${classify(constructPostfix)}`;
 
   return newName;

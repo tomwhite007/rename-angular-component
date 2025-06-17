@@ -6,7 +6,13 @@ export type AngularConstruct =
   | 'guard'
   | 'pipe';
 
-export type DefinitionType = 'class' | 'function' | 'variable' | null; // TODO: support more definitions later
+export type DefinitionType =
+  | 'class'
+  | 'function'
+  | 'variable'
+  | 'interface'
+  | 'enum'
+  | null;
 
 export interface OriginalFileDetails {
   path: string;

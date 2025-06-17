@@ -10,7 +10,7 @@ import {
   OriginalFileDetails,
 } from '../definitions/file.interfaces';
 import { getConstructFromDecorator } from '../in-file-edits/get-construct-from-decorator.function';
-import { getCoreFileDefinitionDetails } from '../in-file-edits/get-core-file-decorator.function';
+import { getCoreFileDefinitionDetails } from '../in-file-edits/get-core-file-definition-details.function';
 import { windowsFilePathFix } from './windows-file-path-fix.function';
 
 interface FileDetails {

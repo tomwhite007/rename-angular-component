@@ -92,7 +92,7 @@
           "group": "navigation"
         },
         {
-          "when": "resourceFilename =~ /^.+\\.(spec.ts|scss|css|sass|less|html|ts)$/",
+          "when": "resourceFilename =~ /^.+(?<!\\.component)(?<!\\.directive)(?<!\\.service)(?<!\\.guard)(?<!\\.module)\\.(spec\\.ts|scss|css|sass|less|html|ts)$/",
           "command": "rename-angular-component.renameFile",
           "group": "navigation"
         }

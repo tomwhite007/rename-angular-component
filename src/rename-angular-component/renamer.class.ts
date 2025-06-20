@@ -99,11 +99,22 @@ export class Renamer {
             fs.remove(this.originalFileDetails.path);
           }
 
+          const unrecognisedDefinition =
+            !this.filesRelatedToStub?.definitionType;
+          const unrecognisedDefinitionMessage = unrecognisedDefinition
+            ? [
+                '',
+                `This extension currently only supports renaming classes, functions, variables, interfaces, and enums that have the same name as the file they are in.`,
+                `In this case, I could only rename the file, not any definition in the file.`,
+              ]
+            : [];
+
           // report process completed
           progress.report({ increment: 100 });
           const renameTime =
             Math.round((Date.now() - this.processTimerStart) / 10) / 100;
           this.userMessage.logInfoToChannel([
+            ...unrecognisedDefinitionMessage,
             '',
             `${this.title} completed in ${renameTime} seconds`,
           ]);
@@ -150,12 +161,12 @@ export class Renamer {
       JSON.stringify(filesToMove)
     );
 
-    if (!filesToMove.some((f) => f.isCoreConstruct)) {
-      const errMsg = `The ${this.construct} class file must use the same file naming convention as '${this.originalFileDetails.file}' for this process to run.`;
-      this.userMessage.popupMessage(errMsg);
-      this.debugLogger.log(errMsg);
-      return false;
-    }
+    // if (!filesToMove.some((f) => f.isCoreConstruct)) {
+    //   const errMsg = `The ${this.construct} class file must use the same file naming convention as '${this.originalFileDetails.file}' for this process to run.`;
+    //   this.userMessage.popupMessage(errMsg);
+    //   this.debugLogger.log(errMsg);
+    //   return false;
+    // }
 
     const coreFilePath = getCoreFilePath(filesToMove);
     const oldClassName = this.filesRelatedToStub.originalDefinitionName!;
@@ -245,16 +256,6 @@ export class Renamer {
         _construct
       );
 
-      if (!this.filesRelatedToStub?.definitionType) {
-        this.debugLogger.logToConsole(
-          `Definition type is not a class, function or variable`
-        );
-        this.userMessage.popupMessage(
-          `This extension currently only supports renaming Angular classes, functions and variables. \n`
-        );
-        return false;
-      }
-
       this.construct = this.filesRelatedToStub.derivedConstruct;
       this.title = `Rename ${
         this.construct ? `Angular ${classify(this.construct)}` : 'file'
@@ -273,11 +274,19 @@ export class Renamer {
           ? `(Angular '.${this.construct}' suffix is optional)`
           : '';
 
+      const unrecognisedDefinition = !this.filesRelatedToStub?.definitionType;
+      const unrecognisedDefinitionMessage = unrecognisedDefinition
+        ? `This extension currently only supports renaming classes, functions, variables, interfaces, and enums
+          that have the same name as the file they are in. In this case, I can only rename the file, not any definition in the file.`
+        : '';
+
+      const constructText = this.construct ? `${this.construct} ` : '';
+
       this.newFilenameInput =
         this.testBypass?.newFilenameInput ?? // test harness input text
         (await vscode.window.showInputBox({
           title: this.title,
-          prompt: `Enter the new ${this.construct} filename. ${inputSuffixNote}`,
+          prompt: `Enter the new ${constructText}filename. ${inputSuffixNote} ${unrecognisedDefinitionMessage}`,
           value: this.originalFileDetails.fileWithoutType,
         })) ??
         '';

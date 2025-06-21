@@ -1,0 +1,47 @@
+diff --git a/src/app/app.routes.ts b/src/app/app.routes.ts
+index 71149da..7417128 100644
+--- a/src/app/app.routes.ts
++++ b/src/app/app.routes.ts
+@@ -1,12 +1,12 @@
+ import { Routes } from '@angular/router';
+-import { Home } from './home/home';
++import { HomePage } from './home-page/home.page';
+ import { testGuard } from './shared/test-guard';
+ import { testResolver } from './shared/test-resolver';
+ export const routes: Routes = [
+   { path: '', redirectTo: '/home', pathMatch: 'full' },
+   {
+     path: 'home',
+-    component: Home,
++    component: HomePage,
+     canActivate: [testGuard],
+     resolve: testResolver,
+   },
+diff --git a/src/app/home/home.css b/src/app/home-page/home.page.css
+similarity index 100%
+rename from src/app/home/home.css
+rename to src/app/home-page/home.page.css
+diff --git a/src/app/home/home.ts b/src/app/home-page/home.page.ts
+similarity index 84%
+rename from src/app/home/home.ts
+rename to src/app/home-page/home.page.ts
+index 02504ee..bda6669 100644
+--- a/src/app/home/home.ts
++++ b/src/app/home-page/home.page.ts
+@@ -4,13 +4,13 @@ import { TestValues } from '../shared/test-values';
+ import { TestModel } from '../shared/test.model';
+ 
+ @Component({
+-  selector: 'app-home',
++  selector: 'app-home-page',
+   imports: [],
+   template: `<p>home works!</p>`,
+-  styleUrl: './home.css',
++  styleUrl: './home.page.css',
+   changeDetection: ChangeDetectionStrategy.OnPush,
+ })
+-export class Home implements OnInit {
++export class HomePage implements OnInit {
+   test: TestModel = { testId: TestValues.HomeTestId };
+   testClass: TestClassNoDecorator = new TestClassNoDecorator();
+ 

@@ -18,6 +18,46 @@ suite('Suite Scenario 6', () => {
           construct: 'file',
           newFilenameInput: 'home.page',
         },
+        {
+          filePath: './src/app/shared/test-class-no-decorator.spec.ts',
+          construct: 'file',
+          newFilenameInput: 'plain-class',
+        },
+        {
+          filePath: './src/app/shared/test-function-no-decorator.ts',
+          construct: 'file',
+          newFilenameInput: 'plain-function',
+        },
+        {
+          filePath: './src/app/shared/test-guard.spec.ts',
+          construct: 'file',
+          newFilenameInput: 'ng-guard-function',
+        },
+        {
+          filePath: './src/app/shared/test-interceptor.spec.ts',
+          construct: 'file',
+          newFilenameInput: 'ng-interceptor-function',
+        },
+        {
+          filePath: './src/app/shared/test-resolver.ts',
+          construct: 'file',
+          newFilenameInput: 'ng-resolver-function',
+        },
+        {
+          filePath: './src/app/shared/test-values.ts',
+          construct: 'file',
+          newFilenameInput: 'plain-enum',
+        },
+        {
+          filePath: './src/app/shared/test.model.ts',
+          construct: 'file',
+          newFilenameInput: 'plain-interface',
+        },
+        {
+          filePath: './src/app/shared/test-unrecognised-definition.ts',
+          construct: 'file',
+          newFilenameInput: 'plain-unrecognised-definition',
+        },
       ],
       fileDiffPath: './src/test/suite/diffs/ng20-all-new-features.txt',
     });

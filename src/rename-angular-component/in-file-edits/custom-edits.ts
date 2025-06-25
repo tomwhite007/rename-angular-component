@@ -77,10 +77,17 @@ export function getAngularCoreClassEdits(
               new RegExp(
                 `(?<=\\/|^)${escapeRegex(
                   originalFileStub
-                )}(\\.${construct})?(?=\\.(html|scss|css|sass|less)$)`
+                )}(\\.\\S+)?(?=\\.(html|scss|css|sass|less)$)`
               ),
               newFilenameInput
             )}'`;
+
+            console.log(
+              `originalFileStub: ${originalFileStub} construct: ${construct}`
+            );
+            console.log(
+              `itemType: ${foundItem.itemType} replacement: ${replacement}`
+            );
             break;
           case 'attributeInput':
             if (selectorTransfer.newSelector) {

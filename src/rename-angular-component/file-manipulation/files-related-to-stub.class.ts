@@ -1,4 +1,5 @@
 import { workspace } from 'vscode';
+import { conf } from '../../move-ts-indexer/util/helper-functions';
 import { escapeRegex } from '../../utils/escape-regex';
 import {
   likeFilesRegexPartialLookup,
@@ -57,7 +58,13 @@ export class FilesRelatedToStub {
   ) {
     this.originalFileDetails = fileDetails;
 
-    if (fileDetails.path.endsWith(fileDetails.stub)) {
+    const expectedFolderName = conf(
+      'followAngular20FolderNamingConvention',
+      true
+    )
+      ? fileDetails.fileWithoutType
+      : fileDetails.stub;
+    if (fileDetails.path.endsWith(expectedFolderName)) {
       this.folderNameSameAsStub = true;
     }
 
@@ -107,7 +114,12 @@ export class FilesRelatedToStub {
       if (this.folderNameSameAsStub) {
         filePath = filePath.replace(
           this.originalFileDetails.path,
-          this.originalFileDetails.path.replace(folderReplaceRegex, newStub)
+          this.originalFileDetails.path.replace(
+            folderReplaceRegex,
+            conf('followAngular20FolderNamingConvention', true)
+              ? newFilenameInput
+              : newStub
+          )
         );
       }
       return filePath.replace(this.constructFilesRegex, newFilenameInput);

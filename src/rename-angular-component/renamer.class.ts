@@ -161,17 +161,9 @@ export class Renamer {
       JSON.stringify(filesToMove)
     );
 
-    // if (!filesToMove.some((f) => f.isCoreConstruct)) {
-    //   const errMsg = `The ${this.construct} class file must use the same file naming convention as '${this.originalFileDetails.file}' for this process to run.`;
-    //   this.userMessage.popupMessage(errMsg);
-    //   this.debugLogger.log(errMsg);
-    //   return false;
-    // }
-
     const coreFilePath = getCoreFilePath(filesToMove);
     const oldClassName = this.filesRelatedToStub.originalDefinitionName!;
     const newClassName = getNewDefinitionName(
-      this.newStub,
       this.newFilenameInput,
       this.construct,
       this.filesRelatedToStub.definitionType

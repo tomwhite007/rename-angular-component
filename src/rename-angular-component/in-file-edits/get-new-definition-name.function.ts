@@ -5,18 +5,21 @@ import {
 } from '../definitions/file.interfaces';
 
 export function getNewDefinitionName(
-  newStub: string,
   newFilenameInput: string,
   construct: AngularConstructOrPlainFile | null,
   definitionType: DefinitionType
 ): string {
-  const newFileEndsWithConstruct = newFilenameInput.endsWith(`.${construct}`);
+  const endsWithConstruct = new RegExp(`[\.\-](${construct})$`);
+  const newFileEndsWithConstruct = endsWithConstruct.test(
+    newFilenameInput.toLowerCase()
+  );
   const constructPostfix =
-    ['module', 'pipe'].includes(construct ?? '') || newFileEndsWithConstruct
+    ['module', 'pipe'].includes(construct ?? '') && !newFileEndsWithConstruct
       ? construct ?? ''
       : '';
 
   const definitionsWithCapitalFirstLetter = ['class', 'interface', 'enum'];
+  const newStub = newFilenameInput.replace('.', '-');
   const newStubName = definitionsWithCapitalFirstLetter.includes(
     definitionType ?? ''
   )

@@ -4,6 +4,7 @@ import {
   GenericEdit,
   GenericEditsCallback,
 } from '../../move-ts-indexer/apply-generic-edits';
+import { conf } from '../../move-ts-indexer/util/helper-functions';
 import {
   FoundItem,
   FoundItemType,
@@ -56,17 +57,25 @@ export function getAngularCoreClassEdits(
             break;
           case 'selector':
             selectorTransfer.oldSelector = foundItem.itemText;
+            const newSelectorText = conf(
+              'followAngular20FolderNamingConvention',
+              true
+            )
+              ? newFilenameInput
+              : newFileStub;
             selectorTransfer.newSelector = generateNewSelector(
               foundItem.itemText,
               originalFileStub,
-              newFileStub
+              newSelectorText
             );
             replacement = `'${selectorTransfer.newSelector}'`;
             break;
           case 'name':
             if (construct === 'pipe') {
               selectorTransfer.oldSelector = foundItem.itemText;
-              selectorTransfer.newSelector = camelize(newFileStub);
+              selectorTransfer.newSelector = camelize(
+                newFileStub.replace(/\-pipe$/, '')
+              );
               replacement = `'${selectorTransfer.newSelector}'`;
             }
             break;

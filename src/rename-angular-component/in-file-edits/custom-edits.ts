@@ -58,7 +58,7 @@ export function getAngularCoreClassEdits(
           case 'selector':
             selectorTransfer.oldSelector = foundItem.itemText;
             const newSelectorText = conf(
-              'followAngular20FolderNamingConvention',
+              'followAngular20+FolderNamingConvention',
               true
             )
               ? newFilenameInput

@@ -1,3 +1,4 @@
+import { basename, dirname, join } from 'path';
 import { workspace } from 'vscode';
 import { conf } from '../../move-ts-indexer/util/helper-functions';
 import { escapeRegex } from '../../utils/escape-regex';
@@ -30,6 +31,7 @@ export interface FileToMove {
 export class FilesRelatedToStub {
   originalFileDetails!: OriginalFileDetails;
   folderNameSameAsStub = false;
+  newFolderPath?: string;
   fileDetails: FileDetails[] = [];
   constructFilesRegex!: RegExp;
   relatedFilesRegex!: RegExp;
@@ -58,13 +60,11 @@ export class FilesRelatedToStub {
   ) {
     this.originalFileDetails = fileDetails;
 
-    const expectedFolderName = conf(
-      'followAngular20FolderNamingConvention',
-      true
-    )
-      ? fileDetails.fileWithoutType
-      : fileDetails.stub;
-    if (fileDetails.path.endsWith(expectedFolderName)) {
+    const folderName = basename(fileDetails.path);
+    if (
+      folderName === fileDetails.stub ||
+      folderName === fileDetails.fileWithoutType
+    ) {
       this.folderNameSameAsStub = true;
     }
 
@@ -107,19 +107,19 @@ export class FilesRelatedToStub {
   }
 
   getFilesToMove(newStub: string, newFilenameInput: string) {
-    const folderReplaceRegex = new RegExp(
-      `(?<=\/)${escapeRegex(this.originalFileDetails.stub)}$`
-    );
     const replaceStub = (filePath: string) => {
       if (this.folderNameSameAsStub) {
+        const newFolderName = conf(
+          'followAngular20+FolderNamingConvention',
+          true
+        )
+          ? newFilenameInput
+          : newStub;
+        const parentPath = dirname(this.originalFileDetails.path);
+        this.newFolderPath = join(parentPath, newFolderName);
         filePath = filePath.replace(
           this.originalFileDetails.path,
-          this.originalFileDetails.path.replace(
-            folderReplaceRegex,
-            conf('followAngular20FolderNamingConvention', true)
-              ? newFilenameInput
-              : newStub
-          )
+          this.newFolderPath
         );
       }
       return filePath.replace(this.constructFilesRegex, newFilenameInput);

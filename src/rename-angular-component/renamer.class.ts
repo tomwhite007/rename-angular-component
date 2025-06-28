@@ -39,7 +39,6 @@ export class Renamer {
   private newStub!: string;
   private newFilenameInput!: string;
   private processTimerStart!: number;
-  private renameFolder!: boolean;
   private fileMoveJobs!: FileItem[];
   private selectorTransfer!: SelectorTransfer;
   public testBypass?: { newFilenameInput: string };
@@ -95,7 +94,10 @@ export class Renamer {
           );
 
           // delete original folder
-          if (this.renameFolder) {
+          if (
+            this.originalFileDetails.path !==
+            this.filesRelatedToStub?.newFolderPath
+          ) {
             fs.remove(this.originalFileDetails.path);
           }
 
@@ -145,17 +147,13 @@ export class Renamer {
       )}/**/*`
     );
 
-    this.renameFolder =
-      this.filesRelatedToStub.folderNameSameAsStub &&
-      this.originalFileDetails.stub !== this.newStub; // makes sure construct suffix is not the only thing being changed
-
     const filesToMove = this.filesRelatedToStub.getFilesToMove(
       this.newStub,
       this.newFilenameInput
     );
 
-    this.debugLogger.log(
-      'renameFolder: ' + this.renameFolder,
+    this.debugLogger.logToConsole(
+      'newFolderPath: ' + this.filesRelatedToStub.newFolderPath,
       '',
       'filesToMove: ',
       JSON.stringify(filesToMove)

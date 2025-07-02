@@ -181,6 +181,7 @@ export class Renamer {
                 oldClassName,
                 newClassName,
                 this.originalFileDetails.stub,
+                this.originalFileDetails.fileWithoutType,
                 this.newStub,
                 this.newFilenameInput,
                 this.construct,

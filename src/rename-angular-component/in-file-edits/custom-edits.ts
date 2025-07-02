@@ -26,6 +26,7 @@ export function getAngularCoreClassEdits(
   originalClassName: string,
   newClassName: string,
   originalFileStub: string,
+  originalFileWithoutType: string,
   newFileStub: string,
   newFilenameInput: string,
   construct: AngularConstructOrPlainFile | null,
@@ -63,9 +64,15 @@ export function getAngularCoreClassEdits(
             )
               ? newFilenameInput
               : newFileStub;
+            const originalStub = conf(
+              'followAngular20+FolderNamingConvention',
+              true
+            )
+              ? originalFileWithoutType
+              : originalFileStub;
             selectorTransfer.newSelector = generateNewSelector(
               foundItem.itemText,
-              originalFileStub,
+              originalStub,
               newSelectorText
             );
             replacement = `'${selectorTransfer.newSelector}'`;
@@ -90,13 +97,6 @@ export function getAngularCoreClassEdits(
               ),
               newFilenameInput
             )}'`;
-
-            console.log(
-              `originalFileStub: ${originalFileStub} construct: ${construct}`
-            );
-            console.log(
-              `itemType: ${foundItem.itemType} replacement: ${replacement}`
-            );
             break;
           case 'attributeInput':
             if (selectorTransfer.newSelector) {

@@ -1,5 +1,8 @@
 const expect = require('chai').expect;
-import { describe, it } from 'mocha';
+import { after, before, describe, it } from 'mocha';
+import sinon from 'sinon';
+import { workspace, WorkspaceConfiguration } from 'vscode';
+import { conf } from '../../../move-ts-indexer/util/helper-functions';
 import {
   getAngularCoreClassEdits,
   getClassNameEdits,
@@ -7,9 +10,25 @@ import {
 } from '../../../rename-angular-component/in-file-edits/custom-edits';
 
 describe('Custom Edits', () => {
+  const stubGetConfiguration = (enabled: boolean) =>
+    sinon.stub(workspace, 'getConfiguration').returns({
+      get: (property: string) => {
+        return enabled;
+      },
+    } as WorkspaceConfiguration);
+
   describe('getCoreClassEdits', () => {
-    it('should handle class name changes and singular styleUrl', () => {
-      const sourceText = `
+    describe('with Angular 20+ folder naming convention', () => {
+      before(() => {
+        stubGetConfiguration(true);
+      });
+
+      after(() => {
+        sinon.restore();
+      });
+
+      it('should handle class name changes and singular styleUrl', () => {
+        const sourceText = `
         @Component({
           selector: 'app-old',
           templateUrl: './old.component.html',
@@ -20,27 +39,27 @@ describe('Custom Edits', () => {
         }
       `;
 
-      const selectorTransfer = new SelectorTransfer();
-      const edits = getAngularCoreClassEdits(
-        'OldComponent',
-        'NewComponent',
-        'old',
-        'old.component',
-        'new',
-        'new.component',
-        'component',
-        selectorTransfer
-      )('test.ts', sourceText);
+        const selectorTransfer = new SelectorTransfer();
+        const edits = getAngularCoreClassEdits(
+          'OldComponent',
+          'NewComponent',
+          'old',
+          'old.component',
+          'new',
+          'new.component',
+          'component',
+          selectorTransfer
+        )('test.ts', sourceText);
 
-      expect(edits).to.have.length(4);
-      expect(edits[0].replacement).to.equal("'app-new'");
-      expect(edits[1].replacement).to.equal("'./new.component.html'");
-      expect(edits[2].replacement).to.equal("'./new.component.scss'");
-      expect(edits[3].replacement).to.equal('NewComponent');
-    });
+        expect(edits).to.have.length(4);
+        expect(edits[0].replacement).to.equal("'app-new.component'");
+        expect(edits[1].replacement).to.equal("'./new.component.html'");
+        expect(edits[2].replacement).to.equal("'./new.component.scss'");
+        expect(edits[3].replacement).to.equal('NewComponent');
+      });
 
-    it('should handle attribute selectors', () => {
-      const sourceText = `
+      it('should handle attribute selectors', () => {
+        const sourceText = `
         @Component({
           selector: '[app-old]',
           templateUrl: './old.component.html'
@@ -50,26 +69,26 @@ describe('Custom Edits', () => {
         }
       `;
 
-      const selectorTransfer = new SelectorTransfer();
-      const edits = getAngularCoreClassEdits(
-        'OldComponent',
-        'NewComponent',
-        'old',
-        'old.component',
-        'new',
-        'new.component',
-        'component',
-        selectorTransfer
-      )('test.ts', sourceText);
+        const selectorTransfer = new SelectorTransfer();
+        const edits = getAngularCoreClassEdits(
+          'OldComponent',
+          'NewComponent',
+          'old',
+          'old.component',
+          'new',
+          'new.component',
+          'component',
+          selectorTransfer
+        )('test.ts', sourceText);
 
-      expect(edits).to.have.length(3);
-      expect(edits[0].replacement).to.equal("'[appNew]'");
-      expect(edits[1].replacement).to.equal("'./new.component.html'");
-      expect(edits[2].replacement).to.equal('NewComponent');
-    });
+        expect(edits).to.have.length(3);
+        expect(edits[0].replacement).to.equal("'[appNewComponent]'");
+        expect(edits[1].replacement).to.equal("'./new.component.html'");
+        expect(edits[2].replacement).to.equal('NewComponent');
+      });
 
-    it('should handle multiple styleUrls', () => {
-      const sourceText = `
+      it('should handle multiple styleUrls', () => {
+        const sourceText = `
         @Component({
           selector: 'app-old',
           styleUrls: ['./old.component.scss', './old.component.css']
@@ -77,23 +96,130 @@ describe('Custom Edits', () => {
         export class OldComponent {}
       `;
 
-      const selectorTransfer = new SelectorTransfer();
-      const edits = getAngularCoreClassEdits(
-        'OldComponent',
-        'NewComponent',
-        'old',
-        'old.component',
-        'new',
-        'new.component',
-        'component',
-        selectorTransfer
-      )('test.ts', sourceText);
+        const selectorTransfer = new SelectorTransfer();
+        const edits = getAngularCoreClassEdits(
+          'OldComponent',
+          'NewComponent',
+          'old',
+          'old.component',
+          'new',
+          'new.component',
+          'component',
+          selectorTransfer
+        )('test.ts', sourceText);
 
-      expect(edits).to.have.length(4);
-      expect(edits[0].replacement).to.equal("'app-new'");
-      expect(edits[1].replacement).to.equal("'./new.component.scss'");
-      expect(edits[2].replacement).to.equal("'./new.component.css'");
-      expect(edits[3].replacement).to.equal('NewComponent');
+        expect(edits).to.have.length(4);
+
+        expect(conf('followAngular20+FolderNamingConvention', true)).to.equal(
+          true
+        );
+        expect(edits[0].replacement).to.equal("'app-new.component'");
+        expect(edits[1].replacement).to.equal("'./new.component.scss'");
+        expect(edits[2].replacement).to.equal("'./new.component.css'");
+        expect(edits[3].replacement).to.equal('NewComponent');
+      });
+    });
+
+    describe('without Angular 20+ folder naming convention', () => {
+      before(() => {
+        stubGetConfiguration(false);
+      });
+
+      after(() => {
+        sinon.restore();
+      });
+
+      it('should handle class name changes and singular styleUrl', () => {
+        const sourceText = `
+        @Component({
+          selector: 'app-old',
+          templateUrl: './old.component.html',
+          styleUrl: './old.component.scss'
+        })
+        export class OldComponent {
+          @Input() old: string;
+        }
+      `;
+
+        const selectorTransfer = new SelectorTransfer();
+        const edits = getAngularCoreClassEdits(
+          'OldComponent',
+          'NewComponent',
+          'old',
+          'old.component',
+          'new',
+          'new.component',
+          'component',
+          selectorTransfer
+        )('test.ts', sourceText);
+
+        expect(edits).to.have.length(4);
+        expect(edits[0].replacement).to.equal("'app-new'");
+        expect(edits[1].replacement).to.equal("'./new.component.html'");
+        expect(edits[2].replacement).to.equal("'./new.component.scss'");
+        expect(edits[3].replacement).to.equal('NewComponent');
+      });
+
+      it('should handle attribute selectors', () => {
+        const sourceText = `
+        @Component({
+          selector: '[app-old]',
+          templateUrl: './old.component.html'
+        })
+        export class OldComponent {
+          @Input() old: string;
+        }
+      `;
+
+        const selectorTransfer = new SelectorTransfer();
+        const edits = getAngularCoreClassEdits(
+          'OldComponent',
+          'NewComponent',
+          'old',
+          'old.component',
+          'new',
+          'new.component',
+          'component',
+          selectorTransfer
+        )('test.ts', sourceText);
+
+        expect(edits).to.have.length(3);
+        expect(edits[0].replacement).to.equal("'[appNew]'");
+        expect(edits[1].replacement).to.equal("'./new.component.html'");
+        expect(edits[2].replacement).to.equal('NewComponent');
+      });
+
+      it('should handle multiple styleUrls', () => {
+        const sourceText = `
+        @Component({
+          selector: 'app-old',
+          styleUrls: ['./old.component.scss', './old.component.css']
+        })
+        export class OldComponent {}
+      `;
+
+        const selectorTransfer = new SelectorTransfer();
+        const edits = getAngularCoreClassEdits(
+          'OldComponent',
+          'NewComponent',
+          'old',
+          'old.component',
+          'new',
+          'new.component',
+          'component',
+          selectorTransfer
+        )('test.ts', sourceText);
+
+        expect(edits).to.have.length(4);
+
+        expect(conf('followAngular20+FolderNamingConvention', true)).to.equal(
+          false
+        );
+        expect(edits[0].replacement).to.equal("'app-new'");
+        expect(edits[1].replacement).to.equal("'./new.component.scss'");
+        expect(edits[2].replacement).to.equal("'./new.component.css'");
+        expect(edits[3].replacement).to.equal('NewComponent');
+      });
     });
   });
 
@@ -149,28 +275,96 @@ describe('Custom Edits', () => {
   });
 
   describe('SelectorTransfer', () => {
-    it('should store old and new selectors', () => {
-      const sourceText = `
+    describe('with Angular 20+ folder naming convention', () => {
+      before(() => {
+        stubGetConfiguration(true);
+      });
+
+      after(() => {
+        sinon.restore();
+      });
+
+      it('should store old and new selectors', () => {
+        const sourceText = `
         @Component({
           selector: 'app-old'
         })
         export class OldComponent {}
       `;
 
-      const selectorTransfer = new SelectorTransfer();
-      getAngularCoreClassEdits(
-        'OldComponent',
-        'NewComponent',
-        'old',
-        'old.component',
-        'new',
-        'new.component',
-        'component',
-        selectorTransfer
-      )('test.ts', sourceText);
+        const selectorTransfer = new SelectorTransfer();
+        getAngularCoreClassEdits(
+          'OldComponent',
+          'NewComponent',
+          'old',
+          'old.component',
+          'new',
+          'new',
+          'component',
+          selectorTransfer
+        )('test.ts', sourceText);
 
-      expect(selectorTransfer.oldSelector).to.equal('app-old');
-      expect(selectorTransfer.newSelector).to.equal('app-new');
+        expect(selectorTransfer.oldSelector).to.equal('app-old');
+        expect(selectorTransfer.newSelector).to.equal('app-new');
+      });
+
+      it('should store old and new selectors with .component postfix', () => {
+        const sourceText = `
+        @Component({
+          selector: 'app-old'
+        })
+        export class OldComponent {}
+      `;
+
+        const selectorTransfer = new SelectorTransfer();
+        getAngularCoreClassEdits(
+          'OldComponent',
+          'NewComponent',
+          'old',
+          'old.component',
+          'new',
+          'new.component',
+          'component',
+          selectorTransfer
+        )('test.ts', sourceText);
+
+        expect(selectorTransfer.oldSelector).to.equal('app-old');
+        expect(selectorTransfer.newSelector).to.equal('app-new.component');
+      });
+    });
+
+    describe('without Angular 20+ folder naming convention', () => {
+      before(() => {
+        stubGetConfiguration(false);
+      });
+
+      after(() => {
+        sinon.restore();
+      });
+
+      it('should store old and new selectors', () => {
+        const sourceText = `
+        @Component({
+          selector: 'app-old'
+        })
+        export class OldComponent {}
+      `;
+
+        const selectorTransfer = new SelectorTransfer();
+        getAngularCoreClassEdits(
+          'OldComponent',
+          'NewComponent',
+          'old',
+          'old.component',
+          'new',
+          'new.component',
+          'component',
+          selectorTransfer
+        )('test.ts', sourceText);
+
+        expect(selectorTransfer.oldSelector).to.equal('app-old');
+        expect(selectorTransfer.newSelector).to.equal('app-new');
+      });
     });
   });
 });

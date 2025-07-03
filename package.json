@@ -132,7 +132,8 @@
     "pretest": "yarn run compile-tests && yarn run compile && yarn run lint",
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
-    "test": "vscode-test --config=unit-tests.vscode-test.mjs"
+    "test": "vscode-test --config=unit-tests.vscode-test.mjs",
+    "test-watch": "vscode-test --config=unit-tests.vscode-test.mjs --watch"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.42",

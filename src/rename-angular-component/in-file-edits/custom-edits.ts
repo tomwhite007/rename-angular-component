@@ -64,15 +64,11 @@ export function getAngularCoreClassEdits(
             )
               ? newFilenameInput
               : newFileStub;
-            const originalStub = conf(
-              'followAngular20+FolderNamingConvention',
-              true
-            )
-              ? originalFileWithoutType
-              : originalFileStub;
+
             selectorTransfer.newSelector = generateNewSelector(
               foundItem.itemText,
-              originalStub,
+              originalFileStub,
+              originalFileWithoutType,
               newSelectorText
             );
             replacement = `'${selectorTransfer.newSelector}'`;

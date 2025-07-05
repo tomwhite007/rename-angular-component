@@ -1,10 +1,17 @@
 const expect = require('chai').expect;
 import fs from 'fs-extra-promise';
-import { afterEach, beforeEach, describe, it } from 'mocha';
+import { after, afterEach, before, beforeEach, describe, it } from 'mocha';
 import sinon from 'sinon';
-import vscode from 'vscode';
+import vscode, { workspace, WorkspaceConfiguration } from 'vscode';
 import { OriginalFileDetails } from '../../../rename-angular-component/definitions/file.interfaces';
 import { FilesRelatedToStub } from '../../../rename-angular-component/file-manipulation/files-related-to-stub.class';
+
+const stubGetConfiguration = (enabled: boolean) =>
+  sinon.stub(workspace, 'getConfiguration').returns({
+    get: (property: string) => {
+      return enabled;
+    },
+  } as WorkspaceConfiguration);
 
 const componentFileContent = `
   @Component({
@@ -60,77 +67,168 @@ describe('FilesRelatedToStub', () => {
   });
 
   describe('getFilesToMove', () => {
-    it('should return correct file paths to move when folder name matches stub', async () => {
-      const fileDetails: OriginalFileDetails = {
-        path: '/project/src/app/component',
-        stub: 'component',
-        fileWithoutType: 'component.component',
-        filePath: '/project/src/app/component/component.component.ts',
-        file: 'component.component.ts',
-      };
+    describe('with Angular 20+ folder naming convention', () => {
+      before(() => {
+        stubGetConfiguration(true);
+      });
 
-      const mockUris = [
-        { fsPath: '/project/src/app/component/component.component.ts' },
-        { fsPath: '/project/src/app/component/component.html' },
-      ];
+      after(() => {
+        sinon.restore();
+      });
+      it('should return correct file paths to move when folder name matches stub', async () => {
+        const fileDetails: OriginalFileDetails = {
+          path: '/project/src/app/component',
+          stub: 'component',
+          fileWithoutType: 'component.component',
+          filePath: '/project/src/app/component/component.component.ts',
+          file: 'component.component.ts',
+        };
 
-      workspaceFindFilesStub.resolves(mockUris);
-      readFileStub.resolves(componentFileContent);
+        const mockUris = [
+          { fsPath: '/project/src/app/component/component.component.ts' },
+          { fsPath: '/project/src/app/component/component.html' },
+        ];
 
-      const instance = await FilesRelatedToStub.init(
-        fileDetails,
-        '/project',
-        'component'
-      );
-      const filesToMove = instance.getFilesToMove(
-        'new-component',
-        'new-component.component'
-      );
+        workspaceFindFilesStub.resolves(mockUris);
+        readFileStub.resolves(componentFileContent);
 
-      expect(filesToMove).to.have.length(2);
-      expect(filesToMove[0].filePath).to.equal(
-        '/project/src/app/component/component.component.ts'
-      );
-      expect(filesToMove[0].newFilePath).to.equal(
-        '/project/src/app/new-component/new-component.component.ts'
-      );
-      expect(filesToMove[0].isCoreConstruct).to.be.true;
+        const instance = await FilesRelatedToStub.init(
+          fileDetails,
+          '/project',
+          'component'
+        );
+        const filesToMove = instance.getFilesToMove(
+          'new-component',
+          'new-component.component'
+        );
+
+        expect(filesToMove).to.have.length(2);
+        expect(filesToMove[0].filePath).to.equal(
+          '/project/src/app/component/component.component.ts'
+        );
+        expect(filesToMove[0].newFilePath).to.equal(
+          '/project/src/app/new-component.component/new-component.component.ts'
+        );
+        expect(filesToMove[0].isCoreConstruct).to.be.true;
+      });
+
+      it('should return correct file paths to move when folder name does not match stub', async () => {
+        const fileDetails: OriginalFileDetails = {
+          path: '/project/src/app/feature',
+          stub: 'component',
+          fileWithoutType: 'component.component',
+          filePath: '/project/src/app/feature/component.component.ts',
+          file: 'component.component.ts',
+        };
+
+        const mockUris = [
+          { fsPath: '/project/src/app/feature/component.component.ts' },
+          { fsPath: '/project/src/app/feature/test.ts' },
+        ];
+
+        workspaceFindFilesStub.resolves(mockUris);
+        readFileStub.resolves(componentFileContent);
+
+        const instance = await FilesRelatedToStub.init(
+          fileDetails,
+          '/project',
+          'component'
+        );
+        const filesToMove = instance.getFilesToMove(
+          'new-component',
+          'new-component.component'
+        );
+
+        expect(filesToMove).to.deep.equal([
+          {
+            filePath: '/project/src/app/feature/component.component.ts',
+            newFilePath: '/project/src/app/feature/new-component.component.ts',
+            isCoreConstruct: true,
+          },
+        ]);
+      });
     });
 
-    it('should return correct file paths to move when folder name does not match stub', async () => {
-      const fileDetails: OriginalFileDetails = {
-        path: '/project/src/app/feature',
-        stub: 'component',
-        fileWithoutType: 'component.component',
-        filePath: '/project/src/app/feature/component.component.ts',
-        file: 'component.component.ts',
-      };
+    describe('without Angular 20+ folder naming convention', () => {
+      before(() => {
+        stubGetConfiguration(false);
+      });
 
-      const mockUris = [
-        { fsPath: '/project/src/app/feature/component.component.ts' },
-        { fsPath: '/project/src/app/feature/test.ts' },
-      ];
+      after(() => {
+        sinon.restore();
+      });
+      it('should return correct file paths to move when folder name matches stub', async () => {
+        const fileDetails: OriginalFileDetails = {
+          path: '/project/src/app/component',
+          stub: 'component',
+          fileWithoutType: 'component.component',
+          filePath: '/project/src/app/component/component.component.ts',
+          file: 'component.component.ts',
+        };
 
-      workspaceFindFilesStub.resolves(mockUris);
-      readFileStub.resolves(componentFileContent);
+        const mockUris = [
+          { fsPath: '/project/src/app/component/component.component.ts' },
+          { fsPath: '/project/src/app/component/component.html' },
+        ];
 
-      const instance = await FilesRelatedToStub.init(
-        fileDetails,
-        '/project',
-        'component'
-      );
-      const filesToMove = instance.getFilesToMove(
-        'new-component',
-        'new-component.component'
-      );
+        workspaceFindFilesStub.resolves(mockUris);
+        readFileStub.resolves(componentFileContent);
 
-      expect(filesToMove).to.deep.equal([
-        {
+        const instance = await FilesRelatedToStub.init(
+          fileDetails,
+          '/project',
+          'component'
+        );
+        const filesToMove = instance.getFilesToMove(
+          'new-component',
+          'new-component.component'
+        );
+
+        expect(filesToMove).to.have.length(2);
+        expect(filesToMove[0].filePath).to.equal(
+          '/project/src/app/component/component.component.ts'
+        );
+        expect(filesToMove[0].newFilePath).to.equal(
+          '/project/src/app/new-component/new-component.component.ts'
+        );
+        expect(filesToMove[0].isCoreConstruct).to.be.true;
+      });
+
+      it('should return correct file paths to move when folder name does not match stub', async () => {
+        const fileDetails: OriginalFileDetails = {
+          path: '/project/src/app/feature',
+          stub: 'component',
+          fileWithoutType: 'component.component',
           filePath: '/project/src/app/feature/component.component.ts',
-          newFilePath: '/project/src/app/feature/new-component.component.ts',
-          isCoreConstruct: true,
-        },
-      ]);
+          file: 'component.component.ts',
+        };
+
+        const mockUris = [
+          { fsPath: '/project/src/app/feature/component.component.ts' },
+          { fsPath: '/project/src/app/feature/test.ts' },
+        ];
+
+        workspaceFindFilesStub.resolves(mockUris);
+        readFileStub.resolves(componentFileContent);
+
+        const instance = await FilesRelatedToStub.init(
+          fileDetails,
+          '/project',
+          'component'
+        );
+        const filesToMove = instance.getFilesToMove(
+          'new-component',
+          'new-component.component'
+        );
+
+        expect(filesToMove).to.deep.equal([
+          {
+            filePath: '/project/src/app/feature/component.component.ts',
+            newFilePath: '/project/src/app/feature/new-component.component.ts',
+            isCoreConstruct: true,
+          },
+        ]);
+      });
     });
   });
 

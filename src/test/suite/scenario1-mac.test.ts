@@ -23,7 +23,7 @@ suite('Suite Scenario 1', () => {
       ],
       fileDiffPath:
         './src/test/suite/diffs/simple-reactive-viewmodel-example.txt',
-      useNg20Convention: false,
+      useNg20Convention: true,
     });
   });
 });

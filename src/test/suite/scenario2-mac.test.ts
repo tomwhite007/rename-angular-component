@@ -22,6 +22,7 @@ suite('Suite Scenario 2', () => {
         },
       ],
       fileDiffPath: './src/test/suite/diffs/shp-wild-paths.txt',
+      useNg20Convention: true,
     });
   });
 });

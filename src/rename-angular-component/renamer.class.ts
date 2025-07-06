@@ -152,7 +152,7 @@ export class Renamer {
       this.newFilenameInput
     );
 
-    this.debugLogger.logToConsole(
+    this.debugLogger.log(
       'newFolderPath: ' + this.filesRelatedToStub.newFolderPath,
       '',
       'filesToMove: ',

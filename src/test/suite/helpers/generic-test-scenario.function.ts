@@ -17,7 +17,9 @@ export interface TestScenarioConfig {
 }
 
 export async function genericTestScenario(config: TestScenarioConfig) {
-  stubGetConfiguration(config.useNg20Convention ?? true);
+  stubGetConfiguration({
+    'followAngular20+FolderNamingConvention': config.useNg20Convention ?? true,
+  });
 
   const git = simpleGit({
     baseDir: config.projectRoot,
@@ -27,9 +29,6 @@ export async function genericTestScenario(config: TestScenarioConfig) {
       return;
     }
     await git.reset(['--hard', 'HEAD']);
-    // unstaged changes:
-    // await git.clean([CleanOptions.FORCE, CleanOptions.RECURSIVE]);
-    // await git.checkout('.');
   };
 
   const notClean = await git.diff(['--staged']);

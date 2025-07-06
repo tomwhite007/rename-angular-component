@@ -1,15 +1,15 @@
 import vscode from 'vscode';
 
 import { ReferenceIndexBuilder } from './move-ts-indexer/reference-index-builder';
+import { conf } from './move-ts-indexer/util/helper-functions';
 import { EXTENSION_NAME } from './rename-angular-component/definitions/extension-name';
-import { getConfig } from './rename-angular-component/definitions/getConfig.function';
 import { FileMoveHandler } from './rename-angular-component/file-manipulation/file-move-handler.class';
 import { DebugLogger } from './rename-angular-component/logging/debug-logger.class';
 import { UserMessage } from './rename-angular-component/logging/user-message.class';
 import { Renamer } from './rename-angular-component/renamer.class';
 
 export function activate(context: vscode.ExtensionContext) {
-  const debugLogger = new DebugLogger(getConfig('debugLog', false));
+  const debugLogger = new DebugLogger(conf('debugLog', false));
   const indexStart = Date.now();
   const userMessage = new UserMessage(EXTENSION_NAME);
   const indexer: ReferenceIndexBuilder = new ReferenceIndexBuilder(debugLogger);

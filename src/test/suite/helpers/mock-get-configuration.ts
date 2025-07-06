@@ -1,9 +1,28 @@
 import sinon from 'sinon';
 import { workspace, WorkspaceConfiguration } from 'vscode';
 
-export const stubGetConfiguration = (enabled: boolean) =>
+interface ConfigItems {
+  'followAngular20+FolderNamingConvention'?: boolean;
+  useLocalDirectPaths?: boolean;
+  openEditors?: boolean;
+  debugLog?: boolean;
+}
+
+const defaultConfig: ConfigItems = {
+  'followAngular20+FolderNamingConvention': true,
+  useLocalDirectPaths: true,
+  openEditors: false,
+  debugLog: false,
+};
+
+export const stubGetConfiguration = (configItems: ConfigItems) =>
   sinon.stub(workspace, 'getConfiguration').returns({
     get: (property: string) => {
-      return enabled;
+      const returnValue =
+        configItems[property as keyof ConfigItems] ??
+        defaultConfig[property as keyof ConfigItems] ??
+        false;
+      console.log(`getConfiguration: ${property} = ${returnValue}`);
+      return returnValue;
     },
   } as WorkspaceConfiguration);

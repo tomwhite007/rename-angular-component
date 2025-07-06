@@ -1,6 +1,8 @@
 import assert = require('assert');
-import simpleGit, { CleanOptions, ResetMode } from 'simple-git';
+import simpleGit from 'simple-git';
+import sinon from 'sinon';
 import { DISCARD_STAGED_CHANGES } from './constants-helper-config';
+import { stubGetConfiguration } from './mock-get-configuration';
 import { readUpsertDiffFile } from './read-upsert-diff-file.function';
 import {
   RenameCallConfig,
@@ -11,9 +13,12 @@ export interface TestScenarioConfig {
   projectRoot: string;
   renames: RenameCallConfig[];
   fileDiffPath: string;
+  useNg20Convention?: boolean;
 }
 
 export async function genericTestScenario(config: TestScenarioConfig) {
+  stubGetConfiguration(config.useNg20Convention ?? true);
+
   const git = simpleGit({
     baseDir: config.projectRoot,
   });
@@ -42,4 +47,6 @@ export async function genericTestScenario(config: TestScenarioConfig) {
   await discardChanges();
 
   assert.strictEqual(diff, fileDiff);
+
+  sinon.restore();
 }

@@ -1,5 +1,5 @@
 diff --git a/src/index.html b/src/index.html
-index 2b16487..d4050a0 100644
+index 2b16487..8037cae 100644
 --- a/src/index.html
 +++ b/src/index.html
 @@ -8,6 +8,6 @@
@@ -7,46 +7,46 @@ index 2b16487..d4050a0 100644
  </head>
  <body>
 -  <app-root></app-root>
-+  <tom-test-root></tom-test-root>
++  <tom-test.component-root></tom-test.component-root>
  </body>
  </html>
 diff --git a/src/main.ts b/src/main.ts
-index 35b00f3..c8de717 100644
+index 35b00f3..be836ce 100644
 --- a/src/main.ts
 +++ b/src/main.ts
 @@ -1,6 +1,6 @@
  import { bootstrapApplication } from '@angular/platform-browser';
 -import { appConfig } from './app/app.config';
 -import { AppComponent } from './app/app.component';
-+import { appConfig } from './tom-test/app.config';
-+import { TomTestComponent } from './tom-test/tom-test.component';
++import { appConfig } from './tom-test.component/app.config';
++import { TomTestComponent } from './tom-test.component/tom-test.component';
  
 -bootstrapApplication(AppComponent, appConfig)
 +bootstrapApplication(TomTestComponent, appConfig)
    .catch((err) => console.error(err));
-diff --git a/src/app/app.config.ts b/src/tom-test/app.config.ts
+diff --git a/src/app/app.config.ts b/src/tom-test.component/app.config.ts
 similarity index 100%
 rename from src/app/app.config.ts
-rename to src/tom-test/app.config.ts
-diff --git a/src/app/app.routes.ts b/src/tom-test/app.routes.ts
+rename to src/tom-test.component/app.config.ts
+diff --git a/src/app/app.routes.ts b/src/tom-test.component/app.routes.ts
 similarity index 100%
 rename from src/app/app.routes.ts
-rename to src/tom-test/app.routes.ts
-diff --git a/src/app/app.component.css b/src/tom-test/tom-test.component.css
+rename to src/tom-test.component/app.routes.ts
+diff --git a/src/app/app.component.css b/src/tom-test.component/tom-test.component.css
 similarity index 100%
 rename from src/app/app.component.css
-rename to src/tom-test/tom-test.component.css
-diff --git a/src/app/app.component.html b/src/tom-test/tom-test.component.html
+rename to src/tom-test.component/tom-test.component.css
+diff --git a/src/app/app.component.html b/src/tom-test.component/tom-test.component.html
 similarity index 100%
 rename from src/app/app.component.html
-rename to src/tom-test/tom-test.component.html
-diff --git a/src/app/app.component.spec.ts b/src/tom-test/tom-test.component.spec.ts
+rename to src/tom-test.component/tom-test.component.html
+diff --git a/src/app/app.component.spec.ts b/src/tom-test.component/tom-test.component.spec.ts
 similarity index 63%
 rename from src/app/app.component.spec.ts
-rename to src/tom-test/tom-test.component.spec.ts
+rename to src/tom-test.component/tom-test.component.spec.ts
 index 0ce9968..e765a37 100644
 --- a/src/app/app.component.spec.ts
-+++ b/src/tom-test/tom-test.component.spec.ts
++++ b/src/tom-test.component/tom-test.component.spec.ts
 @@ -1,34 +1,34 @@
  import { TestBed } from '@angular/core/testing';
 -import { AppComponent } from './app.component';
@@ -89,19 +89,19 @@ index 0ce9968..e765a37 100644
        'getData',
      ]);
    });
-diff --git a/src/app/app.component.ts b/src/tom-test/tom-test.component.ts
-similarity index 63%
+diff --git a/src/app/app.component.ts b/src/tom-test.component/tom-test.component.ts
+similarity index 61%
 rename from src/app/app.component.ts
-rename to src/tom-test/tom-test.component.ts
-index 4361370..16fd332 100644
+rename to src/tom-test.component/tom-test.component.ts
+index 4361370..d18ef85 100644
 --- a/src/app/app.component.ts
-+++ b/src/tom-test/tom-test.component.ts
++++ b/src/tom-test.component/tom-test.component.ts
 @@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
  import { RouterOutlet } from '@angular/router';
  
  @Component({
 -  selector: 'app-root',
-+  selector: 'tom-test-root',
++  selector: 'tom-test.component-root',
    standalone: true,
    imports: [CommonModule, RouterOutlet],
 -  templateUrl: './app.component.html',

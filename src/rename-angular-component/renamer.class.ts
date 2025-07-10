@@ -96,8 +96,15 @@ export class Renamer {
           // delete original folder
           if (
             this.originalFileDetails.path !==
-            this.filesRelatedToStub?.newFolderPath
+              this.filesRelatedToStub?.newFolderPath &&
+            this.filesRelatedToStub?.newFolderPath !== undefined
           ) {
+            this.debugLogger.logToConsole(
+              'Deleting original folder: ',
+              this.originalFileDetails.path,
+              'newFolderPath: ',
+              this.filesRelatedToStub?.newFolderPath ?? 'undefined'
+            );
             fs.remove(this.originalFileDetails.path);
           }
 

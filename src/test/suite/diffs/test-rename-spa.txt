@@ -1,8 +1,8 @@
-diff --git a/projects/shared/src/lib/dir-identifier/dir-identifier.directive.spec.ts b/projects/shared/src/lib/dir-identifier/dir-identifier.directive.spec.ts
+diff --git a/projects/shared/src/lib/dir-identifier.directive/dir-identifier.directive.spec.ts b/projects/shared/src/lib/dir-identifier.directive/dir-identifier.directive.spec.ts
 new file mode 100644
 index 0000000..c1dceff
 --- /dev/null
-+++ b/projects/shared/src/lib/dir-identifier/dir-identifier.directive.spec.ts
++++ b/projects/shared/src/lib/dir-identifier.directive/dir-identifier.directive.spec.ts
 @@ -0,0 +1,8 @@
 +import { DirIdentifierDirective } from './dir-identifier.directive';
 +
@@ -12,32 +12,32 @@ index 0000000..c1dceff
 +    expect(directive).toBeTruthy();
 +  });
 +});
-diff --git a/projects/shared/src/lib/multiply-by-twenty/multiply-by-twenty.directive.ts b/projects/shared/src/lib/dir-identifier/dir-identifier.directive.ts
-similarity index 70%
+diff --git a/projects/shared/src/lib/multiply-by-twenty/multiply-by-twenty.directive.ts b/projects/shared/src/lib/dir-identifier.directive/dir-identifier.directive.ts
+similarity index 68%
 rename from projects/shared/src/lib/multiply-by-twenty/multiply-by-twenty.directive.ts
-rename to projects/shared/src/lib/dir-identifier/dir-identifier.directive.ts
-index bee0500..f294a9a 100644
+rename to projects/shared/src/lib/dir-identifier.directive/dir-identifier.directive.ts
+index bee0500..3179c37 100644
 --- a/projects/shared/src/lib/multiply-by-twenty/multiply-by-twenty.directive.ts
-+++ b/projects/shared/src/lib/dir-identifier/dir-identifier.directive.ts
++++ b/projects/shared/src/lib/dir-identifier.directive/dir-identifier.directive.ts
 @@ -7,10 +7,10 @@ import {
  } from '@angular/core';
  
  @Directive({
 -  selector: '[libMultiplyByTwenty]',
-+  selector: '[libDirIdentifier]',
++  selector: '[libDirIdentifierDirective]',
  })
 -export class MultiplyByTwentyDirective implements OnInit {
 -  @Input('libMultiplyByTwenty') multiplier: number = 0;
 +export class DirIdentifierDirective implements OnInit {
-+  @Input('libDirIdentifier') multiplier: number = 0;
++  @Input('libDirIdentifierDirective') multiplier: number = 0;
    @HostBinding()
    result = 0;
  
-diff --git a/projects/shared/src/lib/dir-prop/dir-prop.directive.spec.ts b/projects/shared/src/lib/dir-prop/dir-prop.directive.spec.ts
+diff --git a/projects/shared/src/lib/dir-prop.directive/dir-prop.directive.spec.ts b/projects/shared/src/lib/dir-prop.directive/dir-prop.directive.spec.ts
 new file mode 100644
 index 0000000..9430eed
 --- /dev/null
-+++ b/projects/shared/src/lib/dir-prop/dir-prop.directive.spec.ts
++++ b/projects/shared/src/lib/dir-prop.directive/dir-prop.directive.spec.ts
 @@ -0,0 +1,8 @@
 +import { DirPropDirective } from './dir-prop.directive';
 +
@@ -47,11 +47,11 @@ index 0000000..9430eed
 +    expect(directive).toBeTruthy();
 +  });
 +});
-diff --git a/projects/shared/src/lib/dir-prop/dir-prop.directive.ts b/projects/shared/src/lib/dir-prop/dir-prop.directive.ts
+diff --git a/projects/shared/src/lib/dir-prop.directive/dir-prop.directive.ts b/projects/shared/src/lib/dir-prop.directive/dir-prop.directive.ts
 new file mode 100644
-index 0000000..990c6d8
+index 0000000..7804da1
 --- /dev/null
-+++ b/projects/shared/src/lib/dir-prop/dir-prop.directive.ts
++++ b/projects/shared/src/lib/dir-prop.directive/dir-prop.directive.ts
 @@ -0,0 +1,24 @@
 +import {
 +  Directive,
@@ -62,26 +62,26 @@ index 0000000..990c6d8
 +} from '@angular/core';
 +
 +@Directive({
-+  selector: '[libDirProp]',
++  selector: '[libDirPropDirective]',
 +})
 +export class DirPropDirective implements OnInit {
-+  @Input() libDirProp: number = 0;
++  @Input() libDirPropDirective: number = 0;
 +  @HostBinding()
 +  result = 0;
 +
 +  constructor(private el: ElementRef) {}
 +
 +  ngOnInit(): void {
-+    this.result = this.libDirProp * 10;
++    this.result = this.libDirPropDirective * 10;
 +
-+    this.el.nativeElement.innerHTML = `${this.libDirProp} multiplied by 10 is <br> = ${this.result}`;
++    this.el.nativeElement.innerHTML = `${this.libDirPropDirective} multiplied by 10 is <br> = ${this.result}`;
 +  }
 +}
-diff --git a/projects/shared/src/lib/dir-prop/index.ts b/projects/shared/src/lib/dir-prop/index.ts
+diff --git a/projects/shared/src/lib/dir-prop.directive/index.ts b/projects/shared/src/lib/dir-prop.directive/index.ts
 new file mode 100644
 index 0000000..8d2a9b8
 --- /dev/null
-+++ b/projects/shared/src/lib/dir-prop/index.ts
++++ b/projects/shared/src/lib/dir-prop.directive/index.ts
 @@ -0,0 +1 @@
 +export * from './dir-prop.directive';
 diff --git a/projects/shared/src/lib/multiply-by-ten/index.ts b/projects/shared/src/lib/multiply-by-ten/index.ts
@@ -150,7 +150,7 @@ index 429df7f..0000000
 -  });
 -});
 diff --git a/projects/shared/src/lib/shared.module.ts b/projects/shared/src/lib/shared.module.ts
-index ca2efdc..7a02a90 100644
+index ca2efdc..375f489 100644
 --- a/projects/shared/src/lib/shared.module.ts
 +++ b/projects/shared/src/lib/shared.module.ts
 @@ -1,15 +1,15 @@
@@ -158,8 +158,8 @@ index ca2efdc..7a02a90 100644
  import { SharedComponent } from './shared.component';
 -import { MultiplyByTenDirective } from './multiply-by-ten';
 -import { MultiplyByTwentyDirective } from './multiply-by-twenty/multiply-by-twenty.directive';
-+import { DirPropDirective } from './dir-prop';
-+import { DirIdentifierDirective } from './dir-identifier/dir-identifier.directive';
++import { DirPropDirective } from './dir-prop.directive';
++import { DirIdentifierDirective } from './dir-identifier.directive/dir-identifier.directive';
  
  @NgModule({
    declarations: [
@@ -175,7 +175,7 @@ index ca2efdc..7a02a90 100644
  })
  export class SharedModule {}
 diff --git a/src/app/app-routing.module.ts b/src/app/app-routing.module.ts
-index a81169d..e1ed888 100644
+index a81169d..a1a3ea3 100644
 --- a/src/app/app-routing.module.ts
 +++ b/src/app/app-routing.module.ts
 @@ -5,7 +5,7 @@ const routes: Routes = [
@@ -183,7 +183,7 @@ index a81169d..e1ed888 100644
      path: 'products',
      loadChildren: () =>
 -      import('./products/products.module').then((m) => m.ProductsModule),
-+      import('./tom-test/tom-test.module').then((m) => m.TomTestModule),
++      import('./tom-test.component/tom-test.module').then((m) => m.TomTestModule),
    },
  ];
  
@@ -235,11 +235,11 @@ index b42ad70..0000000
 -  }
 -
 -}
-diff --git a/src/app/tom-test/formatter.spec.ts b/src/app/tom-test/formatter.spec.ts
+diff --git a/src/app/tom-test.component/formatter.spec.ts b/src/app/tom-test.component/formatter.spec.ts
 new file mode 100644
 index 0000000..8fa674c
 --- /dev/null
-+++ b/src/app/tom-test/formatter.spec.ts
++++ b/src/app/tom-test.component/formatter.spec.ts
 @@ -0,0 +1,8 @@
 +import { FormatterPipe } from './formatter';
 +
@@ -249,13 +249,13 @@ index 0000000..8fa674c
 +    expect(pipe).toBeTruthy();
 +  });
 +});
-diff --git a/src/app/products/product.pipe.ts b/src/app/tom-test/formatter.ts
+diff --git a/src/app/products/product.pipe.ts b/src/app/tom-test.component/formatter.ts
 similarity index 66%
 rename from src/app/products/product.pipe.ts
-rename to src/app/tom-test/formatter.ts
+rename to src/app/tom-test.component/formatter.ts
 index 03aadfa..eedf0c3 100644
 --- a/src/app/products/product.pipe.ts
-+++ b/src/app/tom-test/formatter.ts
++++ b/src/app/tom-test.component/formatter.ts
 @@ -1,9 +1,9 @@
  import { Pipe, PipeTransform } from '@angular/core';
  
@@ -268,13 +268,13 @@ index 03aadfa..eedf0c3 100644
  
    transform(value: unknown, ...args: unknown[]): unknown {
      return null;
-diff --git a/src/app/products/products-routing.module.ts b/src/app/tom-test/products-routing.module.ts
+diff --git a/src/app/products/products-routing.module.ts b/src/app/tom-test.component/products-routing.module.ts
 similarity index 63%
 rename from src/app/products/products-routing.module.ts
-rename to src/app/tom-test/products-routing.module.ts
+rename to src/app/tom-test.component/products-routing.module.ts
 index 72d8bd3..0bd5c33 100644
 --- a/src/app/products/products-routing.module.ts
-+++ b/src/app/tom-test/products-routing.module.ts
++++ b/src/app/tom-test.component/products-routing.module.ts
 @@ -1,8 +1,8 @@
  import { NgModule } from '@angular/core';
  import { RouterModule, Routes } from '@angular/router';
@@ -286,30 +286,30 @@ index 72d8bd3..0bd5c33 100644
  
  @NgModule({
    imports: [RouterModule.forChild(routes)],
-diff --git a/src/app/tom-test/tom-test.component.html b/src/app/tom-test/tom-test.component.html
+diff --git a/src/app/tom-test.component/tom-test.component.html b/src/app/tom-test.component/tom-test.component.html
 new file mode 100644
-index 0000000..adc8101
+index 0000000..7b05d9a
 --- /dev/null
-+++ b/src/app/tom-test/tom-test.component.html
++++ b/src/app/tom-test.component/tom-test.component.html
 @@ -0,0 +1,7 @@
 +<p>products works!</p>
 +
-+<p [libDirProp]="99"></p>
++<p [libDirPropDirective]="99"></p>
 +
-+<p [libDirIdentifier]="99"></p>
++<p [libDirIdentifierDirective]="99"></p>
 +
 +<p>product: {{ 99 | formatter }}</p>
-diff --git a/src/app/products/products.component.scss b/src/app/tom-test/tom-test.component.scss
+diff --git a/src/app/products/products.component.scss b/src/app/tom-test.component/tom-test.component.scss
 similarity index 100%
 rename from src/app/products/products.component.scss
-rename to src/app/tom-test/tom-test.component.scss
-diff --git a/src/app/products/products.component.spec.ts b/src/app/tom-test/tom-test.component.spec.ts
+rename to src/app/tom-test.component/tom-test.component.scss
+diff --git a/src/app/products/products.component.spec.ts b/src/app/tom-test.component/tom-test.component.spec.ts
 similarity index 53%
 rename from src/app/products/products.component.spec.ts
-rename to src/app/tom-test/tom-test.component.spec.ts
+rename to src/app/tom-test.component/tom-test.component.spec.ts
 index 8a96dbf..311f201 100644
 --- a/src/app/products/products.component.spec.ts
-+++ b/src/app/tom-test/tom-test.component.spec.ts
++++ b/src/app/tom-test.component/tom-test.component.spec.ts
 @@ -1,19 +1,19 @@
  import { ComponentFixture, TestBed } from '@angular/core/testing';
  
@@ -336,16 +336,16 @@ index 8a96dbf..311f201 100644
      component = fixture.componentInstance;
      fixture.detectChanges();
    });
-diff --git a/src/app/tom-test/tom-test.component.ts b/src/app/tom-test/tom-test.component.ts
+diff --git a/src/app/tom-test.component/tom-test.component.ts b/src/app/tom-test.component/tom-test.component.ts
 new file mode 100644
-index 0000000..c4a0e53
+index 0000000..5ca9532
 --- /dev/null
-+++ b/src/app/tom-test/tom-test.component.ts
++++ b/src/app/tom-test.component/tom-test.component.ts
 @@ -0,0 +1,15 @@
 +import { Component, OnInit } from '@angular/core';
 +
 +@Component({
-+  selector: 'app-tom-test',
++  selector: 'app-tom-test.component',
 +  templateUrl: './tom-test.component.html',
 +  styleUrls: ['./tom-test.component.scss']
 +})
@@ -357,13 +357,13 @@ index 0000000..c4a0e53
 +  }
 +
 +}
-diff --git a/src/app/products/products.module.ts b/src/app/tom-test/tom-test.module.ts
+diff --git a/src/app/products/products.module.ts b/src/app/tom-test.component/tom-test.module.ts
 similarity index 60%
 rename from src/app/products/products.module.ts
-rename to src/app/tom-test/tom-test.module.ts
+rename to src/app/tom-test.component/tom-test.module.ts
 index ee94bd8..3a17f60 100644
 --- a/src/app/products/products.module.ts
-+++ b/src/app/tom-test/tom-test.module.ts
++++ b/src/app/tom-test.component/tom-test.module.ts
 @@ -2,12 +2,12 @@ import { NgModule } from '@angular/core';
  import { CommonModule } from '@angular/common';
  

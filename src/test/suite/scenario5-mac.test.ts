@@ -32,17 +32,18 @@ suite('Suite Scenario 5', () => {
           newFilenameInput: 'dir-identifier.directive',
         },
         {
-          filePath: './src/app/tom-test/products.module.ts',
+          filePath: './src/app/tom-test.component/products.module.ts',
           construct: 'module',
           newFilenameInput: 'tom-test.module',
         },
         {
-          filePath: './src/app/tom-test/product.pipe.ts',
+          filePath: './src/app/tom-test.component/product.pipe.ts',
           construct: 'file',
           newFilenameInput: 'formatter',
         },
       ],
       fileDiffPath: './src/test/suite/diffs/test-rename-spa.txt',
+      useNg20Convention: true,
     });
   });
 });

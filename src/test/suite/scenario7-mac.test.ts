@@ -1,10 +1,10 @@
 import vscode from 'vscode';
 import { genericTestScenario } from './helpers/generic-test-scenario.function';
 
-suite('Suite Scenario 6', () => {
+suite('Suite Scenario 7', () => {
   vscode.window.showInformationMessage('Start all tests.');
 
-  test('Scenario 6', async () => {
+  test('Scenario 7', async () => {
     /*
     This test scenario uses publicly available repo: https://github.com/tomwhite007/test-latest-css
     as the seed to base 1 renamer test on.
@@ -60,6 +60,7 @@ suite('Suite Scenario 6', () => {
         },
       ],
       fileDiffPath: './src/test/suite/diffs/ng20-all-new-features.txt',
+      useNg20Convention: true,
     });
   });
 });

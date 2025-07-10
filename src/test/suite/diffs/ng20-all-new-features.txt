@@ -1,47 +1,309 @@
 diff --git a/src/app/app.routes.ts b/src/app/app.routes.ts
-index 71149da..7417128 100644
+index b8c0257..6a0a5b1 100644
 --- a/src/app/app.routes.ts
 +++ b/src/app/app.routes.ts
-@@ -1,12 +1,12 @@
+@@ -1,14 +1,14 @@
  import { Routes } from '@angular/router';
 -import { Home } from './home/home';
-+import { HomePage } from './home-page/home.page';
- import { testGuard } from './shared/test-guard';
- import { testResolver } from './shared/test-resolver';
+-import { testGuard } from './shared/test-guard';
+-import { testResolver } from './shared/test-resolver';
++import { HomePage } from './home.page/home.page';
++import { ngGuardFunction } from './shared/ng-guard-function';
++import { ngResolverFunction } from './shared/ng-resolver-function';
  export const routes: Routes = [
    { path: '', redirectTo: '/home', pathMatch: 'full' },
    {
      path: 'home',
 -    component: Home,
+-    canActivate: [testGuard],
+-    resolve: testResolver,
 +    component: HomePage,
-     canActivate: [testGuard],
-     resolve: testResolver,
++    canActivate: [ngGuardFunction],
++    resolve: ngResolverFunction,
    },
-diff --git a/src/app/home/home.css b/src/app/home-page/home.page.css
+   {
+     path: 'test',
+diff --git a/src/app/home/home.css b/src/app/home.page/home.page.css
 similarity index 100%
 rename from src/app/home/home.css
-rename to src/app/home-page/home.page.css
-diff --git a/src/app/home/home.ts b/src/app/home-page/home.page.ts
-similarity index 84%
-rename from src/app/home/home.ts
-rename to src/app/home-page/home.page.ts
-index 02504ee..bda6669 100644
---- a/src/app/home/home.ts
-+++ b/src/app/home-page/home.page.ts
-@@ -4,13 +4,13 @@ import { TestValues } from '../shared/test-values';
- import { TestModel } from '../shared/test.model';
- 
- @Component({
--  selector: 'app-home',
-+  selector: 'app-home-page',
-   imports: [],
-   template: `<p>home works!</p>`,
--  styleUrl: './home.css',
+rename to src/app/home.page/home.page.css
+diff --git a/src/app/home.page/home.page.ts b/src/app/home.page/home.page.ts
+new file mode 100644
+index 0000000..aa61028
+--- /dev/null
++++ b/src/app/home.page/home.page.ts
+@@ -0,0 +1,20 @@
++import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
++import { PlainClass } from '../shared/plain-class';
++import { PlainEnum } from '../shared/plain-enum';
++import { PlainInterface } from '../shared/plain-interface';
++
++@Component({
++  selector: 'app-home.page',
++  imports: [],
++  template: `<p>home works!</p>`,
 +  styleUrl: './home.page.css',
-   changeDetection: ChangeDetectionStrategy.OnPush,
- })
--export class Home implements OnInit {
++  changeDetection: ChangeDetectionStrategy.OnPush,
++})
 +export class HomePage implements OnInit {
-   test: TestModel = { testId: TestValues.HomeTestId };
-   testClass: TestClassNoDecorator = new TestClassNoDecorator();
++  test: PlainInterface = { testId: PlainEnum.HomeTestId };
++  testClass: PlainClass = new PlainClass();
++
++  ngOnInit(): void {
++    console.log(this.testClass.testMethodNoDecorator());
++  }
++}
+diff --git a/src/app/home/home.ts b/src/app/home/home.ts
+deleted file mode 100644
+index 02504ee..0000000
+--- a/src/app/home/home.ts
++++ /dev/null
+@@ -1,20 +0,0 @@
+-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+-import { TestClassNoDecorator } from '../shared/test-class-no-decorator';
+-import { TestValues } from '../shared/test-values';
+-import { TestModel } from '../shared/test.model';
+-
+-@Component({
+-  selector: 'app-home',
+-  imports: [],
+-  template: `<p>home works!</p>`,
+-  styleUrl: './home.css',
+-  changeDetection: ChangeDetectionStrategy.OnPush,
+-})
+-export class Home implements OnInit {
+-  test: TestModel = { testId: TestValues.HomeTestId };
+-  testClass: TestClassNoDecorator = new TestClassNoDecorator();
+-
+-  ngOnInit(): void {
+-    console.log(this.testClass.testMethodNoDecorator());
+-  }
+-}
+diff --git a/src/app/shared/test-guard.spec.ts b/src/app/shared/ng-guard-function.spec.ts
+similarity index 65%
+rename from src/app/shared/test-guard.spec.ts
+rename to src/app/shared/ng-guard-function.spec.ts
+index 3fc0428..df7edb5 100644
+--- a/src/app/shared/test-guard.spec.ts
++++ b/src/app/shared/ng-guard-function.spec.ts
+@@ -1,11 +1,11 @@
+ import { TestBed } from '@angular/core/testing';
+ import { CanActivateFn } from '@angular/router';
  
+-import { testGuard } from './test-guard';
++import { ngGuardFunction } from './ng-guard-function';
+ 
+-describe('testGuard', () => {
++describe('ngGuardFunction', () => {
+   const executeGuard: CanActivateFn = (...guardParameters) =>
+-    TestBed.runInInjectionContext(() => testGuard(...guardParameters));
++    TestBed.runInInjectionContext(() => ngGuardFunction(...guardParameters));
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({});
+diff --git a/src/app/shared/test-guard.ts b/src/app/shared/ng-guard-function.ts
+similarity index 52%
+rename from src/app/shared/test-guard.ts
+rename to src/app/shared/ng-guard-function.ts
+index 0b3b02c..5a2c353 100644
+--- a/src/app/shared/test-guard.ts
++++ b/src/app/shared/ng-guard-function.ts
+@@ -1,7 +1,7 @@
+ import { CanActivateFn } from '@angular/router';
+-import { TestUnrecognisedDefinition } from './test-unrecognised-definition';
++import { TestUnrecognisedDefinition } from './plain-unrecognised-definition';
+ 
+-export const testGuard: CanActivateFn = (route, state) => {
++export const ngGuardFunction: CanActivateFn = (route, state) => {
+   const unrecognisedDefinition: TestUnrecognisedDefinition =
+     'unrecognised-definition';
+   return true;
+diff --git a/src/app/shared/test-interceptor.spec.ts b/src/app/shared/ng-interceptor-function.spec.ts
+similarity index 63%
+rename from src/app/shared/test-interceptor.spec.ts
+rename to src/app/shared/ng-interceptor-function.spec.ts
+index 25e91bc..79aa4df 100644
+--- a/src/app/shared/test-interceptor.spec.ts
++++ b/src/app/shared/ng-interceptor-function.spec.ts
+@@ -1,11 +1,11 @@
+ import { TestBed } from '@angular/core/testing';
+ import { HttpInterceptorFn } from '@angular/common/http';
+ 
+-import { testInterceptor } from './test-interceptor';
++import { ngInterceptorFunction } from './ng-interceptor-function';
+ 
+-describe('testInterceptor', () => {
++describe('ngInterceptorFunction', () => {
+   const interceptor: HttpInterceptorFn = (req, next) => 
+-    TestBed.runInInjectionContext(() => testInterceptor(req, next));
++    TestBed.runInInjectionContext(() => ngInterceptorFunction(req, next));
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({});
+diff --git a/src/app/shared/test-interceptor.ts b/src/app/shared/ng-interceptor-function.ts
+similarity index 52%
+rename from src/app/shared/test-interceptor.ts
+rename to src/app/shared/ng-interceptor-function.ts
+index a5f1ae6..9cc7fb4 100644
+--- a/src/app/shared/test-interceptor.ts
++++ b/src/app/shared/ng-interceptor-function.ts
+@@ -1,5 +1,5 @@
+ import { HttpInterceptorFn } from '@angular/common/http';
+ 
+-export const testInterceptor: HttpInterceptorFn = (req, next) => {
++export const ngInterceptorFunction: HttpInterceptorFn = (req, next) => {
+   return next(req);
+ };
+diff --git a/src/app/shared/test-resolver.spec.ts b/src/app/shared/ng-resolver-function.spec.ts
+similarity index 63%
+rename from src/app/shared/test-resolver.spec.ts
+rename to src/app/shared/ng-resolver-function.spec.ts
+index f243c88..617638b 100644
+--- a/src/app/shared/test-resolver.spec.ts
++++ b/src/app/shared/ng-resolver-function.spec.ts
+@@ -1,11 +1,11 @@
+ import { TestBed } from '@angular/core/testing';
+ import { ResolveFn } from '@angular/router';
+ 
+-import { testResolver } from './test-resolver';
++import { ngResolverFunction } from './ng-resolver-function';
+ 
+-describe('testResolver', () => {
++describe('ngResolverFunction', () => {
+   const executeResolver: ResolveFn<boolean> = (...resolverParameters) => 
+-      TestBed.runInInjectionContext(() => testResolver(...resolverParameters));
++      TestBed.runInInjectionContext(() => ngResolverFunction(...resolverParameters));
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({});
+diff --git a/src/app/shared/ng-resolver-function.ts b/src/app/shared/ng-resolver-function.ts
+new file mode 100644
+index 0000000..208d369
+--- /dev/null
++++ b/src/app/shared/ng-resolver-function.ts
+@@ -0,0 +1,5 @@
++import { ResolveFn } from '@angular/router';
++
++export const ngResolverFunction: ResolveFn<boolean> = (route, state) => {
++  return true;
++};
+diff --git a/src/app/shared/plain-class.spec.ts b/src/app/shared/plain-class.spec.ts
+new file mode 100644
+index 0000000..bc6ea59
+--- /dev/null
++++ b/src/app/shared/plain-class.spec.ts
+@@ -0,0 +1,7 @@
++import { PlainClass } from './plain-class';
++
++describe('PlainClass', () => {
++  it('should create an instance', () => {
++    expect(new PlainClass()).toBeTruthy();
++  });
++});
+diff --git a/src/app/shared/plain-class.ts b/src/app/shared/plain-class.ts
+new file mode 100644
+index 0000000..3ab13f5
+--- /dev/null
++++ b/src/app/shared/plain-class.ts
+@@ -0,0 +1,7 @@
++import { plainFunction } from './plain-function';
++
++export class PlainClass {
++  testMethodNoDecorator(): string {
++    return plainFunction();
++  }
++}
+diff --git a/src/app/shared/test-values.ts b/src/app/shared/plain-enum.ts
+similarity index 80%
+rename from src/app/shared/test-values.ts
+rename to src/app/shared/plain-enum.ts
+index b554d21..184822a 100644
+--- a/src/app/shared/test-values.ts
++++ b/src/app/shared/plain-enum.ts
+@@ -1,4 +1,4 @@
+-export enum TestValues {
++export enum PlainEnum {
+   HomeTestId = 'home-test-id',
+   OtherTestId = 'other-test-id',
+   AnotherTestId = 'another-test-id',
+diff --git a/src/app/shared/plain-function.ts b/src/app/shared/plain-function.ts
+new file mode 100644
+index 0000000..24b4575
+--- /dev/null
++++ b/src/app/shared/plain-function.ts
+@@ -0,0 +1,3 @@
++export function plainFunction(): string {
++  return 'test-function-no-decorator';
++}
+diff --git a/src/app/shared/plain-interface.ts b/src/app/shared/plain-interface.ts
+new file mode 100644
+index 0000000..960b773
+--- /dev/null
++++ b/src/app/shared/plain-interface.ts
+@@ -0,0 +1,5 @@
++import { PlainEnum } from './plain-enum';
++
++export interface PlainInterface {
++  testId: PlainEnum;
++}
+diff --git a/src/app/shared/test-unrecognised-definition.ts b/src/app/shared/plain-unrecognised-definition.ts
+similarity index 100%
+rename from src/app/shared/test-unrecognised-definition.ts
+rename to src/app/shared/plain-unrecognised-definition.ts
+diff --git a/src/app/shared/test-class-no-decorator.spec.ts b/src/app/shared/test-class-no-decorator.spec.ts
+deleted file mode 100644
+index 019e19b..0000000
+--- a/src/app/shared/test-class-no-decorator.spec.ts
++++ /dev/null
+@@ -1,7 +0,0 @@
+-import { TestClassNoDecorator } from './test-class-no-decorator';
+-
+-describe('TestClassNoDecorator', () => {
+-  it('should create an instance', () => {
+-    expect(new TestClassNoDecorator()).toBeTruthy();
+-  });
+-});
+diff --git a/src/app/shared/test-class-no-decorator.ts b/src/app/shared/test-class-no-decorator.ts
+deleted file mode 100644
+index 33ee8cd..0000000
+--- a/src/app/shared/test-class-no-decorator.ts
++++ /dev/null
+@@ -1,7 +0,0 @@
+-import { testFunctionNoDecorator } from './test-function-no-decorator';
+-
+-export class TestClassNoDecorator {
+-  testMethodNoDecorator(): string {
+-    return testFunctionNoDecorator();
+-  }
+-}
+diff --git a/src/app/shared/test-function-no-decorator.ts b/src/app/shared/test-function-no-decorator.ts
+deleted file mode 100644
+index 83668df..0000000
+--- a/src/app/shared/test-function-no-decorator.ts
++++ /dev/null
+@@ -1,3 +0,0 @@
+-export function testFunctionNoDecorator(): string {
+-  return 'test-function-no-decorator';
+-}
+diff --git a/src/app/shared/test-resolver.ts b/src/app/shared/test-resolver.ts
+deleted file mode 100644
+index 14e8c90..0000000
+--- a/src/app/shared/test-resolver.ts
++++ /dev/null
+@@ -1,5 +0,0 @@
+-import { ResolveFn } from '@angular/router';
+-
+-export const testResolver: ResolveFn<boolean> = (route, state) => {
+-  return true;
+-};
+diff --git a/src/app/shared/test.model.ts b/src/app/shared/test.model.ts
+deleted file mode 100644
+index 3144513..0000000
+--- a/src/app/shared/test.model.ts
++++ /dev/null
+@@ -1,5 +0,0 @@
+-import { TestValues } from './test-values';
+-
+-export interface TestModel {
+-  testId: TestValues;
+-}

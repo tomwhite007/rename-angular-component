@@ -18,73 +18,39 @@ export async function getCoreFileDefinitionDetails(
     ts.ScriptTarget.Latest
   );
 
+  let definitionName = '';
   let definitionType: DefinitionType = null;
+  let decoratorName = '';
 
   for (const node of file.statements) {
-    if (ts.isClassDeclaration(node) || ts.isFunctionDeclaration(node)) {
-      definitionType = ts.isClassDeclaration(node) ? 'class' : 'function';
-      const coreClassOrFunctionName = node.name?.escapedText ?? '';
-      const decorator: any = node.modifiers?.find((decorator) => {
-        if (ts.isDecorator(decorator)) {
-          return true;
-        }
-        return false;
-      });
-
-      if (
-        decorator &&
-        ts.isDecorator(decorator) &&
-        ts.isCallExpression(decorator.expression) &&
-        ts.isIdentifier(decorator.expression.expression)
-      ) {
-        const decoratorName = decorator.expression.expression.text;
-        if (definitionStartsWithStub(coreClassOrFunctionName, stub)) {
-          return {
-            definitionName: coreClassOrFunctionName.toString(),
-            definitionType,
-            decoratorName,
-          };
-        }
-      } else {
-        return {
-          definitionName: coreClassOrFunctionName.toString(),
-          definitionType,
-          decoratorName: '',
-        };
-      }
-    } else if (ts.isVariableStatement(node)) {
+    if (isClassAndStartsWithStub(node, stub)) {
+      const classDeclaration = node as ts.ClassDeclaration;
+      definitionType = 'class';
+      definitionName = classDeclaration.name?.escapedText ?? '';
+      decoratorName = getDecoratorName(classDeclaration);
+    } else if (isFunctionAndStartsWithStub(node, stub)) {
+      const functionDeclaration = node as ts.FunctionDeclaration;
+      definitionType = 'function';
+      definitionName = functionDeclaration.name?.escapedText ?? '';
+    } else if (isVariableAndStartsWithStub(node, stub)) {
+      const variableDeclaration = node as ts.VariableStatement;
       definitionType = 'variable';
-      const variable = node.declarationList.declarations[0];
-      if (variable.name && ts.isIdentifier(variable.name)) {
-        const variableName = variable.name.escapedText.toString();
-        if (definitionStartsWithStub(variableName, stub)) {
-          return {
-            definitionName: variableName,
-            definitionType,
-            decoratorName: '',
-          };
-        }
-      }
-    } else if (ts.isInterfaceDeclaration(node)) {
+      definitionName = getVariableName(variableDeclaration);
+    } else if (isInterfaceAndStartsWithStub(node, stub)) {
+      const interfaceDeclaration = node as ts.InterfaceDeclaration;
       definitionType = 'interface';
-      const interfaceName = node.name.escapedText.toString();
-      if (definitionStartsWithStub(interfaceName, stub)) {
-        return {
-          definitionName: interfaceName,
-          definitionType,
-          decoratorName: '',
-        };
-      }
-    } else if (ts.isEnumDeclaration(node)) {
+      definitionName = interfaceDeclaration.name?.escapedText ?? '';
+    } else if (isEnumAndStartsWithStub(node, stub)) {
+      const enumDeclaration = node as ts.EnumDeclaration;
       definitionType = 'enum';
-      const enumName = node.name.escapedText.toString();
-      if (definitionStartsWithStub(enumName, stub)) {
-        return {
-          definitionName: enumName,
-          definitionType,
-          decoratorName: '',
-        };
-      }
+      definitionName = enumDeclaration.name?.escapedText ?? '';
+    }
+    if (definitionName) {
+      return {
+        definitionName,
+        definitionType,
+        decoratorName,
+      };
     }
   }
 
@@ -97,10 +63,100 @@ export async function getCoreFileDefinitionDetails(
   return null;
 }
 
+function getDecoratorName(node: ts.ClassDeclaration): string {
+  const decorator: any = node.modifiers?.find((decorator) => {
+    if (ts.isDecorator(decorator)) {
+      return true;
+    }
+    return false;
+  });
+  if (
+    decorator &&
+    ts.isDecorator(decorator) &&
+    ts.isCallExpression(decorator.expression) &&
+    ts.isIdentifier(decorator.expression.expression)
+  ) {
+    return decorator.expression.expression.text;
+  }
+  return '';
+}
+
+function isClassAndStartsWithStub(node: ts.Statement, stub: string): boolean {
+  const isClass = ts.isClassDeclaration(node);
+  if (!isClass) {
+    return false;
+  }
+  const className = isClass ? node.name?.escapedText.toString() ?? '' : '';
+  return definitionStartsWithStub(className, stub);
+}
+
+function isFunctionAndStartsWithStub(
+  node: ts.Statement,
+  stub: string
+): boolean {
+  const isFunction = ts.isFunctionDeclaration(node);
+  if (!isFunction) {
+    return false;
+  }
+  const functionName = isFunction
+    ? node.name?.escapedText.toString() ?? ''
+    : '';
+  return definitionStartsWithStub(functionName, stub);
+}
+
+function isVariableAndStartsWithStub(
+  node: ts.Statement,
+  stub: string
+): boolean {
+  if (ts.isVariableStatement(node)) {
+    const variableName = getVariableName(node);
+    if (definitionStartsWithStub(variableName, stub)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isInterfaceAndStartsWithStub(
+  node: ts.Statement,
+  stub: string
+): boolean {
+  const isInterface = ts.isInterfaceDeclaration(node);
+  if (!isInterface) {
+    return false;
+  }
+  const interfaceName = isInterface
+    ? node.name?.escapedText.toString() ?? ''
+    : '';
+  return definitionStartsWithStub(interfaceName, stub);
+}
+
+function isEnumAndStartsWithStub(node: ts.Statement, stub: string): boolean {
+  const isEnum = ts.isEnumDeclaration(node);
+  if (!isEnum) {
+    return false;
+  }
+  const enumName = isEnum ? node.name?.escapedText.toString() ?? '' : '';
+  return definitionStartsWithStub(enumName, stub);
+}
+
+function getVariableName(node: ts.VariableStatement): string {
+  if (node.declarationList.declarations.length > 0) {
+    const variable = node.declarationList.declarations[0];
+    if (ts.isIdentifier(variable.name)) {
+      return variable.name.escapedText.toString();
+    }
+  }
+  return '';
+}
+
 function definitionStartsWithStub(
   coreClassOrFunctionName: string,
   stub: string
 ): boolean {
+  if (stub.length === 0) {
+    return false;
+  }
   const dasherizedName = dasherize(coreClassOrFunctionName);
   const stubDashCount = stub.split('-').length;
   const nameDashCount = dasherizedName.split('-').length;

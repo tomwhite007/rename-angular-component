@@ -1,8 +1,8 @@
 diff --git a/src/app/app.routes.ts b/src/app/app.routes.ts
-index b8c0257..6a0a5b1 100644
+index b8c0257..d5e51f6 100644
 --- a/src/app/app.routes.ts
 +++ b/src/app/app.routes.ts
-@@ -1,14 +1,14 @@
+@@ -1,20 +1,20 @@
  import { Routes } from '@angular/router';
 -import { Home } from './home/home';
 -import { testGuard } from './shared/test-guard';
@@ -23,6 +23,14 @@ index b8c0257..6a0a5b1 100644
    },
    {
      path: 'test',
+     loadComponent: () =>
+-      import('./shared/test-shared-component/test-shared-component').then(
+-        (m) => m.TestSharedComponent
++      import('./shared/multi-definition-test/multi-definition-test').then(
++        (m) => m.MultiDefinitionTest
+       ),
+   },
+   {
 diff --git a/src/app/home/home.css b/src/app/home.page/home.page.css
 similarity index 100%
 rename from src/app/home/home.css
@@ -79,6 +87,70 @@ index 02504ee..0000000
 -    console.log(this.testClass.testMethodNoDecorator());
 -  }
 -}
+diff --git a/src/app/shared/test-shared-component/test-shared-component.html b/src/app/shared/multi-definition-test/multi-definition-test.html
+similarity index 100%
+rename from src/app/shared/test-shared-component/test-shared-component.html
+rename to src/app/shared/multi-definition-test/multi-definition-test.html
+diff --git a/src/app/shared/test-shared-component/test-shared-component.scss b/src/app/shared/multi-definition-test/multi-definition-test.scss
+similarity index 100%
+rename from src/app/shared/test-shared-component/test-shared-component.scss
+rename to src/app/shared/multi-definition-test/multi-definition-test.scss
+diff --git a/src/app/shared/test-shared-component/test-shared-component.spec.ts b/src/app/shared/multi-definition-test/multi-definition-test.spec.ts
+similarity index 52%
+rename from src/app/shared/test-shared-component/test-shared-component.spec.ts
+rename to src/app/shared/multi-definition-test/multi-definition-test.spec.ts
+index 9cfbbcd..3327b96 100644
+--- a/src/app/shared/test-shared-component/test-shared-component.spec.ts
++++ b/src/app/shared/multi-definition-test/multi-definition-test.spec.ts
+@@ -1,18 +1,18 @@
+ import { ComponentFixture, TestBed } from '@angular/core/testing';
+ 
+-import { TestSharedComponent } from './test-shared-component';
++import { MultiDefinitionTest } from './multi-definition-test';
+ 
+-describe('TestSharedComponent', () => {
+-  let component: TestSharedComponent;
+-  let fixture: ComponentFixture<TestSharedComponent>;
++describe('MultiDefinitionTest', () => {
++  let component: MultiDefinitionTest;
++  let fixture: ComponentFixture<MultiDefinitionTest>;
+ 
+   beforeEach(async () => {
+     await TestBed.configureTestingModule({
+-      imports: [TestSharedComponent]
++      imports: [MultiDefinitionTest]
+     })
+     .compileComponents();
+ 
+-    fixture = TestBed.createComponent(TestSharedComponent);
++    fixture = TestBed.createComponent(MultiDefinitionTest);
+     component = fixture.componentInstance;
+     fixture.detectChanges();
+   });
+diff --git a/src/app/shared/test-shared-component/test-shared-component.ts b/src/app/shared/multi-definition-test/multi-definition-test.ts
+similarity index 70%
+rename from src/app/shared/test-shared-component/test-shared-component.ts
+rename to src/app/shared/multi-definition-test/multi-definition-test.ts
+index a165c35..48db009 100644
+--- a/src/app/shared/test-shared-component/test-shared-component.ts
++++ b/src/app/shared/multi-definition-test/multi-definition-test.ts
+@@ -17,12 +17,12 @@ export class TestSharedComponentHelper {
+ }
+ 
+ @Component({
+-  selector: 'app-test-shared-component',
++  selector: 'app-multi-definition-test',
+   imports: [],
+-  templateUrl: './test-shared-component.html',
+-  styleUrl: './test-shared-component.scss',
++  templateUrl: './multi-definition-test.html',
++  styleUrl: './multi-definition-test.scss',
+ })
+-export class TestSharedComponent {
++export class MultiDefinitionTest {
+   testData = input<TestData[]>();
+ 
+   callHelper() {
 diff --git a/src/app/shared/test-guard.spec.ts b/src/app/shared/ng-guard-function.spec.ts
 similarity index 65%
 rename from src/app/shared/test-guard.spec.ts

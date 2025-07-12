@@ -58,6 +58,12 @@ suite('Suite Scenario 7', () => {
           construct: 'file',
           newFilenameInput: 'plain-unrecognised-definition',
         },
+        {
+          filePath:
+            './src/app/shared/test-shared-component/test-shared-component.spec.ts',
+          construct: 'file',
+          newFilenameInput: 'multi-definition-test',
+        },
       ],
       fileDiffPath: './src/test/suite/diffs/ng20-all-new-features.txt',
       useNg20Convention: true,

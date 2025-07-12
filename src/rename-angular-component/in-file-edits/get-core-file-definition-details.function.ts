@@ -1,6 +1,6 @@
 import fs from 'fs-extra-promise';
 import ts from 'typescript';
-import { classify, dasherize } from '../../angular-cli/strings';
+import { dasherize } from '../../angular-cli/strings';
 import {
   CoreFileDefinitionDetails,
   DefinitionType,
@@ -22,43 +22,93 @@ export async function getCoreFileDefinitionDetails(
   let definitionType: DefinitionType = null;
   let decoratorName = '';
 
-  for (const node of file.statements) {
-    if (isClassAndStartsWithStub(node, stub)) {
-      const classDeclaration = node as ts.ClassDeclaration;
-      definitionType = 'class';
-      definitionName = classDeclaration.name?.escapedText ?? '';
-      decoratorName = getDecoratorName(classDeclaration);
-    } else if (isFunctionAndStartsWithStub(node, stub)) {
-      const functionDeclaration = node as ts.FunctionDeclaration;
-      definitionType = 'function';
-      definitionName = functionDeclaration.name?.escapedText ?? '';
-    } else if (isVariableAndStartsWithStub(node, stub)) {
-      const variableDeclaration = node as ts.VariableStatement;
-      definitionType = 'variable';
-      definitionName = getVariableName(variableDeclaration);
-    } else if (isInterfaceAndStartsWithStub(node, stub)) {
-      const interfaceDeclaration = node as ts.InterfaceDeclaration;
-      definitionType = 'interface';
-      definitionName = interfaceDeclaration.name?.escapedText ?? '';
-    } else if (isEnumAndStartsWithStub(node, stub)) {
-      const enumDeclaration = node as ts.EnumDeclaration;
-      definitionType = 'enum';
-      definitionName = enumDeclaration.name?.escapedText ?? '';
-    }
-    if (definitionName) {
-      return {
-        definitionName,
-        definitionType,
-        decoratorName,
-      };
-    }
+  const classAndDecoratorDeclaration = file.statements.find((node) =>
+    isClassAndStartsWithStubWithDecorator(node, stub)
+  );
+  if (classAndDecoratorDeclaration) {
+    const classDeclaration =
+      classAndDecoratorDeclaration as ts.ClassDeclaration;
+    definitionType = 'class';
+    definitionName = classDeclaration.name?.escapedText ?? '';
+    decoratorName = getDecoratorName(classDeclaration);
+    return {
+      definitionName,
+      definitionType,
+      decoratorName,
+    };
   }
 
-  console.log(
-    definitionType
-      ? `${classify(definitionType)} Name found but no decorator.`
-      : 'No Class or Function Name found.'
+  const classDeclaration = file.statements.find((node) =>
+    isClassAndStartsWithStub(node, stub)
   );
+  if (classDeclaration) {
+    const classNode = classDeclaration as ts.ClassDeclaration;
+    definitionType = 'class';
+    definitionName = classNode.name?.escapedText ?? '';
+    return {
+      definitionName,
+      definitionType,
+      decoratorName: '',
+    };
+  }
+
+  const functionDeclaration = file.statements.find((node) =>
+    isFunctionAndStartsWithStub(node, stub)
+  );
+  if (functionDeclaration) {
+    const functionNode = functionDeclaration as ts.FunctionDeclaration;
+    definitionType = 'function';
+    definitionName = functionNode.name?.escapedText ?? '';
+    return {
+      definitionName,
+      definitionType,
+      decoratorName: '',
+    };
+  }
+
+  const variableDeclaration = file.statements.find((node) =>
+    isVariableAndStartsWithStub(node, stub)
+  );
+  if (variableDeclaration) {
+    const variableNode = variableDeclaration as ts.VariableStatement;
+    definitionType = 'variable';
+    definitionName = getVariableName(variableNode);
+    return {
+      definitionName,
+      definitionType,
+      decoratorName: '',
+    };
+  }
+
+  const interfaceDeclaration = file.statements.find((node) =>
+    isInterfaceAndStartsWithStub(node, stub)
+  );
+  if (interfaceDeclaration) {
+    const interfaceNode = interfaceDeclaration as ts.InterfaceDeclaration;
+    definitionType = 'interface';
+    definitionName = interfaceNode.name?.escapedText ?? '';
+    return {
+      definitionName,
+      definitionType,
+      decoratorName: '',
+    };
+  }
+
+  const enumDeclaration = file.statements.find((node) =>
+    isEnumAndStartsWithStub(node, stub)
+  );
+  if (enumDeclaration) {
+    const enumNode = enumDeclaration as ts.EnumDeclaration;
+    definitionType = 'enum';
+    definitionName = enumNode.name?.escapedText ?? '';
+    return {
+      definitionName,
+      definitionType,
+      decoratorName: '',
+    };
+  }
+
+  console.log('No definition found to rename in file');
 
   return null;
 }
@@ -88,6 +138,18 @@ function isClassAndStartsWithStub(node: ts.Statement, stub: string): boolean {
   }
   const className = isClass ? node.name?.escapedText.toString() ?? '' : '';
   return definitionStartsWithStub(className, stub);
+}
+
+function isClassAndStartsWithStubWithDecorator(
+  node: ts.Statement,
+  stub: string
+): boolean {
+  if (!isClassAndStartsWithStub(node, stub)) {
+    return false;
+  }
+  const classDeclaration = node as ts.ClassDeclaration;
+  const decoratorName = getDecoratorName(classDeclaration);
+  return decoratorName.length > 0;
 }
 
 function isFunctionAndStartsWithStub(

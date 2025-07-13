@@ -67,34 +67,34 @@ describe('Renamer', () => {
 
   describe('rename', () => {
     it('should handle component rename successfully', async () => {
-      // Mock the prepRenameDetails method
-      const mockPrepRenameDetails = sinon
-        .stub(renamer as any, 'prepRenameDetails')
+      // Mock the prepareRenameDetails method
+      const mockPrepareRenameDetails = sinon
+        .stub(renamer as any, 'prepareRenameDetails')
         .resolves(true);
 
-      // Mock the prepFileMoveJobs method
-      const mockPrepFileMoveJobs = sinon
-        .stub(renamer as any, 'prepFileMoveJobs')
+      // Mock the prepareFileMoveJobs method
+      const mockPrepareFileMoveJobs = sinon
+        .stub(renamer as any, 'prepareFileMoveJobs')
         .resolves(true);
 
-      // Mock the fileMoveJobs property
-      (renamer as any).fileMoveJobs = [
-        new FileItem('source', 'target', false, 'old', 'new'),
-      ];
-      (renamer as any).construct = 'component';
-      (renamer as any).selectorTransfer = new SelectorTransfer();
-      (renamer as any).originalFileDetails = { path: '/test/path' };
-      (renamer as any).renameFolder = false;
+      // Mock the context properties
+      (renamer as any).context = {
+        fileMoveJobs: [new FileItem('source', 'target', false, 'old', 'new')],
+        construct: 'component',
+        selectorTransfer: new SelectorTransfer(),
+        originalFileDetails: { path: '/test/path' },
+        title: 'Rename Angular Component',
+      };
 
       await renamer.rename('component', vscode.Uri.file('/test/path'));
 
       expect(
-        mockPrepRenameDetails.calledWith(
+        mockPrepareRenameDetails.calledWith(
           'component',
           sinon.match.instanceOf(vscode.Uri)
         )
       ).to.be.true;
-      expect(mockPrepFileMoveJobs.called).to.be.true;
+      expect(mockPrepareFileMoveJobs.called).to.be.true;
       expect(
         mockFileMoveHandler.runFileMoveJobs.calledWith(
           sinon.match.array,
@@ -105,35 +105,34 @@ describe('Renamer', () => {
     });
 
     it('should handle errors during rename process', async () => {
-      // Mock the prepRenameDetails method
-      const mockPrepRenameDetails = sinon
-        .stub(renamer as any, 'prepRenameDetails')
+      // Mock the prepareRenameDetails method
+      const mockPrepareRenameDetails = sinon
+        .stub(renamer as any, 'prepareRenameDetails')
         .resolves(true);
 
-      // Mock the prepFileMoveJobs method
-      const mockPrepFileMoveJobs = sinon
-        .stub(renamer as any, 'prepFileMoveJobs')
+      // Mock the prepareFileMoveJobs method
+      const mockPrepareFileMoveJobs = sinon
+        .stub(renamer as any, 'prepareFileMoveJobs')
         .rejects(new Error('Test error'));
 
-      // Mock the fileMoveJobs property
-      (renamer as any).fileMoveJobs = [
-        new FileItem('source', 'target', false, 'old', 'new'),
-      ];
-      (renamer as any).construct = 'component';
-      (renamer as any).selectorTransfer = new SelectorTransfer();
-      (renamer as any).originalFileDetails = { path: '/test/path' };
-      (renamer as any).renameFolder = false;
-      (renamer as any).title = 'Rename Angular Component';
+      // Mock the context properties
+      (renamer as any).context = {
+        fileMoveJobs: [new FileItem('source', 'target', false, 'old', 'new')],
+        construct: 'component',
+        selectorTransfer: new SelectorTransfer(),
+        originalFileDetails: { path: '/test/path' },
+        title: 'Rename Angular Component',
+      };
 
       await renamer.rename('component', vscode.Uri.file('/test/path'));
 
       expect(
-        mockPrepRenameDetails.calledWith(
+        mockPrepareRenameDetails.calledWith(
           'component',
           sinon.match.instanceOf(vscode.Uri)
         )
       ).to.be.true;
-      expect(mockPrepFileMoveJobs.called).to.be.true;
+      expect(mockPrepareFileMoveJobs.called).to.be.true;
 
       expect(
         mockUserMessage.logInfoToChannel.calledWith(
@@ -147,33 +146,33 @@ describe('Renamer', () => {
       ).to.be.true;
     });
 
-    it('should not proceed if prepRenameDetails returns false', async () => {
-      // Mock the prepRenameDetails method to return false
-      const mockPrepRenameDetails = sinon
-        .stub(renamer as any, 'prepRenameDetails')
+    it('should not proceed if prepareRenameDetails returns false', async () => {
+      // Mock the prepareRenameDetails method to return false
+      const mockPrepareRenameDetails = sinon
+        .stub(renamer as any, 'prepareRenameDetails')
         .resolves(false);
 
       await renamer.rename('component', vscode.Uri.file('/test/path'));
 
-      expect(mockPrepRenameDetails.called).to.be.true;
+      expect(mockPrepareRenameDetails.called).to.be.true;
       expect(mockFileMoveHandler.runFileMoveJobs.called).to.be.false;
     });
 
-    it('should not proceed if prepFileMoveJobs returns false', async () => {
-      // Mock the prepRenameDetails method to return true
-      const mockPrepRenameDetails = sinon
-        .stub(renamer as any, 'prepRenameDetails')
+    it('should not proceed if prepareFileMoveJobs returns false', async () => {
+      // Mock the prepareRenameDetails method to return true
+      const mockPrepareRenameDetails = sinon
+        .stub(renamer as any, 'prepareRenameDetails')
         .resolves(true);
 
-      // Mock the prepFileMoveJobs method to return false
-      const mockPrepFileMoveJobs = sinon
-        .stub(renamer as any, 'prepFileMoveJobs')
+      // Mock the prepareFileMoveJobs method to return false
+      const mockPrepareFileMoveJobs = sinon
+        .stub(renamer as any, 'prepareFileMoveJobs')
         .resolves(false);
 
       await renamer.rename('component', vscode.Uri.file('/test/path'));
 
-      expect(mockPrepRenameDetails.called).to.be.true;
-      expect(mockPrepFileMoveJobs.called).to.be.true;
+      expect(mockPrepareRenameDetails.called).to.be.true;
+      expect(mockPrepareFileMoveJobs.called).to.be.true;
       expect(mockFileMoveHandler.runFileMoveJobs.called).to.be.false;
     });
   });

@@ -2,7 +2,7 @@ out
 dist
 node_modules
 .vscode-test/
-*.vsix
+./*.vsix
 build
 src/test/suite/diffs/shp-wild-paths.txt
 src/test/suite/diffs/dsls-spa.txt

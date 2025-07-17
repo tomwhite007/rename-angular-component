@@ -20,6 +20,7 @@ type StringLiteralAttributesInScope = 'selector' | 'templateUrl' | 'styleUrl';
 export class SelectorTransfer {
   oldSelector?: string;
   newSelector?: string;
+  generatedSelectorIsSameAsOld?: boolean;
 }
 
 export function getAngularCoreClassEdits(
@@ -71,6 +72,7 @@ export function getAngularCoreClassEdits(
               originalFileWithoutType,
               newSelectorText
             );
+
             replacement = `'${selectorTransfer.newSelector}'`;
             break;
           case 'name':
@@ -107,6 +109,12 @@ export function getAngularCoreClassEdits(
             }
             break;
         }
+
+        selectorTransfer.generatedSelectorIsSameAsOld =
+          !!selectorTransfer.oldSelector &&
+          !!selectorTransfer.newSelector &&
+          selectorTransfer.oldSelector === selectorTransfer.newSelector &&
+          originalFileStub === newFileStub;
 
         if (replacement === foundItem.itemText || !replacement) {
           return null;

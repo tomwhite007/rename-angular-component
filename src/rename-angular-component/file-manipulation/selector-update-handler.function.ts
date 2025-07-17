@@ -21,10 +21,10 @@ export async function updateSelectorsInTemplates(
           construct
         );
       } else {
-        userMessage.logInfoToChannel([
-          ``,
-          `Original Selector doesn't match Angular CLI naming convention for a ${construct}. Unexpected Selector not replaced.`,
-        ]);
+        const message = selectorTransfer.generatedSelectorIsSameAsOld
+          ? `Selector for ${construct} is unchanged. No updates made.`
+          : `Original Selector doesn't match Angular CLI naming convention for a ${construct}. Unexpected Selector not replaced.`;
+        userMessage.logInfoToChannel([``, message]);
       }
 
       debugLogger.logToConsole(

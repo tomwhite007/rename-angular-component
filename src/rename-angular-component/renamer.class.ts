@@ -200,10 +200,7 @@ export class Renamer {
       JSON.stringify(filesToMove)
     );
 
-    const { fileMoveJobs, selectorTransfer } =
-      this.createFileMoveJobs(filesToMove);
-    this.context.fileMoveJobs = fileMoveJobs;
-    this.context.selectorTransfer = selectorTransfer;
+    this.createFileMoveJobs(filesToMove);
 
     this.debugLogger.log(
       'fileMoveJobs: ',
@@ -231,10 +228,7 @@ export class Renamer {
     );
   }
 
-  private createFileMoveJobs(filesToMove: any[]): {
-    fileMoveJobs: FileItem[];
-    selectorTransfer: SelectorTransfer;
-  } {
+  private createFileMoveJobs(filesToMove: any[]): void {
     const oldClassName =
       this.context.filesRelatedToStub!.originalDefinitionName!;
     const newClassName = getNewDefinitionName(
@@ -243,9 +237,9 @@ export class Renamer {
       this.context.filesRelatedToStub!.definitionType
     );
 
-    const selectorTransfer = new SelectorTransfer();
+    this.context.selectorTransfer = new SelectorTransfer();
 
-    const fileMoveJobs = filesToMove.map((file) => {
+    this.context.fileMoveJobs = filesToMove.map((file) => {
       const additionalEdits = this.createAdditionalEdits(
         file,
         oldClassName,
@@ -261,8 +255,6 @@ export class Renamer {
         additionalEdits
       );
     });
-
-    return { fileMoveJobs, selectorTransfer };
   }
 
   private createAdditionalEdits(

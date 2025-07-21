@@ -3,6 +3,7 @@ import path from 'path';
 import vscode from 'vscode';
 import { classify, dasherize } from '../angular-cli/strings';
 import { validateHtmlSelector } from '../angular-cli/validation';
+import { GenericEditsCallback } from '../move-ts-indexer/apply-generic-edits';
 import { FileItem } from '../move-ts-indexer/file-item';
 import { timeoutPause } from '../utils/timeout-pause';
 import {
@@ -11,7 +12,10 @@ import {
 } from './definitions/file.interfaces';
 import { getProjectRoot } from './definitions/get-project-root-file-path.function';
 import { FileMoveHandler } from './file-manipulation/file-move-handler.class';
-import { FilesRelatedToStub } from './file-manipulation/files-related-to-stub.class';
+import {
+  FilesRelatedToStub,
+  FileToMove,
+} from './file-manipulation/files-related-to-stub.class';
 import { updateSelectorsInTemplates } from './file-manipulation/selector-update-handler.function';
 import { windowsFilePathFix } from './file-manipulation/windows-file-path-fix.function';
 import {
@@ -40,6 +44,8 @@ interface RenameContext {
   processTimerStart: number;
   fileMoveJobs: FileItem[];
   selectorTransfer: SelectorTransfer;
+  coreConstructNewFilePath?: string;
+  newClassName?: string;
 }
 
 export class Renamer {
@@ -117,7 +123,9 @@ export class Renamer {
       this.context.construct!,
       this.context.selectorTransfer!,
       this.userMessage,
-      this.debugLogger
+      this.debugLogger,
+      this.context.coreConstructNewFilePath!,
+      this.context.newClassName!
     );
 
     await this.cleanupOriginalFolder();
@@ -236,16 +244,20 @@ export class Renamer {
       this.context.construct!,
       this.context.filesRelatedToStub!.definitionType
     );
+    this.context.newClassName = newClassName;
 
     this.context.selectorTransfer = new SelectorTransfer();
 
-    this.context.fileMoveJobs = filesToMove.map((file) => {
+    this.context.fileMoveJobs = filesToMove.map((file: FileToMove) => {
       const additionalEdits = this.createAdditionalEdits(
         file,
         oldClassName,
         newClassName
       );
 
+      if (file.isCoreConstruct) {
+        this.context.coreConstructNewFilePath = file.newFilePath;
+      }
       return new FileItem(
         windowsFilePathFix(file.filePath, true),
         windowsFilePathFix(file.newFilePath, true),
@@ -258,10 +270,13 @@ export class Renamer {
   }
 
   private createAdditionalEdits(
-    file: any,
+    file: FileToMove,
     oldClassName: string,
     newClassName: string
-  ) {
+  ): {
+    importsEdits?: GenericEditsCallback;
+    movedFileEdits?: GenericEditsCallback;
+  } {
     return {
       importsEdits:
         path.extname(file.filePath) === '.ts'

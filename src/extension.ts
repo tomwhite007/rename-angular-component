@@ -13,11 +13,7 @@ export function activate(context: vscode.ExtensionContext) {
   const indexStart = Date.now();
   const userMessage = new UserMessage(EXTENSION_NAME);
   const indexer: ReferenceIndexBuilder = new ReferenceIndexBuilder(debugLogger);
-  const fileMoveHandler = new FileMoveHandler(
-    indexer,
-    userMessage,
-    debugLogger
-  );
+  const fileMoveHandler = new FileMoveHandler(indexer, userMessage);
 
   const initWithProgress = () => {
     return vscode.window.withProgress(

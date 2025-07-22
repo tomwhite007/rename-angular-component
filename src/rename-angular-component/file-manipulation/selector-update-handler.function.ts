@@ -9,7 +9,9 @@ export async function updateSelectorsInTemplates(
   construct: AngularConstructOrPlainFile | null,
   selectorTransfer: SelectorTransfer,
   userMessage: UserMessage,
-  debugLogger: DebugLogger
+  debugLogger: DebugLogger,
+  coreFilePath: string,
+  filePathsAffected: string[]
 ): Promise<void> {
   if (construct && CONSTRUCTS_WITH_SELECTORS.includes(construct)) {
     if (selectorTransfer.oldSelector && selectorTransfer.newSelector) {
@@ -18,11 +20,14 @@ export async function updateSelectorsInTemplates(
           selectorTransfer.oldSelector,
           selectorTransfer.newSelector,
           userMessage,
-          construct
+          construct,
+          coreFilePath,
+          filePathsAffected,
+          debugLogger
         );
       } else {
         const message = selectorTransfer.generatedSelectorIsSameAsOld
-          ? `Selector for ${construct} is unchanged. No updates made.`
+          ? `Selector for ${construct} is unchanged. No updates to templates.`
           : `Original Selector doesn't match Angular CLI naming convention for a ${construct}. Unexpected Selector not replaced.`;
         userMessage.logInfoToChannel([``, message]);
       }

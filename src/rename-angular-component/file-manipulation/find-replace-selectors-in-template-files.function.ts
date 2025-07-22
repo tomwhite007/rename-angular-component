@@ -2,13 +2,17 @@ import fs from 'fs-extra-promise';
 import { workspace } from 'vscode';
 import { AngularConstructOrPlainFile } from '../definitions/file.interfaces';
 import { renameSelectorInTemplate } from '../in-file-edits/rename-selector-in-template.function';
+import { DebugLogger } from '../logging/debug-logger.class';
 import { UserMessage } from '../logging/user-message.class';
 
 export async function findReplaceSelectorsInTemplateFiles(
   originalSelector: string,
   newSelector: string,
   userMessage: UserMessage,
-  construct: AngularConstructOrPlainFile | null
+  construct: AngularConstructOrPlainFile | null,
+  coreFilePath: string,
+  filePathsAffected: string[],
+  debugLogger: DebugLogger
 ) {
   if (originalSelector === newSelector) {
     return;
@@ -19,10 +23,25 @@ export async function findReplaceSelectorsInTemplateFiles(
     10000
   );
 
-  console.log(`found ${uris.length} template files`);
+  debugLogger.log(
+    `ReplaceSelectorsInTemplateFiles found ${uris.length} possible template files`
+  );
 
   let changed = 0;
   for (const uri of uris) {
+    const filePathBase = uri.fsPath.replace(/\.(html|scss|css|sass|less)$/, '');
+    if (
+      uri.fsPath === coreFilePath || // Skip core file because selector is already updated
+      !filePathsAffected.includes(filePathBase) // Skip template files that are not siblings to files that have been edited
+    ) {
+      debugLogger.logToConsole(
+        `Skipping ${
+          uri.fsPath === coreFilePath ? 'core' : 'non-sibling'
+        } file:`,
+        uri.fsPath
+      );
+      continue;
+    }
     let html: string | null = await fs.readFileAsync(uri.fsPath, 'utf-8');
     if (html) {
       html = renameSelectorInTemplate(

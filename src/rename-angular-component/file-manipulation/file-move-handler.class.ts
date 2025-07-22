@@ -48,7 +48,7 @@ export class FileMoveHandler {
           fileMoveJobs.find((job: FileItem) => job.sourcePath === file)
             ?.targetPath ?? file
       )
-      .map((file) => file.replace(projectRoot, ''));
+      .map((file) => file.replace(`${projectRoot}/`, ''));
     files = [...new Set(files.sort())];
     this.userMessage.logInfoToChannel(files);
   }

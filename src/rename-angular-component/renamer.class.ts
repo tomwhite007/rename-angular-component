@@ -124,7 +124,6 @@ export class Renamer {
       .fileMoveJobs!.map((fileItem) => fileItem.targetPath)
       .filter((filePath) => filePath.endsWith('.ts'))
       .map((filePath) => filePath.replace(/(\.module)?\.ts$/, ''));
-    console.log(`Base file paths affected:`, filePathsAffected);
 
     await updateSelectorsInTemplates(
       this.context.construct!,

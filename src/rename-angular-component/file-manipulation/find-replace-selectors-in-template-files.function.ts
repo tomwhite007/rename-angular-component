@@ -29,12 +29,15 @@ export async function findReplaceSelectorsInTemplateFiles(
 
   let changed = 0;
   for (const uri of uris) {
-    const filePathBase = uri.fsPath.replace(/\.(html|scss|css|sass|less)$/, '');
+    const filePathBase = uri.fsPath.replace(
+      /\.(ts|html|scss|css|sass|less)$/,
+      ''
+    );
     if (
       uri.fsPath === coreFilePath || // Skip core file because selector is already updated
       !filePathsAffected.includes(filePathBase) // Skip template files that are not siblings to files that have been edited
     ) {
-      debugLogger.logToConsole(
+      debugLogger.log(
         `Skipping ${
           uri.fsPath === coreFilePath ? 'core' : 'non-sibling'
         } file:`,

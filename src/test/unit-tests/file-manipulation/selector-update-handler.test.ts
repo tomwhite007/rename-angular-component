@@ -12,6 +12,8 @@ describe('updateSelectorsInTemplates', () => {
   let userMessage: UserMessage;
   let debugLogger: DebugLogger;
   let findReplaceSelectorsInTemplateFilesStub: sinon.SinonStub;
+  const coreFilePath = 'src/app/test/test.component.ts';
+  const filePathsAffected = ['/path/to/file1', '/path/to/file2.component'];
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
@@ -40,13 +42,23 @@ describe('updateSelectorsInTemplates', () => {
       'component',
       selectorTransfer,
       userMessage,
-      debugLogger
+      debugLogger,
+      coreFilePath,
+      filePathsAffected
     );
 
     expect(findReplaceSelectorsInTemplateFilesStub.calledOnce).to.be.true;
     expect(
       findReplaceSelectorsInTemplateFilesStub.firstCall.args
-    ).to.deep.equal(['app-old', 'app-new', userMessage, 'component']);
+    ).to.deep.equal([
+      'app-old',
+      'app-new',
+      userMessage,
+      'component',
+      coreFilePath,
+      filePathsAffected,
+      debugLogger,
+    ]);
   });
 
   it('should not update selectors when they are the same', async () => {
@@ -59,7 +71,9 @@ describe('updateSelectorsInTemplates', () => {
       'component',
       selectorTransfer,
       userMessage,
-      debugLogger
+      debugLogger,
+      coreFilePath,
+      filePathsAffected
     );
 
     expect(findReplaceSelectorsInTemplateFilesStub.called).to.be.false;
@@ -76,7 +90,9 @@ describe('updateSelectorsInTemplates', () => {
         'component',
         selectorTransfer,
         userMessage,
-        debugLogger
+        debugLogger,
+        coreFilePath,
+        filePathsAffected
       );
       expect.fail('Should have thrown an error');
     } catch (error: any) {
@@ -96,7 +112,9 @@ describe('updateSelectorsInTemplates', () => {
       'service',
       selectorTransfer,
       userMessage,
-      debugLogger
+      debugLogger,
+      coreFilePath,
+      filePathsAffected
     );
 
     expect(findReplaceSelectorsInTemplateFilesStub.called).to.be.false;

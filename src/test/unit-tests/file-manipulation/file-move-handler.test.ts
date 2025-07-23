@@ -17,6 +17,7 @@ describe('FileMoveHandler', () => {
   let progress: vscode.Progress<{ message?: string; increment?: number }> & {
     report: sinon.SinonStub;
   };
+  const projectRoot = 'test/project/root';
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
@@ -26,7 +27,7 @@ describe('FileMoveHandler', () => {
     progress = {
       report: sandbox.stub(),
     };
-    fileMoveHandler = new FileMoveHandler(indexer, userMessage, debugLogger);
+    fileMoveHandler = new FileMoveHandler(indexer, userMessage);
   });
 
   afterEach(() => {
@@ -44,7 +45,11 @@ describe('FileMoveHandler', () => {
         },
       ];
 
-      await fileMoveHandler.runFileMoveJobs(fileMoveJobs, progress);
+      await fileMoveHandler.runFileMoveJobs(
+        fileMoveJobs,
+        progress,
+        projectRoot
+      );
 
       expect(progress.report.called).to.be.true;
       expect(fileMoveJobs[0].move.calledOnce).to.be.true;
@@ -54,7 +59,11 @@ describe('FileMoveHandler', () => {
     it('should handle empty file move jobs array', async () => {
       const fileMoveJobs: FileItem[] = [];
 
-      await fileMoveHandler.runFileMoveJobs(fileMoveJobs, progress);
+      await fileMoveHandler.runFileMoveJobs(
+        fileMoveJobs,
+        progress,
+        projectRoot
+      );
 
       expect(progress.report.called).to.be.true;
     });

@@ -22,11 +22,7 @@ export async function runRenamerScenario(
   const debugLogger = new DebugLogger(false);
   const userMessage = new UserMessage(EXTENSION_NAME);
   const indexer: ReferenceIndexBuilder = new ReferenceIndexBuilder(debugLogger);
-  const fileMoveHandler = new FileMoveHandler(
-    indexer,
-    userMessage,
-    debugLogger
-  );
+  const fileMoveHandler = new FileMoveHandler(indexer, userMessage);
 
   const initWithProgress = () => {
     return vscode.window.withProgress(

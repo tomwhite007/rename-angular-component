@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, it } from 'mocha';
 import sinon from 'sinon';
 import vscode from 'vscode';
 import { findReplaceSelectorsInTemplateFiles } from '../../../rename-angular-component/file-manipulation/find-replace-selectors-in-template-files.function';
+import { DebugLogger } from '../../../rename-angular-component/logging/debug-logger.class';
 import { UserMessage } from '../../../rename-angular-component/logging/user-message.class';
 
 describe('findReplaceSelectorsInTemplateFiles', () => {
@@ -12,8 +13,11 @@ describe('findReplaceSelectorsInTemplateFiles', () => {
   let workspaceFindFilesStub: sinon.SinonStub;
   let readFileAsyncStub: sinon.SinonStub;
   let writeFileAsyncStub: sinon.SinonStub;
+  let debugLogger: DebugLogger;
+  const coreFilePath = 'src/app/test/test.component.ts';
 
   beforeEach(() => {
+    debugLogger = new DebugLogger(false);
     sandbox = sinon.createSandbox();
     userMessage = new UserMessage('test message');
     workspaceFindFilesStub = sandbox.stub(vscode.workspace, 'findFiles');
@@ -30,7 +34,10 @@ describe('findReplaceSelectorsInTemplateFiles', () => {
       'same',
       'same',
       userMessage,
-      'component'
+      'component',
+      coreFilePath,
+      [],
+      debugLogger
     );
     expect(workspaceFindFilesStub.called).to.be.false;
   });
@@ -48,7 +55,35 @@ describe('findReplaceSelectorsInTemplateFiles', () => {
       'app-old-selector',
       'app-new-selector',
       userMessage,
-      'component'
+      'component',
+      coreFilePath,
+      ['/path/to/file1', '/path/to/file2.component'],
+      debugLogger
+    );
+
+    expect(workspaceFindFilesStub.calledOnce).to.be.true;
+    expect(readFileAsyncStub.callCount).to.equal(2);
+    expect(writeFileAsyncStub.callCount).to.equal(2);
+  });
+
+  it('should exclude core file from processing', async () => {
+    const mockUris = [
+      { fsPath: '/path/to/file1.html' },
+      { fsPath: '/path/to/file2.component.ts' },
+      { fsPath: coreFilePath }, // Core file should be skipped
+    ];
+    workspaceFindFilesStub.resolves(mockUris);
+    readFileAsyncStub.resolves('<app-old-selector></app-old-selector>');
+    writeFileAsyncStub.resolves();
+
+    await findReplaceSelectorsInTemplateFiles(
+      'app-old-selector',
+      'app-new-selector',
+      userMessage,
+      'component',
+      coreFilePath,
+      ['/path/to/file1', '/path/to/file2.component'],
+      debugLogger
     );
 
     expect(workspaceFindFilesStub.calledOnce).to.be.true;
@@ -68,11 +103,14 @@ describe('findReplaceSelectorsInTemplateFiles', () => {
       'app-old-selector',
       'app-new-selector',
       userMessage,
-      'component'
+      'component',
+      coreFilePath,
+      ['/path/to/file1'],
+      debugLogger
     );
 
     expect(workspaceFindFilesStub.calledOnce).to.be.true;
-    expect(readFileAsyncStub.calledOnce).to.be.true;
+    expect(readFileAsyncStub.callCount).to.equal(1);
     expect(
       writeFileAsyncStub.calledOnceWith(
         '/path/to/file1.html',

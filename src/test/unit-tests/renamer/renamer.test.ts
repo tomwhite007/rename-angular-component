@@ -3,6 +3,7 @@ import sinon from 'sinon';
 import vscode from 'vscode';
 import { FileItem } from '../../../move-ts-indexer/file-item';
 import { FileMoveHandler } from '../../../rename-angular-component/file-manipulation/file-move-handler.class';
+import * as selectorUpdateHandler from '../../../rename-angular-component/file-manipulation/selector-update-handler.function';
 import { SelectorTransfer } from '../../../rename-angular-component/in-file-edits/custom-edits';
 import { DebugLogger } from '../../../rename-angular-component/logging/debug-logger.class';
 import { UserMessage } from '../../../rename-angular-component/logging/user-message.class';
@@ -16,6 +17,7 @@ describe('Renamer', () => {
   let mockDebugLogger: sinon.SinonStubbedInstance<DebugLogger>;
   let mockIndexerInitialisePromise: Promise<number>;
   let mockWithProgress: sinon.SinonStub;
+  let mockUpdateSelectorsInTemplates: sinon.SinonStub;
 
   beforeEach(() => {
     // Create mock objects using sinon
@@ -26,6 +28,10 @@ describe('Renamer', () => {
     mockUserMessage.logInfoToChannel.returns();
     mockUserMessage.popupMessage.returns();
     mockUserMessage.setOperationTitle.returns();
+
+    mockUpdateSelectorsInTemplates = sinon
+      .stub(selectorUpdateHandler, 'updateSelectorsInTemplates')
+      .resolves();
 
     mockDebugLogger = sinon.createStubInstance(DebugLogger);
     mockDebugLogger.log.returns();
@@ -79,11 +85,28 @@ describe('Renamer', () => {
 
       // Mock the context properties
       (renamer as any).context = {
-        fileMoveJobs: [new FileItem('source', 'target', false, 'old', 'new')],
+        fileMoveJobs: [
+          new FileItem(
+            '/test/core/file/path/old.component.ts',
+            '/test/core/file/path/test.component.ts',
+            false,
+            'old',
+            'new'
+          ),
+          new FileItem(
+            '/test/core/file/path/old-consumer.component.ts',
+            '/test/core/file/path/old-consumer.component.ts',
+            false,
+            'old',
+            'new'
+          ),
+        ],
         construct: 'component',
         selectorTransfer: new SelectorTransfer(),
-        originalFileDetails: { path: '/test/path' },
+        originalFileDetails: { path: '/test/core/file/path/old.component.ts' },
         title: 'Rename Angular Component',
+        projectRoot: '/test/core',
+        coreConstructNewFilePath: '/test/core/file/path/test.component.ts',
       };
 
       await renamer.rename('component', vscode.Uri.file('/test/path'));
@@ -101,6 +124,10 @@ describe('Renamer', () => {
           sinon.match.object
         )
       ).to.be.true;
+      expect(mockUpdateSelectorsInTemplates.getCall(0).args[5]).to.deep.equal([
+        '/test/core/file/path/test.component',
+        '/test/core/file/path/old-consumer.component',
+      ]);
       expect(mockWithProgress.called).to.be.true;
     });
 

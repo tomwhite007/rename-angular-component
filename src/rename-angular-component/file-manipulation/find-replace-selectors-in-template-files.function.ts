@@ -60,7 +60,7 @@ export async function findReplaceSelectorsInTemplateFiles(
       changed++;
     }
   }
-  const logMsg = `Processed ${uris.length} template files. Replaced ${
+  const logMsg = `Processed ${uris.length} possible template files. Replaced ${
     construct === 'pipe' ? 'pipe names' : 'selectors'
   } in ${changed} files`;
   userMessage.logInfoToChannel([logMsg], false);

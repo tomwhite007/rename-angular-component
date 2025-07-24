@@ -24,7 +24,8 @@ export async function findReplaceSelectorsInTemplateFiles(
   );
 
   debugLogger.log(
-    `ReplaceSelectorsInTemplateFiles found ${uris.length} possible template files`
+    `ReplaceSelectorsInTemplateFiles found ${uris.length} possible template files`,
+    `coreFilePath: ${coreFilePath}`
   );
 
   let changed = 0;
@@ -40,8 +41,8 @@ export async function findReplaceSelectorsInTemplateFiles(
       debugLogger.log(
         `Skipping ${
           uri.fsPath === coreFilePath ? 'core' : 'non-sibling'
-        } file:`,
-        uri.fsPath
+        } file: ${uri.fsPath}`,
+        `filePathBase: ${filePathBase}`
       );
       continue;
     }

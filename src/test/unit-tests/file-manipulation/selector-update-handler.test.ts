@@ -44,7 +44,8 @@ describe('updateSelectorsInTemplates', () => {
       userMessage,
       debugLogger,
       coreFilePath,
-      filePathsAffected
+      filePathsAffected,
+      'src/project-root'
     );
 
     expect(findReplaceSelectorsInTemplateFilesStub.calledOnce).to.be.true;
@@ -73,7 +74,8 @@ describe('updateSelectorsInTemplates', () => {
       userMessage,
       debugLogger,
       coreFilePath,
-      filePathsAffected
+      filePathsAffected,
+      'src/project-root'
     );
 
     expect(findReplaceSelectorsInTemplateFilesStub.called).to.be.false;
@@ -92,7 +94,8 @@ describe('updateSelectorsInTemplates', () => {
         userMessage,
         debugLogger,
         coreFilePath,
-        filePathsAffected
+        filePathsAffected,
+        'src/project-root'
       );
       expect.fail('Should have thrown an error');
     } catch (error: any) {
@@ -114,7 +117,8 @@ describe('updateSelectorsInTemplates', () => {
       userMessage,
       debugLogger,
       coreFilePath,
-      filePathsAffected
+      filePathsAffected,
+      'src/project-root'
     );
 
     expect(findReplaceSelectorsInTemplateFilesStub.called).to.be.false;

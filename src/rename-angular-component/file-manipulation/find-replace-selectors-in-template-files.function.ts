@@ -12,6 +12,7 @@ export async function findReplaceSelectorsInTemplateFiles(
   construct: AngularConstructOrPlainFile | null,
   coreFilePath: string,
   filePathsAffected: string[],
+  projectRoot: string,
   debugLogger: DebugLogger
 ) {
   if (originalSelector === newSelector) {
@@ -25,8 +26,7 @@ export async function findReplaceSelectorsInTemplateFiles(
 
   debugLogger.log(
     `ReplaceSelectorsInTemplateFiles found ${uris.length} possible template files`,
-    `coreFilePath: ${coreFilePath}`,
-    `ignore filePathsAffected for now`
+    `coreFilePath: ${coreFilePath}`
   );
 
   let changed = 0;
@@ -36,8 +36,8 @@ export async function findReplaceSelectorsInTemplateFiles(
       ''
     );
     if (
-      uri.fsPath === coreFilePath //|| // Skip core file because selector is already updated
-      // !filePathsAffected.includes(filePathBase) // Skip template files that are not siblings to files that have been edited
+      uri.fsPath === coreFilePath || // Skip core file because selector is already updated
+      !filePathsAffected.includes(filePathBase) // Skip template files that are not siblings to files that have been edited
     ) {
       debugLogger.log(
         `Skipping ${
@@ -58,7 +58,8 @@ export async function findReplaceSelectorsInTemplateFiles(
     }
     if (html) {
       await fs.writeFileAsync(uri.fsPath, html, 'utf-8');
-      userMessage.logInfoToChannel([uri.fsPath], false);
+      const relativePath = uri.fsPath.replace(`${projectRoot}/`, '');
+      userMessage.logInfoToChannel([relativePath], false);
       changed++;
     }
   }

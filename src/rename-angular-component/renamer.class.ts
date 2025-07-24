@@ -114,16 +114,11 @@ export class Renamer {
       return;
     }
 
-    await this.fileMoveHandler.runFileMoveJobs(
+    const filePathsAffected = await this.fileMoveHandler.runFileMoveJobs(
       this.context.fileMoveJobs!,
       progress,
       this.context.projectRoot!
     );
-
-    const filePathsAffected = this.context
-      .fileMoveJobs!.map((fileItem) => fileItem.targetPath)
-      .filter((filePath) => filePath.endsWith('.ts'))
-      .map((filePath) => filePath.replace(/(\.module)?\.ts$/, ''));
     this.debugLogger.log(
       'filePathsAffected: ',
       JSON.stringify(filePathsAffected)
@@ -135,7 +130,8 @@ export class Renamer {
       this.userMessage,
       this.debugLogger,
       this.context.coreConstructNewFilePath!,
-      filePathsAffected
+      filePathsAffected,
+      this.context.projectRoot!
     );
 
     await this.cleanupOriginalFolder();

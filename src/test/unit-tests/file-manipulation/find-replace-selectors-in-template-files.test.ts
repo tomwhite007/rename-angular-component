@@ -37,6 +37,7 @@ describe('findReplaceSelectorsInTemplateFiles', () => {
       'component',
       coreFilePath,
       [],
+      'src/project-root',
       debugLogger
     );
     expect(workspaceFindFilesStub.called).to.be.false;
@@ -58,6 +59,7 @@ describe('findReplaceSelectorsInTemplateFiles', () => {
       'component',
       coreFilePath,
       ['/path/to/file1', '/path/to/file2.component'],
+      'src/project-root',
       debugLogger
     );
 
@@ -83,6 +85,7 @@ describe('findReplaceSelectorsInTemplateFiles', () => {
       'component',
       coreFilePath,
       ['/path/to/file1', '/path/to/file2.component'],
+      'src/project-root',
       debugLogger
     );
 
@@ -106,6 +109,7 @@ describe('findReplaceSelectorsInTemplateFiles', () => {
       'component',
       coreFilePath,
       ['/path/to/file1'],
+      'src/project-root',
       debugLogger
     );
 

@@ -17,7 +17,7 @@ export class FileMoveHandler {
       increment?: number | undefined;
     }>,
     projectRoot: string
-  ): Promise<void> {
+  ): Promise<string[]> {
     progress.report({ increment: 20 });
     await timeoutPause();
     const progressIncrement = Math.floor(70 / fileMoveJobs.length);
@@ -30,26 +30,36 @@ export class FileMoveHandler {
       await timeoutPause(10);
       await item.move(this.indexer);
     }
-    this.logFileEditsToOutput(
-      this.indexer.endNewMoves(),
+    const files = this.indexer.endNewMoves();
+    const affectedFiles = this.generateFilePathsAffected(
+      files,
       fileMoveJobs,
       projectRoot
     );
+    this.logFileEditsToOutput(affectedFiles, projectRoot);
+    return affectedFiles;
   }
 
   private logFileEditsToOutput(
+    affectedFiles: string[],
+    projectRoot: string
+  ): void {
+    this.userMessage.logInfoToChannel(
+      affectedFiles.map((file) => file.replace(`${projectRoot}/`, ''))
+    );
+  }
+
+  private generateFilePathsAffected(
     files: string[],
     fileMoveJobs: FileItem[],
     projectRoot: string
-  ): void {
-    files = files
-      .map(
-        (file) =>
-          fileMoveJobs.find((job: FileItem) => job.sourcePath === file)
-            ?.targetPath ?? file
-      )
-      .map((file) => file.replace(`${projectRoot}/`, ''));
-    files = [...new Set(files.sort())];
-    this.userMessage.logInfoToChannel(files);
+  ): string[] {
+    let affectedFiles = files.map(
+      (file) =>
+        fileMoveJobs.find((job: FileItem) => job.sourcePath === file)
+          ?.targetPath ?? file
+    );
+    affectedFiles = [...new Set(affectedFiles.sort())];
+    return affectedFiles;
   }
 }

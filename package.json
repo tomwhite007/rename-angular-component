@@ -127,7 +127,7 @@
     "watch:esbuild": "node esbuild.js --watch",
     "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
     "package": "yarn run check-types && yarn run lint && node esbuild.js --production",
-    "generate-vsix": "vsce package",
+    "generate-vsix": "vsce package --out release/",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "yarn run compile-tests && yarn run compile && yarn run lint",

@@ -119,9 +119,12 @@ export class Renamer {
       progress,
       this.context.projectRoot!
     );
+    const baseFilePathsAffected = filePathsAffected.map((filePath) =>
+      filePath.replace(/(\.module)?\.ts$/, '')
+    );
     this.debugLogger.log(
-      'filePathsAffected: ',
-      JSON.stringify(filePathsAffected)
+      'baseFilePathsAffected: ',
+      JSON.stringify(baseFilePathsAffected)
     );
 
     await updateSelectorsInTemplates(
@@ -130,7 +133,7 @@ export class Renamer {
       this.userMessage,
       this.debugLogger,
       this.context.coreConstructNewFilePath!,
-      filePathsAffected,
+      baseFilePathsAffected,
       this.context.projectRoot!
     );
 

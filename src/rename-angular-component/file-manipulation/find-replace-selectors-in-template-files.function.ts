@@ -25,7 +25,8 @@ export async function findReplaceSelectorsInTemplateFiles(
 
   debugLogger.log(
     `ReplaceSelectorsInTemplateFiles found ${uris.length} possible template files`,
-    `coreFilePath: ${coreFilePath}`
+    `coreFilePath: ${coreFilePath}`,
+    `ignore filePathsAffected for now`
   );
 
   let changed = 0;
@@ -35,8 +36,8 @@ export async function findReplaceSelectorsInTemplateFiles(
       ''
     );
     if (
-      uri.fsPath === coreFilePath || // Skip core file because selector is already updated
-      !filePathsAffected.includes(filePathBase) // Skip template files that are not siblings to files that have been edited
+      uri.fsPath === coreFilePath //|| // Skip core file because selector is already updated
+      // !filePathsAffected.includes(filePathBase) // Skip template files that are not siblings to files that have been edited
     ) {
       debugLogger.log(
         `Skipping ${

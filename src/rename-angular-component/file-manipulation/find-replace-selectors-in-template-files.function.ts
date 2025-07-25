@@ -1,6 +1,7 @@
 import fs from 'fs-extra-promise';
 import { workspace } from 'vscode';
 import { AngularConstructOrPlainFile } from '../definitions/file.interfaces';
+import { isProjectUsingStandaloneComponents } from '../definitions/is-project-using-standalone-components';
 import { renameSelectorInTemplate } from '../in-file-edits/rename-selector-in-template.function';
 import { DebugLogger } from '../logging/debug-logger.class';
 import { UserMessage } from '../logging/user-message.class';
@@ -11,7 +12,7 @@ export async function findReplaceSelectorsInTemplateFiles(
   userMessage: UserMessage,
   construct: AngularConstructOrPlainFile | null,
   coreFilePath: string,
-  filePathsAffected: string[],
+  baseFilePathsAffected: string[],
   projectRoot: string,
   debugLogger: DebugLogger
 ) {
@@ -26,7 +27,7 @@ export async function findReplaceSelectorsInTemplateFiles(
 
   debugLogger.log(
     `ReplaceSelectorsInTemplateFiles found ${uris.length} possible template files`,
-    `coreFilePath: ${coreFilePath}`
+    `Avoid changing coreFilePath: ${coreFilePath}`
   );
 
   let changed = 0;
@@ -35,9 +36,12 @@ export async function findReplaceSelectorsInTemplateFiles(
       /\.(ts|html|scss|css|sass|less)$/,
       ''
     );
+    const isSpecFile = uri.fsPath.endsWith('.spec.ts');
     if (
-      uri.fsPath === coreFilePath || // Skip core file because selector is already updated
-      !filePathsAffected.includes(filePathBase) // Skip template files that are not siblings to files that have been edited
+      !isSpecFile && // replace all selectors in spec files
+      (uri.fsPath === coreFilePath || // Skip core file because selector is already updated
+        (isProjectUsingStandaloneComponents() &&
+          !baseFilePathsAffected.includes(filePathBase))) // Skip template files that are not siblings to files that have been edited
     ) {
       debugLogger.log(
         `Skipping ${

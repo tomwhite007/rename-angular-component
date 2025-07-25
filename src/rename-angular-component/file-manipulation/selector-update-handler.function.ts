@@ -11,7 +11,7 @@ export async function updateSelectorsInTemplates(
   userMessage: UserMessage,
   debugLogger: DebugLogger,
   coreFilePath: string,
-  filePathsAffected: string[],
+  baseFilePathsAffected: string[],
   projectRoot: string
 ): Promise<void> {
   if (construct && CONSTRUCTS_WITH_SELECTORS.includes(construct)) {
@@ -23,7 +23,7 @@ export async function updateSelectorsInTemplates(
           userMessage,
           construct,
           coreFilePath,
-          filePathsAffected,
+          baseFilePathsAffected,
           projectRoot,
           debugLogger
         );

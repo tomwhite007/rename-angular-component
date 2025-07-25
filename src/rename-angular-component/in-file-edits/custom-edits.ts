@@ -4,13 +4,13 @@ import {
   GenericEdit,
   GenericEditsCallback,
 } from '../../move-ts-indexer/apply-generic-edits';
-import { conf } from '../../move-ts-indexer/util/helper-functions';
 import {
   FoundItem,
   FoundItemType,
 } from '../../move-ts-indexer/util/shared-interfaces';
 import { escapeRegex } from '../../utils/escape-regex';
 import { AngularConstructOrPlainFile } from '../definitions/file.interfaces';
+import { isFollowingAngular20FolderNamingConvention } from '../definitions/is-following-angular20-folder-naming-convention';
 import { generateNewSelector } from './generate-new-selector.function';
 import { getSelectorType } from './get-selector-type.function';
 import { stripSelectorBraces } from './strip-selector-braces.function';
@@ -59,10 +59,7 @@ export function getAngularCoreClassEdits(
             break;
           case 'selector':
             selectorTransfer.oldSelector = foundItem.itemText;
-            const newSelectorText = conf(
-              'followAngular20+FolderNamingConvention',
-              true
-            )
+            const newSelectorText = isFollowingAngular20FolderNamingConvention()
               ? newFilenameInput
               : newFileStub;
 

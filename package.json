@@ -116,6 +116,11 @@
           "type": "boolean",
           "default": true,
           "description": "Since Angular 20.x, CLI generated folder names include any dot-suffix in the folder name or selector. \re.g. `my-component.component.ts` will be in a folder called `my-component.component/`. \rSet this to false to generate the folder name and selector without the dot-suffix."
+        },
+        "renameAngularComponent.projectUsesStandaloneComponentsOnly": {
+          "type": "boolean",
+          "default": true,
+          "description": "Untick this if your project uses modules. Then all selectors will be updated in templates, instead of just the Components that import the renamed Component."
         }
       }
     }

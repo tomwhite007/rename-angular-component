@@ -31,6 +31,7 @@ export async function findReplaceSelectorsInTemplateFiles(
   );
 
   let changed = 0;
+  let specFilesChanged = 0;
   for (const uri of uris) {
     const filePathBase = uri.fsPath.replace(
       /\.(ts|html|scss|css|sass|less)$/,
@@ -65,10 +66,22 @@ export async function findReplaceSelectorsInTemplateFiles(
       const relativePath = uri.fsPath.replace(`${projectRoot}/`, '');
       userMessage.logInfoToChannel([relativePath], false);
       changed++;
+      if (isSpecFile) {
+        specFilesChanged++;
+      }
     }
   }
   const logMsg = `Processed ${uris.length} possible template files. Replaced ${
     construct === 'pipe' ? 'pipe names' : 'selectors'
   } in ${changed} files`;
-  userMessage.logInfoToChannel([logMsg], false);
+  const specFilesMessage =
+    specFilesChanged > 0
+      ? [
+          '',
+          `Updated selectors in ${specFilesChanged} .spec files.`,
+          "PLEASE NOTE: If you have duplicate selectors for different components in your tests' .spec files, you may need to revert some tests manually. PLEASE CHECK YOUR DIFF.",
+          '(Duplicate selectors are not a recommended practice, and this extension will not handle tests for them automatically.)',
+        ]
+      : [];
+  userMessage.logInfoToChannel([logMsg, ...specFilesMessage], false);
 }

@@ -49,6 +49,7 @@ describe('updateSelectorsInTemplates', () => {
     );
 
     expect(findReplaceSelectorsInTemplateFilesStub.calledOnce).to.be.true;
+    console.log(findReplaceSelectorsInTemplateFilesStub.firstCall.args);
     expect(
       findReplaceSelectorsInTemplateFilesStub.firstCall.args
     ).to.deep.equal([
@@ -58,6 +59,7 @@ describe('updateSelectorsInTemplates', () => {
       'component',
       coreFilePath,
       filePathsAffected,
+      'src/project-root',
       debugLogger,
     ]);
   });

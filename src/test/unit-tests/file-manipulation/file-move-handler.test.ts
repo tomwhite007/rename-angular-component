@@ -89,12 +89,12 @@ describe('FileMoveHandler', () => {
       );
 
       // @ts-ignore - accessing private method for testing
-      fileMoveHandler.logFileEditsToOutput(files, fileMoveJobs);
+      fileMoveHandler.logFileEditsToOutput(files, '/path');
 
       expect(logInfoToChannelStub.calledOnce).to.be.true;
       const loggedFiles = logInfoToChannelStub.firstCall.args[0];
-      expect(loggedFiles).to.include('/path/to/target1.ts');
-      expect(loggedFiles).to.include('/path/to/target2.ts');
+
+      expect(loggedFiles).to.deep.equal(['to/source1.ts', 'to/source2.ts']);
     });
   });
 });

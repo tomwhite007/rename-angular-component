@@ -30,4 +30,32 @@ suite('Suite Scenario 8', () => {
       useNg20Convention: true,
     });
   });
+
+  test('Scenario 8 non-ng20 half circle', async () => {
+    /*
+    This test scenario uses publicly available repo: https://github.com/tomwhite007/ng20-latest-circle-back
+    as the seed to base renamer tests on.
+    */
+
+    await genericTestScenario({
+      projectRoot:
+        '/Users/tom/Development/vscode-ext/_rename-test-spas/ng20-latest-circle-back',
+      renames: [
+        {
+          filePath: './src/app/test/test.scss',
+          construct: 'file',
+          newFilenameInput: 'foo.component',
+        },
+        {
+          filePath:
+            './src/app/test-suffix.component/test-suffix.component.spec.ts',
+          construct: 'component',
+          newFilenameInput: 'baa',
+        },
+      ],
+      fileDiffPath:
+        './src/test/suite/diffs/ng20-latest-half-circle-non-ng20.txt',
+      useNg20Convention: false,
+    });
+  });
 });

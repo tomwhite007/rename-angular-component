@@ -1,0 +1,27 @@
+diff --git a/src/app/app.ts b/src/app/app.ts
+index d71e8b1..988516c 100644
+--- a/src/app/app.ts
++++ b/src/app/app.ts
+@@ -1,5 +1,5 @@
+ import { Component } from '@angular/core';
+-import { TestSuffixComponent } from './test-suffix.component/test-suffix.component';
++import { TestSuffixComponent } from './test-suffix/test-suffix.component';
+ import { Test } from './test/test';
+ 
+ @Component({
+diff --git a/src/app/test-suffix.component/test-suffix.component.html b/src/app/test-suffix/test-suffix.component.html
+similarity index 100%
+rename from src/app/test-suffix.component/test-suffix.component.html
+rename to src/app/test-suffix/test-suffix.component.html
+diff --git a/src/app/test-suffix.component/test-suffix.component.scss b/src/app/test-suffix/test-suffix.component.scss
+similarity index 100%
+rename from src/app/test-suffix.component/test-suffix.component.scss
+rename to src/app/test-suffix/test-suffix.component.scss
+diff --git a/src/app/test-suffix.component/test-suffix.component.spec.ts b/src/app/test-suffix/test-suffix.component.spec.ts
+similarity index 100%
+rename from src/app/test-suffix.component/test-suffix.component.spec.ts
+rename to src/app/test-suffix/test-suffix.component.spec.ts
+diff --git a/src/app/test-suffix.component/test-suffix.component.ts b/src/app/test-suffix/test-suffix.component.ts
+similarity index 100%
+rename from src/app/test-suffix.component/test-suffix.component.ts
+rename to src/app/test-suffix/test-suffix.component.ts

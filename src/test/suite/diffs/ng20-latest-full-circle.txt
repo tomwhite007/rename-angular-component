@@ -1,0 +1,21 @@
+diff --git a/src/app/app.html b/src/app/app.html
+index 6ac5c69..11b6ffe 100644
+--- a/src/app/app.html
++++ b/src/app/app.html
+@@ -1,2 +1,2 @@
+ <app-test />
+-<app-test-suffix />
++<app-test-suffix.component />
+diff --git a/src/app/test-suffix.component/test-suffix.component.ts b/src/app/test-suffix.component/test-suffix.component.ts
+index 508a412..f3324bc 100644
+--- a/src/app/test-suffix.component/test-suffix.component.ts
++++ b/src/app/test-suffix.component/test-suffix.component.ts
+@@ -1,7 +1,7 @@
+ import { Component } from '@angular/core';
+ 
+ @Component({
+-  selector: 'app-test-suffix',
++  selector: 'app-test-suffix.component',
+   imports: [],
+   templateUrl: './test-suffix.component.html',
+   styleUrl: './test-suffix.component.scss',

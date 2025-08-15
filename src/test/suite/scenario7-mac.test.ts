@@ -6,8 +6,8 @@ suite('Suite Scenario 7', () => {
 
   test('Scenario 7', async () => {
     /*
-    This test scenario uses publicly available repo: https://github.com/tomwhite007/test-latest-css
-    as the seed to base 1 renamer test on.
+    This test scenario uses publicly available repo: https://github.com/tomwhite007/test-renamer-with-ng20
+    as the seed to base renamer tests on.
     */
 
     await genericTestScenario({

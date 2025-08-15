@@ -13,7 +13,7 @@ export function getNewDefinitionName(
   const newFileEndsWithConstruct = endsWithConstruct.test(
     newFilenameInput.toLowerCase()
   );
-  const constructPostfix =
+  const constructSuffix =
     ['module', 'pipe'].includes(construct ?? '') && !newFileEndsWithConstruct
       ? construct ?? ''
       : '';
@@ -25,7 +25,7 @@ export function getNewDefinitionName(
   )
     ? classify(newStub)
     : camelize(newStub);
-  const newName = `${newStubName}${classify(constructPostfix)}`;
+  const newName = `${newStubName}${classify(constructSuffix)}`;
 
   return newName;
 }

@@ -19,7 +19,7 @@ Right-click the Angular file or its associated sibling file (.html, .scss, .spec
 
 Click 'Rename Angular Component' and then enter a new name.
 
-The extension converts the text you enter into kebab case for the filename, capital case for the class name, the correct case for the type of selector, and then adds all the existing pre and postfixes back on.
+The extension converts the text you enter into kebab case for the filename, capital case for the class name, the correct case for the type of selector, and then adds all the existing prefixes and suffixes back on.
 
 ![Rename Angular Component in action](https://cdn.jsdelivr.net/gh/tomwhite007/rename-angular-component@main/assets/rename-angular-component-demo.gif)
 
@@ -27,7 +27,7 @@ The extension converts the text you enter into kebab case for the filename, capi
 
 Based on the same naming convention in the [Angular Style Guide](https://angular.io/guide/styleguide#style-02-01) and following the file pattern created by the Angular CLI, this extension will:
 
-- Rename the files files associated with the component, directive or service whilst retaining their original postfixes
+- Rename the files files associated with the component, directive or service whilst retaining their original suffixes
 - Rename the containing folder if it has the same name as the original file selected
 - Rename the class name of the component, directive or service to match the new file name (provided the class name follows the same naming convention)
 - Rename the element, attribute or class selectors inside the class decorator meta data, and in all html templates in the repo (provided the selector follows the correct naming convention)

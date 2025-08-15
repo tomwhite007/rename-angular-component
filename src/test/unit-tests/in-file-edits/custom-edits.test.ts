@@ -308,7 +308,7 @@ describe('Custom Edits', () => {
         expect(selectorTransfer.newSelector).to.equal('app-new');
       });
 
-      it('should store old and new selectors with .component postfix', () => {
+      it('should store old and new selectors with .component suffix', () => {
         const sourceText = `
         @Component({
           selector: 'app-old'

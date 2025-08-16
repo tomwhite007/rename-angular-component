@@ -21,6 +21,7 @@ suite('Suite Scenario 4', () => {
         },
       ],
       fileDiffPath: './src/test/suite/diffs/test-paths-app.txt',
+      useNg20Convention: false,
     });
   });
 });

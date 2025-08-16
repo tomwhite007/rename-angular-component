@@ -13,7 +13,7 @@ export interface TestScenarioConfig {
   projectRoot: string;
   renames: RenameCallConfig[];
   fileDiffPath: string;
-  useNg20Convention?: boolean;
+  useNg20Convention: boolean;
 }
 
 export async function genericTestScenario(config: TestScenarioConfig) {

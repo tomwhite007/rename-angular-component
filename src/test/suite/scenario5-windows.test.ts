@@ -37,6 +37,7 @@ suite('Suite Scenario 5', () => {
         },
       ],
       fileDiffPath: './src/test/suite/diffs/test-rename-spa.txt',
+      useNg20Convention: false,
     });
   });
 });

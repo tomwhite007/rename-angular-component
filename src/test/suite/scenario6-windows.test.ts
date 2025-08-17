@@ -16,12 +16,12 @@ suite('Suite Scenario 6', () => {
         {
           filePath: './src/app/app.component.css',
           construct: 'component',
-          newFilenameInput: 'tom-test',
+          newFilenameInput: 'tom-test.component',
         },
       ],
       fileDiffPath:
         './src/test/suite/diffs/test-styleurl-and-jasminespy-app.txt',
-      useNg20Convention: false,
+      useNg20Convention: true,
     });
   });
 });

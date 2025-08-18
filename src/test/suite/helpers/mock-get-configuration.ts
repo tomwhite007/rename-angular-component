@@ -3,6 +3,7 @@ import { workspace, WorkspaceConfiguration } from 'vscode';
 
 interface ConfigItems {
   'followAngular20+FolderNamingConvention'?: boolean;
+  projectUsesStandaloneComponentsOnly?: boolean;
   useLocalDirectPaths?: boolean;
   openEditors?: boolean;
   debugLog?: boolean;
@@ -10,6 +11,7 @@ interface ConfigItems {
 
 const defaultConfig: ConfigItems = {
   'followAngular20+FolderNamingConvention': true,
+  projectUsesStandaloneComponentsOnly: true,
   useLocalDirectPaths: true,
   openEditors: false,
   debugLog: false,

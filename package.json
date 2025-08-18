@@ -114,8 +114,8 @@
         },
         "renameAngularComponent.followAngular20+FolderNamingConvention": {
           "type": "boolean",
-          "default": true,
-          "description": "Since Angular 20.x, CLI generated folder names include any dot-suffix in the folder name or selector. \re.g. `my-component.component.ts` will be in a folder called `my-component.component/`. \rSet this to false to generate the folder name and selector without the dot-suffix."
+          "default": false,
+          "description": "Since Angular 20.x, CLI generated folder names include any dot-suffix in the folder name or selector. \re.g. `my-component.component.ts` will be in a folder called `my-component.component/`. \rSet this to false to generate the folder name, and selector without the dot-suffix."
         },
         "renameAngularComponent.projectUsesStandaloneComponentsOnly": {
           "type": "boolean",

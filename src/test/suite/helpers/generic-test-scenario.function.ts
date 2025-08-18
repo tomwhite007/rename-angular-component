@@ -14,11 +14,14 @@ export interface TestScenarioConfig {
   renames: RenameCallConfig[];
   fileDiffPath: string;
   useNg20Convention: boolean;
+  projectUsesStandaloneComponentsOnly?: boolean;
 }
 
 export async function genericTestScenario(config: TestScenarioConfig) {
   stubGetConfiguration({
     'followAngular20+FolderNamingConvention': config.useNg20Convention ?? true,
+    projectUsesStandaloneComponentsOnly:
+      config.projectUsesStandaloneComponentsOnly ?? true,
   });
 
   const git = simpleGit({

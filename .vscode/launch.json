@@ -199,7 +199,7 @@
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
         "--extensionTestsPath=${workspaceFolder}/out/test/suite/index7mac",
-        "C:\\Development\\my-stuff\\test-renamer-with-ng20"
+        "/Users/tom/Development/vscode-ext/_rename-test-spas/ng20"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests"

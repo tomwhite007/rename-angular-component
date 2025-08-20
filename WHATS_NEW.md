@@ -1,7 +1,11 @@
-<h1>
-  <sub><img src="https://cdn.jsdelivr.net/gh/tomwhite007/rename-angular-component@main/assets/rename-angular-component-icon.png" height="120"></sub>
-  Rename Angular Component - updated
-</h1>
+<div style="display: flex; align-items: center; gap: 20px; margin-bottom: 30px;">
+  <img src="https://cdn.jsdelivr.net/gh/tomwhite007/rename-angular-component@main/assets/rename-angular-component-icon.png" height="120">
+  <div>
+    <h1 style="margin: 0; border-bottom: none;">Rename Angular Component - updated</h1>
+    <p style="margin: 0 0 5px 0;">tomwhite007</p>
+    <p style="margin: 0;">Rename Angular Components, Directives and Services</p>
+  </div>
+</div>
 
 ## 🎉 Welcome to version 4.0.0
 

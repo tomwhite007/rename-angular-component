@@ -1,11 +1,10 @@
-import fs from 'fs-extra-promise';
 import vscode from 'vscode';
 
-import path from 'path';
 import { ReferenceIndexBuilder } from './move-ts-indexer/reference-index-builder';
 import { conf } from './move-ts-indexer/util/helper-functions';
 import { EXTENSION_NAME } from './rename-angular-component/definitions/extension-name';
 import { FileMoveHandler } from './rename-angular-component/file-manipulation/file-move-handler.class';
+import { isAngularProject } from './rename-angular-component/file-manipulation/is-angular-project.function';
 import { DebugLogger } from './rename-angular-component/logging/debug-logger.class';
 import { UserMessage } from './rename-angular-component/logging/user-message.class';
 import { Renamer } from './rename-angular-component/renamer.class';
@@ -108,30 +107,3 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {}
-
-// Angular project detection
-async function isAngularProject(): Promise<boolean> {
-  const folders = vscode.workspace.workspaceFolders;
-  if (!folders) {
-    return false;
-  }
-  for (const folder of folders) {
-    const angularJson = path.join(folder.uri.fsPath, 'angular.json');
-    const packageJson = path.join(folder.uri.fsPath, 'package.json');
-    if (fs.existsSync(angularJson)) {
-      return true;
-    }
-    if (fs.existsSync(packageJson)) {
-      try {
-        const pkg = JSON.parse(fs.readFileSync(packageJson, 'utf8'));
-        if (
-          (pkg.dependencies && pkg.dependencies['@angular/core']) ||
-          (pkg.devDependencies && pkg.devDependencies['@angular/core'])
-        ) {
-          return true;
-        }
-      } catch {}
-    }
-  }
-  return false;
-}

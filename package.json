@@ -3,7 +3,7 @@
   "displayName": "Rename Angular Component",
   "description": "Rename Angular Components, Directives and Services",
   "publisher": "tomwhite007",
-  "version": "4.0.0-beta.4",
+  "version": "4.0.0-beta.5",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -37,6 +37,9 @@
     "workspace"
   ],
   "main": "./dist/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "contributes": {
     "commands": [
       {
@@ -67,32 +70,32 @@
     "menus": {
       "explorer/context": [
         {
-          "when": "resourceFilename =~ /^.+\\.component\\.(spec.ts|scss|css|sass|less|html|ts)$/",
+          "when": "renameAngularComponent.isAngularProject && resourceFilename =~ /^.+\\.component\\.(spec.ts|scss|css|sass|less|html|ts)$/",
           "command": "rename-angular-component.renameComponent",
           "group": "navigation"
         },
         {
-          "when": "resourceFilename =~ /^.+\\.directive\\.(spec.ts|ts)$/",
+          "when": "renameAngularComponent.isAngularProject && resourceFilename =~ /^.+\\.directive\\.(spec.ts|ts)$/",
           "command": "rename-angular-component.renameDirective",
           "group": "navigation"
         },
         {
-          "when": "resourceFilename =~ /^.+\\.service\\.(spec.ts|ts)$/",
+          "when": "renameAngularComponent.isAngularProject && resourceFilename =~ /^.+\\.service\\.(spec.ts|ts)$/",
           "command": "rename-angular-component.renameService",
           "group": "navigation"
         },
         {
-          "when": "resourceFilename =~ /^.+\\.guard\\.(spec.ts|ts)$/",
+          "when": "renameAngularComponent.isAngularProject && resourceFilename =~ /^.+\\.guard\\.(spec.ts|ts)$/",
           "command": "rename-angular-component.renameGuard",
           "group": "navigation"
         },
         {
-          "when": "resourceFilename =~ /^.+\\.module\\.(spec.ts|ts)$/",
+          "when": "renameAngularComponent.isAngularProject && resourceFilename =~ /^.+\\.module\\.(spec.ts|ts)$/",
           "command": "rename-angular-component.renameModule",
           "group": "navigation"
         },
         {
-          "when": "resourceFilename =~ /^.+(?<!\\.component)(?<!\\.directive)(?<!\\.service)(?<!\\.guard)(?<!\\.module)\\.(spec\\.ts|scss|css|sass|less|html|ts)$/",
+          "when": "renameAngularComponent.isAngularProject && resourceFilename =~ /^.+(?<!\\.component)(?<!\\.directive)(?<!\\.service)(?<!\\.guard)(?<!\\.module)\\.(spec\\.ts|scss|css|sass|less|html|ts)$/",
           "command": "rename-angular-component.renameFile",
           "group": "navigation"
         }

@@ -8,6 +8,7 @@ import { isAngularProject } from './rename-angular-component/file-manipulation/i
 import { DebugLogger } from './rename-angular-component/logging/debug-logger.class';
 import { UserMessage } from './rename-angular-component/logging/user-message.class';
 import { Renamer } from './rename-angular-component/renamer.class';
+import { WhatsNewHandler } from './whats-new/whats-new-handler';
 
 export function activate(context: vscode.ExtensionContext) {
   isAngularProject().then((isAngular) => {
@@ -26,6 +27,11 @@ export function activate(context: vscode.ExtensionContext) {
     if (!isAngular) {
       return;
     }
+
+    const whatsNewHandler = new WhatsNewHandler(context);
+    whatsNewHandler.checkAndShowWhatsNew().catch((error) => {
+      console.error("Error showing What's New screen:", error);
+    });
 
     const indexStart = Date.now();
     const userMessage = new UserMessage(EXTENSION_NAME);
@@ -101,6 +107,14 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.commands.registerCommand(
         'rename-angular-component.renameFile',
         (uri: vscode.Uri) => renamer.rename('file', uri)
+      )
+    );
+
+    // Register What's New command
+    context.subscriptions.push(
+      vscode.commands.registerCommand(
+        'rename-angular-component.showWhatsNew',
+        () => whatsNewHandler.showWhatsNewManually()
       )
     );
   });

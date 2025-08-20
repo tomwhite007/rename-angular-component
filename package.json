@@ -65,9 +65,19 @@
       {
         "command": "rename-angular-component.renameFile",
         "title": "Rename Angular file"
+      },
+      {
+        "command": "rename-angular-component.showWhatsNew",
+        "title": "Show What's New"
       }
     ],
     "menus": {
+      "commandPalette": [
+        {
+          "command": "rename-angular-component.showWhatsNew",
+          "when": "true"
+        }
+      ],
       "explorer/context": [
         {
           "when": "renameAngularComponent.isAngularProject && resourceFilename =~ /^.+\\.component\\.(spec.ts|scss|css|sass|less|html|ts)$/",

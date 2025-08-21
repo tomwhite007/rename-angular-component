@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 export class WhatsNewHandler {
   private static readonly LAST_VERSION_KEY =
     'renameAngularComponent.lastVersion';
-  private static readonly CURRENT_VERSION = '4.0.0-beta.5';
+  private static readonly CURRENT_VERSION = '4.0.0-beta.6';
   private static readonly WHATS_NEW_FILE = 'WHATS_NEW.md';
 
   constructor(private context: vscode.ExtensionContext) {}

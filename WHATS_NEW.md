@@ -3,91 +3,47 @@
   <div>
     <h1 style="margin: 0; border-bottom: none;">Rename Angular Component - updated</h1>
     <p style="margin: 0 0 5px 0;">tomwhite007</p>
-    <p style="margin: 0;">Rename Angular Components, Directives and Services</p>
+    <p style="margin: 0;">Rename Angular Components, Directives, Pipes and Services (plus any other Angular files)</p>
   </div>
 </div>
 
 ## 🎉 Welcome to version 4.0.0
 
-Thank you for updating to the latest version of Rename Angular Component. Here are the key improvements and new features:
+Thank you for updating to the latest version of Rename Angular Component.
 
 ## ✨ New Features
 
-### What's New Screen
+### Angular 20 Style Guide and old '.component' suffix
 
-- **Automatic Update Notifications**: You'll now see this screen whenever you update to a new version
-- **Simple and Clean**: Just a markdown file that opens automatically after updates
-- **One-time Display**: This screen only shows once per version update
+- **Component suffix can be removed or added**: This extension now allows you to migrate between the old **'.component'** and new no-suffix format.
+- **'.component' suffix removed from selectors**: This extension removes the suffix from selectors by default during a rename, (but can be configured to follow Angular 20 exactly). Angular 20 now puts **'.component'** into selectors if you try adding them with the cli (which breaks the build).
+- **'.component' suffix removed from folders**: This extension removes this part from folders by default during a rename, (but can be configured to follow Angular 20). Angular 20 now puts **'.component'** into folders if you try adding them with the cli.
+- **Coming soon...** A script to migrate all old **'.component'** files in your project in one go (if that's what you'd like to do).
 
-### Enhanced Angular Support
+### Enhanced Selector updates
 
-- **Angular 20+ Compatibility**: Better support for the latest Angular folder naming conventions
-- **Improved Selector Detection**: More accurate detection and replacement of component selectors
-- **Enhanced Error Handling**: Better error messages and debugging information
+- **Standalone Component mode**: This setting only updates selectors in templates where the renamed component is imported. But can be configured to update all templates, for use where UI components in Modules are still being used in a project.
+- **Pipes are also updated in templates**: Pipes can now be renamed with this extension.
 
-## ⚡ Improvements
+## ⚡ More Renamers
 
-### Performance Enhancements
+### You can now rename anything in an Angular project
 
-- **Faster Indexing**: Improved performance when scanning large Angular projects
-- **Better Memory Usage**: Optimized memory consumption during rename operations
-- **Enhanced Reliability**: More stable operation across different project structures
-
-### User Experience
-
-- **Clearer Feedback**: Better progress indicators and status messages
-- **Improved Error Messages**: More helpful error descriptions and suggestions
-- **Enhanced Logging**: Better debug information for troubleshooting
-
-## 🐛 Bug Fixes
-
-### Windows Compatibility
-
-- **Fixed Path Issues**: Resolved Windows file path handling problems
-- **Drive Letter Support**: Better support for non-default drive letters
-- **Cross-platform Consistency**: Improved consistency between Windows and Unix systems
-
-### Template Processing
-
-- **Selector Replacement**: Fixed issues with selector replacement in complex templates
-- **Import Updates**: Improved accuracy of import statement updates
-- **File Movement**: Better handling of file relocation operations
-
-## 🔧 Technical Improvements
-
-### Code Quality
-
-- **TypeScript Updates**: Updated to latest TypeScript and VS Code extension APIs
-- **Better Error Handling**: More robust error handling throughout the extension
-- **Code Refactoring**: Improved code organization and maintainability
-
-### Development Experience
-
-- **Enhanced Testing**: Better test coverage and more reliable test suite
-- **Improved Documentation**: Updated documentation and code comments
-- **Build Process**: Streamlined build and packaging process
+- **All Angular CLI-generated files**: Supports renaming classes, functions, variables, interfaces, and enums that have the same name as the file they are in.
+- **One concept per file**: Expects to rename [one important thing per file](https://angular.dev/style-guide#one-concept-per-file) that has the same name as the file. "The Rule of One"
 
 ## 📋 How to Use
 
-1. **Right-click** on any Angular component, directive, service, or module file in the explorer
-2. Select the appropriate rename command from the context menu
-3. Enter the new name when prompted
-4. The extension will automatically update all related files and references
+1. **Right-click** on any Angular file in the explorer.
+2. Choose **Rename Angular file** from the top of the menu.
+3. Enter the new name when prompted (with a dot-suffix if you feel old-school).
+4. The extension will automatically update all related files, selectors and imports.
 
-## 🆘 Need Help?
+## 🆘 Need Help or found a bug?
 
-- **GitHub Issues**: Report bugs or request features on [GitHub](https://github.com/tomwhite007/rename-angular-component/issues)
+- **GitHub Issues**: Report bugs or request features on [GitHub](https://github.com/tomwhite007/rename-angular-component/issues). This is a big new release so you can expect a same-day response.
 - **Documentation**: Check the [README](https://github.com/tomwhite007/rename-angular-component#readme) for detailed usage instructions
 - **Configuration**: Customize the extension behavior in VS Code settings
-
-## 🎯 What's Next?
-
-We're constantly working to improve the extension. Some upcoming features include:
-
-- Enhanced support for Angular standalone components
-- Better integration with Angular CLI
-- Improved performance for large projects
-- Additional customization options
 
 ---
 

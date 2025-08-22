@@ -68,7 +68,11 @@
       },
       {
         "command": "rename-angular-component.showWhatsNew",
-        "title": "Rename Angular Component: Show What's New"
+        "title": "Rename Angular Component: Show the current What's New screen"
+      },
+      {
+        "command": "rename-angular-component.disableWhatsNew",
+        "title": "Rename Angular Component: Disable What's New popup"
       },
       {
         "command": "rename-angular-component.resetWhatsNew",
@@ -139,7 +143,7 @@
           "default": true,
           "description": "Untick this if your project uses modules. Then all selectors will be updated in templates, instead of just the Components that import the renamed Component."
         },
-        "renameAngularComponent.showWhatsNew": {
+        "renameAngularComponent.showWhatsNewPopup": {
           "type": "boolean",
           "default": true,
           "description": "Show the 'What's New' screen when the extension is updated to a new version."

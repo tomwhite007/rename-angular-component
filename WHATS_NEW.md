@@ -37,6 +37,10 @@ Thank you for updating to the latest version of Rename Angular Component.
 3. Enter the new name when prompted (include a dot-suffix if you want to follow the old style guide)
 4. The extension automatically updates all related files, selectors, and imports
 
+## 🙈 Don't want a "What's new" popup again?
+
+That's ok, you can disable it in settings, or choose command: `Rename Angular Component: Disable What's New popup`
+
 ## 🆘 Need Help or found a bug?
 
 - **GitHub Issues**: Report bugs or request features on [GitHub](https://github.com/tomwhite007/rename-angular-component/issues). This is a major release, so you can expect a same-day response.

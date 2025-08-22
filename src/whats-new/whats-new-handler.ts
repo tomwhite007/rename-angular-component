@@ -12,8 +12,8 @@ export class WhatsNewHandler {
 
   public async checkAndShowWhatsNew(): Promise<void> {
     // Check if the user has disabled the What's New screen
-    const showWhatsNew = conf('showWhatsNew', true);
-    if (!showWhatsNew) {
+    const showWhatsNewPopup = conf('showWhatsNewPopup', true);
+    if (!showWhatsNewPopup) {
       return;
     }
 
@@ -45,6 +45,16 @@ export class WhatsNewHandler {
     await this.context.globalState.update(
       WhatsNewHandler.LAST_VERSION_KEY,
       undefined
+    );
+  }
+
+  // Disable the What's New screen
+  public async disableWhatsNew(): Promise<void> {
+    await vscode.workspace
+      .getConfiguration('renameAngularComponent')
+      .update('showWhatsNewPopup', false, vscode.ConfigurationTarget.Global);
+    vscode.window.showInformationMessage(
+      "What's New screen has been disabled. You can re-enable it in VS Code settings."
     );
   }
 

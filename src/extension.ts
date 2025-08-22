@@ -120,6 +120,13 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
       vscode.commands.registerCommand(
+        'rename-angular-component.disableWhatsNew',
+        () => whatsNewHandler.disableWhatsNew()
+      )
+    );
+
+    context.subscriptions.push(
+      vscode.commands.registerCommand(
         'rename-angular-component.resetWhatsNew',
         () => whatsNewHandler.resetStoredVersion()
       )

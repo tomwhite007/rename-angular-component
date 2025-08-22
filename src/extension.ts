@@ -110,11 +110,18 @@ export function activate(context: vscode.ExtensionContext) {
       )
     );
 
-    // Register What's New command
+    // Register What's New commands
     context.subscriptions.push(
       vscode.commands.registerCommand(
         'rename-angular-component.showWhatsNew',
         () => whatsNewHandler.showWhatsNewManually()
+      )
+    );
+
+    context.subscriptions.push(
+      vscode.commands.registerCommand(
+        'rename-angular-component.resetWhatsNew',
+        () => whatsNewHandler.resetStoredVersion()
       )
     );
   });

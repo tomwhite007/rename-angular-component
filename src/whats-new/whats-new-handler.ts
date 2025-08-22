@@ -36,15 +36,16 @@ export class WhatsNewHandler {
     }
   }
 
-  private async updateStoredVersion(version: string): Promise<void> {
-    await this.context.globalState.update(
-      WhatsNewHandler.LAST_VERSION_KEY,
-      version
-    );
-  }
-
   public async showWhatsNewManually(): Promise<void> {
     await this.showWhatsNew();
+  }
+
+  // For development/testing: reset the stored version
+  public async resetStoredVersion(): Promise<void> {
+    await this.context.globalState.update(
+      WhatsNewHandler.LAST_VERSION_KEY,
+      undefined
+    );
   }
 
   private async showWhatsNew(): Promise<void> {
@@ -62,9 +63,9 @@ export class WhatsNewHandler {
         return;
       }
 
-      // Open the markdown file
-      const document = await vscode.workspace.openTextDocument(whatsNewPath);
-      await vscode.window.showTextDocument(document, vscode.ViewColumn.One);
+      // Open the markdown file in preview mode
+      const uri = vscode.Uri.file(whatsNewPath);
+      await vscode.commands.executeCommand('markdown.showPreview', uri);
     } catch (error) {
       console.error("Error showing What's New:", error);
     }
@@ -86,5 +87,12 @@ export class WhatsNewHandler {
       console.error('Error reading package.json version:', error);
       return 'unknown';
     }
+  }
+
+  private async updateStoredVersion(version: string): Promise<void> {
+    await this.context.globalState.update(
+      WhatsNewHandler.LAST_VERSION_KEY,
+      version
+    );
   }
 }

@@ -24,6 +24,7 @@ suite('Suite Scenario 1', () => {
       fileDiffPath:
         './src/test/suite/diffs/simple-reactive-viewmodel-example.txt',
       useNg20Convention: true,
+      projectUsesStandaloneComponentsOnly: false,
     });
   });
 
@@ -47,6 +48,7 @@ suite('Suite Scenario 1', () => {
       fileDiffPath:
         './src/test/suite/diffs/simple-reactive-viewmodel-example.txt',
       useNg20Convention: false,
+      projectUsesStandaloneComponentsOnly: false,
     });
   });
 });

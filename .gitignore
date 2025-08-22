@@ -6,5 +6,6 @@ node_modules
 build
 src/test/suite/diffs/shp-wild-paths.txt
 src/test/suite/diffs/dsls-spa.txt
+src/test/suite/diffs/backup_private_diffs
 
 

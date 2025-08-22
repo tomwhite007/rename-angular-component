@@ -1,6 +1,7 @@
 import * as fs from 'fs-extra-promise';
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { conf } from '../move-ts-indexer/util/helper-functions';
 
 export class WhatsNewHandler {
   private static readonly LAST_VERSION_KEY =
@@ -10,6 +11,12 @@ export class WhatsNewHandler {
   constructor(private context: vscode.ExtensionContext) {}
 
   public async checkAndShowWhatsNew(): Promise<void> {
+    // Check if the user has disabled the What's New screen
+    const showWhatsNew = conf('showWhatsNew', true);
+    if (!showWhatsNew) {
+      return;
+    }
+
     const currentVersion = await this.getCurrentVersion();
     const lastVersion = this.context.globalState.get<string>(
       WhatsNewHandler.LAST_VERSION_KEY

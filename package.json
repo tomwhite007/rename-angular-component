@@ -134,6 +134,11 @@
           "type": "boolean",
           "default": true,
           "description": "Untick this if your project uses modules. Then all selectors will be updated in templates, instead of just the Components that import the renamed Component."
+        },
+        "renameAngularComponent.showWhatsNew": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the 'What's New' screen when the extension is updated to a new version."
         }
       }
     }

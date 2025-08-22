@@ -10,7 +10,7 @@ import {
   DefinitionType,
   OriginalFileDetails,
 } from '../definitions/file.interfaces';
-import { isFollowingAngular20FolderNamingConvention } from '../definitions/is-following-angular20-folder-naming-convention';
+import { isFollowingAngular20FolderAndSelectorNamingConvention } from '../definitions/is-following-angular20-folder-naming-convention';
 import { getConstructFromDecorator } from '../in-file-edits/get-construct-from-decorator.function';
 import { getCoreFileDefinitionDetails } from '../in-file-edits/get-core-file-definition-details.function';
 import { windowsFilePathFix } from './windows-file-path-fix.function';
@@ -109,9 +109,10 @@ export class FilesRelatedToStub {
   getFilesToMove(newStub: string, newFilenameInput: string) {
     const replaceStub = (filePath: string) => {
       if (this.folderNameSameAsStub) {
-        const newFolderName = isFollowingAngular20FolderNamingConvention()
-          ? newFilenameInput
-          : newStub;
+        const newFolderName =
+          isFollowingAngular20FolderAndSelectorNamingConvention()
+            ? newFilenameInput
+            : newStub;
         const parentPath = dirname(this.originalFileDetails.path);
         this.newFolderPath = join(parentPath, newFolderName);
         filePath = filePath.replace(

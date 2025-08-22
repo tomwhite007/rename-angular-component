@@ -2,7 +2,7 @@ import sinon from 'sinon';
 import { workspace, WorkspaceConfiguration } from 'vscode';
 
 interface ConfigItems {
-  'followAngular20+FolderNamingConvention'?: boolean;
+  followAngular20FolderAndSelectorNamingConvention?: boolean;
   projectUsesStandaloneComponentsOnly?: boolean;
   useLocalDirectPaths?: boolean;
   openEditors?: boolean;
@@ -10,7 +10,7 @@ interface ConfigItems {
 }
 
 const defaultConfig: ConfigItems = {
-  'followAngular20+FolderNamingConvention': true,
+  followAngular20FolderAndSelectorNamingConvention: true,
   projectUsesStandaloneComponentsOnly: true,
   useLocalDirectPaths: true,
   openEditors: false,

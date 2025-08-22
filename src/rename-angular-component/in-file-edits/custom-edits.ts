@@ -10,7 +10,7 @@ import {
 } from '../../move-ts-indexer/util/shared-interfaces';
 import { escapeRegex } from '../../utils/escape-regex';
 import { AngularConstructOrPlainFile } from '../definitions/file.interfaces';
-import { isFollowingAngular20FolderNamingConvention } from '../definitions/is-following-angular20-folder-naming-convention';
+import { isFollowingAngular20FolderAndSelectorNamingConvention } from '../definitions/is-following-angular20-folder-naming-convention';
 import { generateNewSelector } from './generate-new-selector.function';
 import { getSelectorType } from './get-selector-type.function';
 import { stripSelectorBraces } from './strip-selector-braces.function';
@@ -59,9 +59,10 @@ export function getAngularCoreClassEdits(
             break;
           case 'selector':
             selectorTransfer.oldSelector = foundItem.itemText;
-            const newSelectorText = isFollowingAngular20FolderNamingConvention()
-              ? newFilenameInput
-              : newFileStub;
+            const newSelectorText =
+              isFollowingAngular20FolderAndSelectorNamingConvention()
+                ? newFilenameInput
+                : newFileStub;
 
             selectorTransfer.newSelector = generateNewSelector(
               foundItem.itemText,

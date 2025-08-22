@@ -19,7 +19,8 @@ export interface TestScenarioConfig {
 
 export async function genericTestScenario(config: TestScenarioConfig) {
   stubGetConfiguration({
-    'followAngular20+FolderNamingConvention': config.useNg20Convention ?? true,
+    followAngular20FolderAndSelectorNamingConvention:
+      config.useNg20Convention ?? true,
     projectUsesStandaloneComponentsOnly:
       config.projectUsesStandaloneComponentsOnly ?? true,
   });

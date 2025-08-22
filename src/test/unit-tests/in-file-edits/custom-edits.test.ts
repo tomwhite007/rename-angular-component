@@ -110,9 +110,9 @@ describe('Custom Edits', () => {
 
         expect(edits).to.have.length(4);
 
-        expect(conf('followAngular20+FolderNamingConvention', true)).to.equal(
-          true
-        );
+        expect(
+          conf('followAngular20FolderAndSelectorNamingConvention', true)
+        ).to.equal(true);
         expect(edits[0].replacement).to.equal("'app-new.component'");
         expect(edits[1].replacement).to.equal("'./new.component.scss'");
         expect(edits[2].replacement).to.equal("'./new.component.css'");
@@ -212,9 +212,9 @@ describe('Custom Edits', () => {
 
         expect(edits).to.have.length(4);
 
-        expect(conf('followAngular20+FolderNamingConvention', true)).to.equal(
-          false
-        );
+        expect(
+          conf('followAngular20FolderAndSelectorNamingConvention', true)
+        ).to.equal(false);
         expect(edits[0].replacement).to.equal("'app-new'");
         expect(edits[1].replacement).to.equal("'./new.component.scss'");
         expect(edits[2].replacement).to.equal("'./new.component.css'");

@@ -68,11 +68,11 @@
       },
       {
         "command": "rename-angular-component.showWhatsNew",
-        "title": "Show What's New"
+        "title": "Rename Angular Component: Show What's New"
       },
       {
         "command": "rename-angular-component.resetWhatsNew",
-        "title": "Reset What's New Version (Development). This will re-trigger the 'What's New' screen on startup."
+        "title": "Rename Angular Component: Show What's New screen on startup (reset)"
       }
     ],
     "menus": {

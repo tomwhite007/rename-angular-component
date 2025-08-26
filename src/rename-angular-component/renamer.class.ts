@@ -116,8 +116,7 @@ export class Renamer {
 
     const filePathsAffected = await this.fileMoveHandler.runFileMoveJobs(
       this.context.fileMoveJobs!,
-      progress,
-      this.context.projectRoot!
+      progress
     );
     const baseFilePathsAffected = filePathsAffected.map((filePath) =>
       filePath.replace(/(\.module)?\.ts$/, '')

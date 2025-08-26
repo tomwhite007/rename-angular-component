@@ -1,8 +1,9 @@
-import vscode from 'vscode';
+import vscode, { workspace } from 'vscode';
 import { FileItem } from '../../move-ts-indexer/file-item';
 import { ReferenceIndexBuilder } from '../../move-ts-indexer/reference-index-builder';
 import { timeoutPause } from '../../utils/timeout-pause';
 import { UserMessage } from '../logging/user-message.class';
+import path from 'path';
 
 export class FileMoveHandler {
   constructor(
@@ -15,8 +16,7 @@ export class FileMoveHandler {
     progress: vscode.Progress<{
       message?: string | undefined;
       increment?: number | undefined;
-    }>,
-    projectRoot: string
+    }>
   ): Promise<string[]> {
     progress.report({ increment: 20 });
     await timeoutPause();
@@ -31,28 +31,21 @@ export class FileMoveHandler {
       await item.move(this.indexer);
     }
     const files = this.indexer.endNewMoves();
-    const affectedFiles = this.generateFilePathsAffected(
-      files,
-      fileMoveJobs,
-      projectRoot
-    );
-    this.logFileEditsToOutput(affectedFiles, projectRoot);
+    const affectedFiles = this.generateFilePathsAffected(files, fileMoveJobs);
+    this.logFileEditsToOutput(affectedFiles);
     return affectedFiles;
   }
 
-  private logFileEditsToOutput(
-    affectedFiles: string[],
-    projectRoot: string
-  ): void {
+  private logFileEditsToOutput(affectedFiles: string[]): void {
+    const projectRoot = workspace.workspaceFolders?.[0].uri.fsPath + path.sep;
     this.userMessage.logInfoToChannel(
-      affectedFiles.map((file) => file.replace(`${projectRoot}/`, ''))
+      affectedFiles.map((file) => file.replace(projectRoot, ''))
     );
   }
 
   private generateFilePathsAffected(
     files: string[],
-    fileMoveJobs: FileItem[],
-    projectRoot: string
+    fileMoveJobs: FileItem[]
   ): string[] {
     let affectedFiles = files.map(
       (file) =>

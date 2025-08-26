@@ -67,7 +67,6 @@ export async function findReplaceSelectorsInTemplateFiles(
     if (html) {
       await fs.writeFileAsync(uri.fsPath, html, 'utf-8');
       const relativePath = uri.fsPath.replace(projectRoot, '');
-      console.log(relativePath);
       userMessage.logInfoToChannel([relativePath], false);
       changed++;
       if (isSpecFile) {

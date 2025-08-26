@@ -17,7 +17,6 @@ describe('FileMoveHandler', () => {
   let progress: vscode.Progress<{ message?: string; increment?: number }> & {
     report: sinon.SinonStub;
   };
-  const projectRoot = 'test/project/root';
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
@@ -45,11 +44,7 @@ describe('FileMoveHandler', () => {
         },
       ];
 
-      await fileMoveHandler.runFileMoveJobs(
-        fileMoveJobs,
-        progress,
-        projectRoot
-      );
+      await fileMoveHandler.runFileMoveJobs(fileMoveJobs, progress);
 
       expect(progress.report.called).to.be.true;
       expect(fileMoveJobs[0].move.calledOnce).to.be.true;
@@ -59,11 +54,7 @@ describe('FileMoveHandler', () => {
     it('should handle empty file move jobs array', async () => {
       const fileMoveJobs: FileItem[] = [];
 
-      await fileMoveHandler.runFileMoveJobs(
-        fileMoveJobs,
-        progress,
-        projectRoot
-      );
+      await fileMoveHandler.runFileMoveJobs(fileMoveJobs, progress);
 
       expect(progress.report.called).to.be.true;
     });
@@ -72,16 +63,6 @@ describe('FileMoveHandler', () => {
   describe('logFileEditsToOutput', () => {
     it('should log file edits with correct paths', () => {
       const files = ['/path/to/source1.ts', '/path/to/source2.ts'];
-      const fileMoveJobs: FileItem[] = [
-        {
-          sourcePath: '/path/to/source1.ts',
-          targetPath: '/path/to/target1.ts',
-        } as FileItem,
-        {
-          sourcePath: '/path/to/source2.ts',
-          targetPath: '/path/to/target2.ts',
-        } as FileItem,
-      ];
 
       const logInfoToChannelStub = sandbox.stub(
         userMessage,

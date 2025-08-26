@@ -14,12 +14,12 @@ export async function findReplaceSelectorsInTemplateFiles(
   construct: AngularConstructOrPlainFile | null,
   coreFilePath: string,
   baseFilePathsAffected: string[],
-  projectRoot: string,
   debugLogger: DebugLogger
 ) {
   if (originalSelector === newSelector) {
     return;
   }
+  const projectRoot = workspace.workspaceFolders?.[0].uri.fsPath + path.sep;
   const uris = await workspace.findFiles(
     '**/*.{html,spec.ts,component.ts,stories.ts}',
     '**/node_modules/**',
@@ -66,7 +66,8 @@ export async function findReplaceSelectorsInTemplateFiles(
     }
     if (html) {
       await fs.writeFileAsync(uri.fsPath, html, 'utf-8');
-      const relativePath = uri.fsPath.replace(`${projectRoot}/`, '');
+      const relativePath = uri.fsPath.replace(projectRoot, '');
+      console.log(relativePath);
       userMessage.logInfoToChannel([relativePath], false);
       changed++;
       if (isSpecFile) {

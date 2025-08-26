@@ -133,8 +133,7 @@ export class Renamer {
       this.userMessage,
       this.debugLogger,
       this.context.coreConstructNewFilePath!,
-      baseFilePathsAffected,
-      this.context.projectRoot!
+      baseFilePathsAffected
     );
 
     await this.cleanupOriginalFolder();

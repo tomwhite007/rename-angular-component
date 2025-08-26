@@ -23,7 +23,7 @@ suite('Suite Scenario 6', () => {
       fileDiffPath:
         './src/test/suite/diffs/test-styleurl-and-jasminespy-app.txt',
       useNg20Convention: false,
-      projectUsesStandaloneComponentsOnly: false,
+      projectUsesStandaloneComponentsOnly: true,
     });
   });
 });

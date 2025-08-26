@@ -1,9 +1,9 @@
+import path from 'path';
 import vscode, { workspace } from 'vscode';
 import { FileItem } from '../../move-ts-indexer/file-item';
 import { ReferenceIndexBuilder } from '../../move-ts-indexer/reference-index-builder';
 import { timeoutPause } from '../../utils/timeout-pause';
 import { UserMessage } from '../logging/user-message.class';
-import path from 'path';
 
 export class FileMoveHandler {
   constructor(
@@ -37,7 +37,7 @@ export class FileMoveHandler {
   }
 
   private logFileEditsToOutput(affectedFiles: string[]): void {
-    const projectRoot = workspace.workspaceFolders?.[0].uri.fsPath + path.sep;
+    const projectRoot = workspace.workspaceFolders?.[0]?.uri.fsPath + path.sep;
     this.userMessage.logInfoToChannel(
       affectedFiles.map((file) => file.replace(projectRoot, ''))
     );

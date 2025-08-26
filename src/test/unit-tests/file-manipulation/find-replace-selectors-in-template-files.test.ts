@@ -23,6 +23,16 @@ describe('findReplaceSelectorsInTemplateFiles', () => {
     workspaceFindFilesStub = sandbox.stub(vscode.workspace, 'findFiles');
     readFileAsyncStub = sandbox.stub(fs, 'readFileAsync');
     writeFileAsyncStub = sandbox.stub(fs, 'writeFileAsync');
+
+    // Mock workspace.workspaceFolders for all tests
+    const mockWorkspaceFolder = {
+      uri: {
+        fsPath: '/path',
+      },
+    };
+    sandbox
+      .stub(vscode.workspace, 'workspaceFolders')
+      .value([mockWorkspaceFolder]);
   });
 
   afterEach(() => {
@@ -118,5 +128,36 @@ describe('findReplaceSelectorsInTemplateFiles', () => {
         'utf-8'
       )
     ).to.be.true;
+  });
+
+  it('should handle workspace folders being undefined', async () => {
+    // Override the workspace folders mock for this specific test
+    sandbox.restore();
+    sandbox = sinon.createSandbox();
+    workspaceFindFilesStub = sandbox.stub(vscode.workspace, 'findFiles');
+    readFileAsyncStub = sandbox.stub(fs, 'readFileAsync');
+    writeFileAsyncStub = sandbox.stub(fs, 'writeFileAsync');
+
+    // Mock workspace.workspaceFolders as undefined
+    sandbox.stub(vscode.workspace, 'workspaceFolders').value(undefined);
+
+    const mockUris = [{ fsPath: '/path/to/file1.html' }];
+    workspaceFindFilesStub.resolves(mockUris);
+    readFileAsyncStub.resolves('<app-old-selector></app-old-selector>');
+    writeFileAsyncStub.resolves();
+
+    await findReplaceSelectorsInTemplateFiles(
+      'app-old-selector',
+      'app-new-selector',
+      userMessage,
+      'component',
+      coreFilePath,
+      ['/path/to/file1'],
+      debugLogger
+    );
+
+    expect(workspaceFindFilesStub.calledOnce).to.be.true;
+    expect(readFileAsyncStub.callCount).to.equal(1);
+    expect(writeFileAsyncStub.callCount).to.equal(1);
   });
 });

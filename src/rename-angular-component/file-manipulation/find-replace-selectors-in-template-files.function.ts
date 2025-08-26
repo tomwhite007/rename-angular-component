@@ -19,7 +19,7 @@ export async function findReplaceSelectorsInTemplateFiles(
   if (originalSelector === newSelector) {
     return;
   }
-  const projectRoot = workspace.workspaceFolders?.[0].uri.fsPath + path.sep;
+  const projectRoot = workspace.workspaceFolders?.[0]?.uri.fsPath + path.sep;
   const uris = await workspace.findFiles(
     '**/*.{html,spec.ts,component.ts,stories.ts}',
     '**/node_modules/**',

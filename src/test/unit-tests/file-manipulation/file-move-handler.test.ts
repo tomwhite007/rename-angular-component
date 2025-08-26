@@ -69,13 +69,71 @@ describe('FileMoveHandler', () => {
         'logInfoToChannel'
       );
 
+      // Mock workspace.workspaceFolders
+      const mockWorkspaceFolder = {
+        uri: {
+          fsPath: '/path',
+        },
+      };
+      sandbox
+        .stub(vscode.workspace, 'workspaceFolders')
+        .value([mockWorkspaceFolder]);
+
       // @ts-ignore - accessing private method for testing
-      fileMoveHandler.logFileEditsToOutput(files, '/path');
+      fileMoveHandler.logFileEditsToOutput(files);
 
       expect(logInfoToChannelStub.calledOnce).to.be.true;
       const loggedFiles = logInfoToChannelStub.firstCall.args[0];
 
       expect(loggedFiles).to.deep.equal(['to/source1.ts', 'to/source2.ts']);
+    });
+
+    it('should handle workspace folders being undefined', () => {
+      const files = ['/path/to/source1.ts', '/path/to/source2.ts'];
+
+      const logInfoToChannelStub = sandbox.stub(
+        userMessage,
+        'logInfoToChannel'
+      );
+
+      // Mock workspace.workspaceFolders as undefined
+      sandbox.stub(vscode.workspace, 'workspaceFolders').value(undefined);
+
+      // @ts-ignore - accessing private method for testing
+      fileMoveHandler.logFileEditsToOutput(files);
+
+      expect(logInfoToChannelStub.calledOnce).to.be.true;
+      const loggedFiles = logInfoToChannelStub.firstCall.args[0];
+
+      // When workspace folders is undefined, the original paths should be logged
+      expect(loggedFiles).to.deep.equal([
+        '/path/to/source1.ts',
+        '/path/to/source2.ts',
+      ]);
+    });
+
+    it('should handle empty workspace folders array', () => {
+      const files = ['/path/to/source1.ts', '/path/to/source2.ts'];
+
+      const logInfoToChannelStub = sandbox.stub(
+        userMessage,
+        'logInfoToChannel'
+      );
+
+      // Mock workspace.workspaceFolders as empty array
+      sandbox.stub(vscode.workspace, 'workspaceFolders').value([]);
+
+      // @ts-ignore - accessing private method for testing
+      fileMoveHandler.logFileEditsToOutput(files);
+
+      expect(logInfoToChannelStub.calledOnce).to.be.true;
+      const loggedFiles = logInfoToChannelStub.firstCall.args[0];
+
+      // When workspace folders is empty, the original paths should be logged
+      expect(loggedFiles).to.deep.equal([
+        '/path/to/source1.ts',
+        '/path/to/source2.ts',
+      ]);
     });
   });
 });

@@ -1,4 +1,5 @@
 import fs from 'fs-extra-promise';
+import path from 'path';
 import { workspace } from 'vscode';
 import { AngularConstructOrPlainFile } from '../definitions/file.interfaces';
 import { isProjectUsingStandaloneComponents } from '../definitions/is-project-using-standalone-components';
@@ -38,8 +39,10 @@ export async function findReplaceSelectorsInTemplateFiles(
       ''
     );
     const isSpecFile = uri.fsPath.endsWith('.spec.ts');
+    const isIndexFile = path.basename(uri.fsPath) === 'index.html';
+    const isNotSpecOrIndexFile = !isSpecFile && !isIndexFile;
     if (
-      !isSpecFile && // replace all selectors in spec files
+      isNotSpecOrIndexFile && // replace all selectors in spec files and index.html
       (uri.fsPath === coreFilePath || // Skip core file because selector is already updated
         (isProjectUsingStandaloneComponents() &&
           !baseFilePathsAffected.includes(filePathBase))) // Skip template files that are not siblings to files that have been edited

@@ -224,7 +224,9 @@ export class Renamer {
     );
 
     if (this.hasConflictingFiles()) {
-      vscode.window.showErrorMessage('Not allowed to overwrite existing files');
+      vscode.window.showErrorMessage(
+        'Renamer: Not allowed to overwrite existing files'
+      );
       this.debugLogger.logToConsole(
         'l.exists(): Not allowed to overwrite existing files'
       );

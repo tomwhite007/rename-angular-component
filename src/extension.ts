@@ -29,9 +29,12 @@ export function activate(context: vscode.ExtensionContext) {
     }
 
     const whatsNewHandler = new WhatsNewHandler(context);
-    whatsNewHandler.checkAndShowWhatsNew().catch((error) => {
-      console.error("Error showing What's New screen:", error);
-    });
+    // Check and show What's New screen if needed (after a short delay to not interfere with startup)
+    setTimeout(() => {
+      whatsNewHandler.checkAndShowWhatsNew().catch((error) => {
+        console.error("Error showing What's New screen:", error);
+      });
+    }, 1000);
 
     const indexStart = Date.now();
     const userMessage = new UserMessage(EXTENSION_NAME);

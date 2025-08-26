@@ -43,6 +43,7 @@ suite('Suite Scenario 5', () => {
       ],
       fileDiffPath: './src/test/suite/diffs/test-rename-spa-ng20.txt',
       useNg20Convention: true,
+      projectUsesStandaloneComponentsOnly: false,
     });
   });
 
@@ -85,6 +86,7 @@ suite('Suite Scenario 5', () => {
       ],
       fileDiffPath: './src/test/suite/diffs/test-rename-spa-non-ng20.txt',
       useNg20Convention: false,
+      projectUsesStandaloneComponentsOnly: false,
     });
   });
 });

@@ -34,6 +34,7 @@ suite('Suite Scenario 3', () => {
       ],
       fileDiffPath: './src/test/suite/diffs/dsls-spa.txt',
       useNg20Convention: false,
+      projectUsesStandaloneComponentsOnly: false,
     });
   });
 });

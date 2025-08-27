@@ -42,6 +42,7 @@ interface ConfigInfo {
 
 export class ReferenceIndexBuilder {
   index: ReferenceIndex = new ReferenceIndex();
+  indexerRunning: boolean = false;
   isinitialised: boolean = false;
   changeDocumentEvent!: vscode.Disposable;
 
@@ -54,6 +55,7 @@ export class ReferenceIndexBuilder {
   constructor(private debugLogger: { log: (...args: string[]) => void }) {}
 
   async init(progress?: vscode.Progress<{ message: string }>) {
+    this.indexerRunning = true;
     this.debugLogger.log('## Debug Indexer Start ###');
     this.index = new ReferenceIndex();
 
@@ -63,6 +65,7 @@ export class ReferenceIndexBuilder {
     this.attachFileWatcher();
     console.log('indexer initialised');
     this.isinitialised = true;
+    this.indexerRunning = false;
     this.debugLogger.log('## Debug Indexer End ###');
   }
 

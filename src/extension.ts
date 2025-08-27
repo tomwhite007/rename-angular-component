@@ -56,7 +56,7 @@ export function activate(context: vscode.ExtensionContext) {
     };
 
     const initialise = async () => {
-      if (indexer.isinitialised || indexer.indexerRunning) {
+      if (indexer.isinitialised) {
         return Promise.resolve();
       }
       await initWithProgress();

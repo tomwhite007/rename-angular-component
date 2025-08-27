@@ -58,7 +58,6 @@ describe('updateSelectorsInTemplates', () => {
       'component',
       coreFilePath,
       filePathsAffected,
-      'src/project-root',
       debugLogger,
     ]);
   });

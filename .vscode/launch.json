@@ -20,7 +20,10 @@
       "testConfiguration": "${workspaceFolder}/unit-tests.vscode-test.mjs",
       "testConfigurationLabel": "unitTests",
       "autoAttachChildProcesses": false,
-      "preLaunchTask": "tasks: watch-tests"
+      "preLaunchTask": "tasks: watch-tests",
+      "env": {
+        "VSCODE_RENAME_ANGULAR_TEST": "1"
+      }
     },
     {
       "name": "Extension Tests 1 Mac",
@@ -34,7 +37,10 @@
         "/Users/tom/Development/vscode-ext/_rename-test-spas/simple-reactive-viewmodel-example"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "tasks: watch-tests"
+      "preLaunchTask": "tasks: watch-tests",
+      "env": {
+        "VSCODE_RENAME_ANGULAR_TEST": "1"
+      }
     },
     {
       "name": "Extension Tests 1 Windows",
@@ -48,7 +54,10 @@
         "C:\\Development\\my-stuff\\simple-reactive-viewmodel-example"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "tasks: watch-tests"
+      "preLaunchTask": "tasks: watch-tests",
+      "env": {
+        "VSCODE_RENAME_ANGULAR_TEST": "1"
+      }
     },
     {
       "name": "Extension Tests 2 Mac",
@@ -62,7 +71,10 @@
         "/Users/tom/Development/vscode-ext/_rename-test-spas/shp-wild-paths"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "tasks: watch-tests"
+      "preLaunchTask": "tasks: watch-tests",
+      "env": {
+        "VSCODE_RENAME_ANGULAR_TEST": "1"
+      }
     },
     {
       "name": "Extension Tests 2 Windows",
@@ -76,7 +88,10 @@
         "C:\\Development\\my-stuff\\shp-wild-paths"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "tasks: watch-tests"
+      "preLaunchTask": "tasks: watch-tests",
+      "env": {
+        "VSCODE_RENAME_ANGULAR_TEST": "1"
+      }
     },
     {
       "name": "Extension Tests 3 Mac",
@@ -90,7 +105,10 @@
         "/Users/tom/Development/vscode-ext/_rename-test-spas/dsls-spa"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "tasks: watch-tests"
+      "preLaunchTask": "tasks: watch-tests",
+      "env": {
+        "VSCODE_RENAME_ANGULAR_TEST": "1"
+      }
     },
     {
       "name": "Extension Tests 3 Windows",
@@ -104,7 +122,10 @@
         "C:\\Development\\my-stuff\\dsls-spa"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "tasks: watch-tests"
+      "preLaunchTask": "tasks: watch-tests",
+      "env": {
+        "VSCODE_RENAME_ANGULAR_TEST": "1"
+      }
     },
     {
       "name": "Extension Tests 4 Mac",
@@ -118,7 +139,10 @@
         "/Users/tom/Development/vscode-ext/_rename-test-spas/test-paths-app"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "tasks: watch-tests"
+      "preLaunchTask": "tasks: watch-tests",
+      "env": {
+        "VSCODE_RENAME_ANGULAR_TEST": "1"
+      }
     },
     {
       "name": "Extension Tests 4 Windows",
@@ -132,7 +156,10 @@
         "C:\\Development\\my-stuff\\test-paths-app"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "tasks: watch-tests"
+      "preLaunchTask": "tasks: watch-tests",
+      "env": {
+        "VSCODE_RENAME_ANGULAR_TEST": "1"
+      }
     },
     {
       "name": "Extension Tests 5 Mac",
@@ -146,7 +173,10 @@
         "/Users/tom/Development/vscode-ext/_rename-test-spas/test-rename-spa"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "tasks: watch-tests"
+      "preLaunchTask": "tasks: watch-tests",
+      "env": {
+        "VSCODE_RENAME_ANGULAR_TEST": "1"
+      }
     },
     {
       "name": "Extension Tests 5 Windows",
@@ -160,7 +190,10 @@
         "C:\\Development\\my-stuff\\test-rename-spa"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "tasks: watch-tests"
+      "preLaunchTask": "tasks: watch-tests",
+      "env": {
+        "VSCODE_RENAME_ANGULAR_TEST": "1"
+      }
     },
     {
       "name": "Extension Tests 6 Mac",
@@ -174,7 +207,10 @@
         "/Users/tom/Development/vscode-ext/_rename-test-spas/test-ng17-css"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "tasks: watch-tests"
+      "preLaunchTask": "tasks: watch-tests",
+      "env": {
+        "VSCODE_RENAME_ANGULAR_TEST": "1"
+      }
     },
     {
       "name": "Extension Tests 6 Windows",
@@ -188,7 +224,10 @@
         "C:\\Development\\my-stuff\\test-ng17-css"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "tasks: watch-tests"
+      "preLaunchTask": "tasks: watch-tests",
+      "env": {
+        "VSCODE_RENAME_ANGULAR_TEST": "1"
+      }
     },
     {
       "name": "Extension Tests 7 Mac ng20",
@@ -202,7 +241,10 @@
         "/Users/tom/Development/vscode-ext/_rename-test-spas/ng20"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "tasks: watch-tests"
+      "preLaunchTask": "tasks: watch-tests",
+      "env": {
+        "VSCODE_RENAME_ANGULAR_TEST": "1"
+      }
     },
     {
       "name": "Extension Tests 7 Windows ng20",
@@ -216,7 +258,10 @@
         "C:\\Development\\my-stuff\\test-renamer-with-ng20"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "tasks: watch-tests"
+      "preLaunchTask": "tasks: watch-tests",
+      "env": {
+        "VSCODE_RENAME_ANGULAR_TEST": "1"
+      }
     },
     {
       "name": "Extension Tests 8 Mac ng20",
@@ -230,7 +275,10 @@
         "/Users/tom/Development/vscode-ext/_rename-test-spas/ng20-latest-circle-back"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "tasks: watch-tests"
+      "preLaunchTask": "tasks: watch-tests",
+      "env": {
+        "VSCODE_RENAME_ANGULAR_TEST": "1"
+      }
     },
     {
       "name": "Extension Tests 8 Windows ng20",
@@ -244,7 +292,10 @@
         "C:\\Development\\my-stuff\\ng20-latest-circle-back"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
-      "preLaunchTask": "tasks: watch-tests"
+      "preLaunchTask": "tasks: watch-tests",
+      "env": {
+        "VSCODE_RENAME_ANGULAR_TEST": "1"
+      }
     }
   ]
 }

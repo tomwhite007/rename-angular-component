@@ -63,7 +63,13 @@ export function activate(context: vscode.ExtensionContext) {
       return (Date.now() - indexStart) / 1000;
     };
 
-    const initialisePromise = initialise();
+    const isTestEnv = process.env.VSCODE_RENAME_ANGULAR_TEST === '1';
+    if (isTestEnv) {
+      debugLogger.logToConsole(
+        '### Test environment detected - skipping indexer ###'
+      );
+    }
+    const initialisePromise = isTestEnv ? Promise.resolve() : initialise();
     const renamer = new Renamer(
       initialisePromise,
       userMessage,

@@ -21,7 +21,7 @@ suite('Suite Scenario 6', () => {
       ],
       fileDiffPath:
         './src/test/suite/diffs/test-styleurl-and-jasminespy-app.txt',
-      useNg20Convention: true,
+      useNg20Convention: false,
     });
   });
 });

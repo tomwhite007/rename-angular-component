@@ -8,6 +8,7 @@ import {
   RenameCallConfig,
   runRenamerScenario,
 } from './run-renamer-scenario.function';
+import { timeoutPause } from '../../../utils/timeout-pause';
 
 export interface TestScenarioConfig {
   projectRoot: string;
@@ -18,12 +19,19 @@ export interface TestScenarioConfig {
 }
 
 export async function genericTestScenario(config: TestScenarioConfig) {
+  console.log(
+    '>>> Test Scenario - useNg20Convention:',
+    config.useNg20Convention,
+    'standalone:',
+    config.projectUsesStandaloneComponentsOnly
+  );
   stubGetConfiguration({
     followAngular20FolderAndSelectorNamingConvention:
       config.useNg20Convention ?? true,
     projectUsesStandaloneComponentsOnly:
       config.projectUsesStandaloneComponentsOnly ?? true,
   });
+  await timeoutPause(1000);
 
   const git = simpleGit({
     baseDir: config.projectRoot,
@@ -52,4 +60,5 @@ export async function genericTestScenario(config: TestScenarioConfig) {
   assert.strictEqual(diff, fileDiff);
 
   sinon.restore();
+  await timeoutPause(1000);
 }

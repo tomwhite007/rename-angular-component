@@ -141,10 +141,13 @@ export class Renamer {
 
   private async cleanupOriginalFolder(): Promise<void> {
     const { originalFileDetails, filesRelatedToStub } = this.context;
+    const newFolderPath = filesRelatedToStub?.newFolderPath
+      ? windowsFilePathFix(filesRelatedToStub.newFolderPath)
+      : undefined;
 
     if (
-      originalFileDetails!.path !== filesRelatedToStub?.newFolderPath &&
-      filesRelatedToStub?.newFolderPath !== undefined
+      originalFileDetails!.path !== newFolderPath &&
+      newFolderPath !== undefined
     ) {
       this.debugLogger.logToConsole(
         'Deleting original folder: ',

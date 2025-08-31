@@ -25,6 +25,8 @@ Click 'Rename Angular file' and then enter a new name.
 
 The extension converts the text you enter into kebab case for the filename, capital case for the class name, the correct case for the type of selector, and then adds all the existing prefixes and suffixes back on.
 
+Note: There is a default option that assumes your project uses Standalone components. Please see 'Extension Settings' below for further info.
+
 ![Rename Angular Component in action](https://cdn.jsdelivr.net/gh/tomwhite007/rename-angular-component@main/assets/rename-angular-component-demo.gif)
 
 ## Features
@@ -54,6 +56,9 @@ This extension contributes the following settings:
 
 - `renameAngularComponent.debugLog`: Enable/disable debug logging to file for optional submission with new issue posts
 - `renameAngularComponent.useLocalDirectPaths`: Update imports/exports with direct local paths even if wildcard path exists
+- `renameAngularComponent.followAngular20FolderAndSelectorNamingConvention`: Since Angular 20.x, CLI generated folder names include any dot-suffix you type in the folder name, and the selector - which breaks the build. When this option is set to false, the Renamer generates the folder name, and selector without the dot-suffix (this is the default setting).
+- `renameAngularComponent.projectUsesStandaloneComponentsOnly`: Untick this if your project uses Modules. Then all selectors will be updated in templates, instead of just the Components that import the renamed Component. But note, unticking this option means that any duplicate selectors will get updated as well.
+- `renameAngularComponent.showWhatsNewPopup`: Show the 'What's New' screen when the extension is updated to a new version
 
 ## Known Issues
 

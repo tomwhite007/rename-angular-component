@@ -9,7 +9,7 @@
 
 ## 🎉 Welcome to version 4.0.0
 
-Thank you for installing to the latest version of Rename Angular Component.
+Thank you for installing the latest version of Rename Angular Component.
 
 ## ✨ New Features
 

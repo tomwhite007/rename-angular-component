@@ -12,12 +12,16 @@ Works with these Angular features:
 - services
 - guards
 - modules
+- pipes
+- interfaces
+- enums
+- classes, functions, and variables that follow the "Rule of One"
 
 ## How to use
 
 Right-click the Angular file or its associated sibling file (.html, .scss, .spec.ts).
 
-Click 'Rename Angular Component' and then enter a new name.
+Click 'Rename Angular file' and then enter a new name.
 
 The extension converts the text you enter into kebab case for the filename, capital case for the class name, the correct case for the type of selector, and then adds all the existing prefixes and suffixes back on.
 
@@ -25,13 +29,16 @@ The extension converts the text you enter into kebab case for the filename, capi
 
 ## Features
 
-Based on the same naming convention in the [Angular Style Guide](https://angular.io/guide/styleguide#style-02-01) and following the file pattern created by the Angular CLI, this extension will:
+Based on the same naming convention in the [Angular Style Guide](https://angular.dev/style-guide) and following the file pattern created by the Angular CLI, this extension will:
 
 - Rename the files files associated with the component, directive or service whilst retaining their original suffixes
 - Rename the containing folder if it has the same name as the original file selected
 - Rename the class name of the component, directive or service to match the new file name (provided the class name follows the same naming convention)
 - Rename the element, attribute or class selectors inside the class decorator meta data, and in all html templates in the repo (provided the selector follows the correct naming convention)
 - Fix all import paths and their class names
+- **Angular 20 compatibility**: Automatically handles the transition between old '.component' suffix and new no-suffix format
+- **Enhanced selector updates**: Standalone component mode updates selectors only where the component is imported
+- **Expanded file support**: Rename any Angular CLI-generated file following the "Rule of One" principle
 
 _Example - Changes to Component file after rename:_
 
@@ -67,9 +74,9 @@ Thanks to you for reading this.
 
 ## Release Notes
 
-Latest version: [3.0.0] - 2024-02-27
+Latest version: [4.0.0] - 2025-09-10
 
-- Update to latest VSCode extension lib deps
-- Add `styleUrl` decorator attribute to import edits
-- Replace string class names in test files per issue 34
-- Create new extension icon using latest ng 17 logo
+- **Angular 20 compatibility**: Support for new no-suffix component format and automatic '.component' suffix handling
+- **Enhanced selector updates**: Standalone component mode with configurable template update behavior
+- **Expanded file support**: Rename pipes, interfaces, enums, and any Angular CLI-generated file
+- **Improved selector management**: Automatic removal of '.component' from selectors and folders per Angular 20 conventions

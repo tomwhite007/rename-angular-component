@@ -144,11 +144,11 @@ export class Renamer {
     const newFolderPath = filesRelatedToStub?.newFolderPath
       ? windowsFilePathFix(filesRelatedToStub.newFolderPath)
       : undefined;
-
-    if (
+    const isPathChanged =
       originalFileDetails!.path !== newFolderPath &&
-      newFolderPath !== undefined
-    ) {
+      newFolderPath !== undefined;
+
+    if (isPathChanged) {
       this.debugLogger.logToConsole(
         'Deleting original folder: ',
         originalFileDetails!.path,

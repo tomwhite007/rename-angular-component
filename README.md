@@ -44,11 +44,11 @@ Based on the same naming convention in the [Angular Style Guide](https://angular
 
 _Example - Changes to Component file after rename:_
 
-![Changes to Component file after rename](https://cdn.jsdelivr.net/gh/tomwhite007/rename-angular-component@ng-20-assets/assets/diff-component-decorator-meta-changes.png)
+<img src="https://cdn.jsdelivr.net/gh/tomwhite007/rename-angular-component@ng-20-assets/assets/diff-component-decorator-meta-changes.png" alt="Changes to Component file after rename" width="900"/>
 
 _Example - Changes to an element selector in a parent template:_
 
-![Changes to Component file after rename](https://cdn.jsdelivr.net/gh/tomwhite007/rename-angular-component@ng-20-assets/assets/diff-template-selector-changed.png)
+<img src="https://cdn.jsdelivr.net/gh/tomwhite007/rename-angular-component@ng-20-assets/assets/diff-template-selector-changed.png" alt="Changes to a consumer template file after rename" width="900"/>
 
 ## Extension Settings
 

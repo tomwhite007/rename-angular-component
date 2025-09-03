@@ -16,7 +16,7 @@ Thank you for installing the latest version of Rename Angular Component.
 ### 👍 Angular 20 Style Guide and old '.component' suffix
 
 - **Component suffix can be removed or added**: This extension now allows you to migrate in either direction between the old **'.component'** and the new no-suffix format.
-- **Any dot-suffix can be used for rename**: Have you ever wanted to add **'.page'** or **'.facade'** as the suffix on a component or service? Now you can - in one step. Now you can control your own naming conventions.
+- **Any dot-suffix can be used for rename**: Have you ever wanted to add **'.page'** or **'.facade'** as the suffix on a component or service? Now you can - in one step. You can control your own naming conventions.
 - **Coming soon...** A migration script to [convert all existing **'.component'** files](https://github.com/tomwhite007/rename-angular-component/issues/56) in your project to the new Angular 20 suffixless format in a single operation.
 
 ### 🌈 Enhanced Selector updates

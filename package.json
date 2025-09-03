@@ -1,7 +1,7 @@
 {
   "name": "rename-angular-component",
   "displayName": "Rename Angular Component",
-  "description": "Rename Angular Components, Directives and Services",
+  "description": "Rename Angular Components, Directives, Pipes and Services",
   "publisher": "tomwhite007",
   "version": "4.0.0-RC.2.2",
   "license": "MIT",

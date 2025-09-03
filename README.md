@@ -19,11 +19,11 @@ Works with these Angular features:
 
 ## How to use
 
-Right-click the Angular file or its associated sibling file (.html, .scss, .css, .spec.ts).
+1. Right-click the Angular file or its associated sibling file (.html, .scss, .css, .spec.ts).
 
-Click 'Rename Angular file' and then enter a new name.
+2. Click 'Rename Angular file', and then enter a new name (include a dot-suffix if you want to follow the old style guide).
 
-The extension converts the text you enter into kebab case for the filename, capital case for the class name, the correct case for the type of selector, and then adds all the existing prefixes and suffixes back on.
+3. The extension converts the text you enter into kebab case for the filename, capital case for the class name, the correct case for the type of selector, and then adds all the existing prefixes and suffixes back on.
 
 Note: There is a default option that assumes your project uses Standalone Components. Please see 'Extension Settings' below for further info if your project uses Modules.
 
@@ -35,7 +35,7 @@ _Example - Renaming an old Component to the newer Angular 20 suffix-less format:
 
 Based on the same naming convention in the [Angular Style Guide](https://angular.dev/style-guide) and following the file pattern created by the Angular CLI, this extension will:
 
-- Rename the files files associated with the component, directive or service whilst retaining their original suffixes
+- Rename the files associated with the component, directive or service whilst retaining their original suffixes
 - Rename the containing folder if it has the same name as the original file selected
 - Rename the class name of the component, directive or service to match the new file name (provided the class name follows the same naming convention)
 - Rename the element, attribute or class selectors inside the class decorator meta data, and in all html templates in the repo (provided the selector follows the correct naming convention)
@@ -65,6 +65,7 @@ This extension contributes the following settings:
 ## Known Issues
 
 1. [Extension does not support WSL](https://github.com/tomwhite007/rename-angular-component/issues/28)
+2. [Does not work in a VS Code devcontainer](https://github.com/tomwhite007/rename-angular-component/issues/52)
 
 ## Support
 
@@ -81,4 +82,4 @@ Latest version: [4.0.0] - 2025-09-10
 - **Angular 20 compatibility**: Support for new no-suffix component format and automatic '.component' suffix handling
 - **Enhanced selector updates**: Standalone component mode with configurable template update behavior
 - **Expanded file support**: Rename pipes, interfaces, enums, and any Angular CLI-generated file
-- **Improved selector management**: Automatic removal of '.component' from selectors and folders per Angular 20 conventions
+- **Improved selector management**: Automatic removal of '.component' from renamed selectors and folders for backward compatibility

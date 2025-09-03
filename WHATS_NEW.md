@@ -16,6 +16,7 @@ Thank you for installing the latest version of Rename Angular Component.
 ### 👍 Angular 20 Style Guide and old '.component' suffix
 
 - **Component suffix can be removed or added**: This extension now allows you to migrate in either direction between the old **'.component'** and new no-suffix format.
+- TODO:ADD A DOT SUFFIX TO THE NEW NAME!
 - **'.component' suffix removed from selectors**: This extension automatically removes **'.component'** from selectors during rename operations by default (this can be configured to follow Angular 20 conventions exactly). Angular 20 CLI now includes **'.component'** in selectors when generating components, which breaks the build.
 - **'.component' suffix removed from folders**: This extension automatically removes **'.component'** from folder names during rename operations by default (this can be configured to follow Angular 20 conventions). Angular 20 CLI now includes **'.component'** in folder names when generating components.
 - **Coming soon...** A migration script to [convert all existing **'.component'** files](https://github.com/tomwhite007/rename-angular-component/issues/56) in your project to the new format in a single operation.

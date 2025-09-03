@@ -27,6 +27,8 @@ The extension converts the text you enter into kebab case for the filename, capi
 
 Note: There is a default option that assumes your project uses Standalone Components. Please see 'Extension Settings' below for further info if your project uses Modules.
 
+_Example - Renaming an old Component to the newer Angular 20 suffix-less format:_
+
 <img src="https://cdn.jsdelivr.net/gh/tomwhite007/rename-angular-component@ng-20-assets/assets/rename-angular-component-demo.gif" alt="Rename Angular Component in action" width="900"/>
 
 ## Features
@@ -44,11 +46,11 @@ Based on the same naming convention in the [Angular Style Guide](https://angular
 
 _Example - Changes to Component file after rename:_
 
-<img src="https://cdn.jsdelivr.net/gh/tomwhite007/rename-angular-component@ng-20-assets/assets/diff-component-decorator-meta-changed.png" alt="Changes to Component file after rename" width="900"/>
+![Changes to Component file after rename](https://cdn.jsdelivr.net/gh/tomwhite007/rename-angular-component@ng-20-assets/assets/diff-component-decorator-meta-changed.png)
 
 _Example - Changes to an element selector in a parent template:_
 
-<img src="https://cdn.jsdelivr.net/gh/tomwhite007/rename-angular-component@ng-20-assets/assets/diff-consumer-template-selector-changed.png" alt="Changes to a consumer template file after rename" width="900"/>
+![Changes to a consumer template file after rename](https://cdn.jsdelivr.net/gh/tomwhite007/rename-angular-component@ng-20-assets/assets/diff-consumer-template-selector-changed.png)
 
 ## Extension Settings
 

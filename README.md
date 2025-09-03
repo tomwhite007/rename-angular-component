@@ -56,7 +56,7 @@ _Example - Changes to an element selector in a parent template:_
 
 This extension contributes the following settings:
 
-- `renameAngularComponent.projectUsesStandaloneComponentsOnly`: Uncheck this if your project uses modules. Then all selectors will be updated in **all** templates, instead of just the components that import the renamed component. Note: unchecking this option means that any duplicate selectors in your repository will get updated as well.
+- `renameAngularComponent.projectUsesStandaloneComponentsOnly`: Uncheck this if your project uses Modules. Then all selectors will be updated in **all** templates, instead of just the components that import the renamed component. Note: unchecking this option means that any duplicate selectors in your repository will get updated as well.
 - `renameAngularComponent.followAngular20FolderAndSelectorNamingConvention`: Since Angular 20.x, CLI-generated folder names include any dot-suffix you type in the folder name, and the selector - which breaks the build. When this option is set to false, the renamer generates the folder name and selector without the dot-suffix (this is the default setting, to allow you to convert new components to the old suffix format if you want to).
 - `renameAngularComponent.useLocalDirectPaths`: Update imports/exports with direct local paths even if wildcard path exists
 - `renameAngularComponent.showWhatsNewPopup`: Show the 'What's New' screen when the extension is updated to a new version

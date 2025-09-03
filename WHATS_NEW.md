@@ -16,12 +16,12 @@ Thank you for installing the latest version of Rename Angular Component.
 ### 👍 Angular 20 Style Guide and old '.component' suffix
 
 - **Component suffix can be removed or added**: This extension now allows you to migrate in either direction between the old **'.component'** and the new no-suffix format.
-- **Any dot-suffix can used for rename**: Have you ever wanted to add **'.page'** or **'.facade'** as the suffix on a component or service? Now you can - in one step.
-- **Coming soon...** A migration script to [convert all existing **'.component'** files](https://github.com/tomwhite007/rename-angular-component/issues/56) in your project to the new Angular 20 suffix-less format in a single operation.
+- **Any dot-suffix can be used for rename**: Have you ever wanted to add **'.page'** or **'.facade'** as the suffix on a component or service? Now you can - in one step. Now you can control your own naming conventions.
+- **Coming soon...** A migration script to [convert all existing **'.component'** files](https://github.com/tomwhite007/rename-angular-component/issues/56) in your project to the new Angular 20 suffixless format in a single operation.
 
 ### 🌈 Enhanced Selector updates
 
-- **Standalone Component mode**: This default setting updates selectors only in templates where the renamed component is imported. If your project still uses Modules, it can be switched to update all templates.
+- **Standalone Component mode**: This default setting updates selectors only in templates where the renamed component is imported. If your project still uses Modules, it can be switched to update all templates (though this may affect other components with same selectors).
 - **Pipes are also updated in templates**: Pipes can now be renamed using this extension.
 
 ### ⚡ Now you can rename anything in an Angular project

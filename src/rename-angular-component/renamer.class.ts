@@ -59,10 +59,8 @@ export class Renamer {
     private fileMoveHandler: FileMoveHandler
   ) {}
 
-  async rename(
-    construct: AngularConstructOrPlainFile,
-    selectedUri: vscode.Uri
-  ): Promise<void> {
+  async rename(selectedUri: vscode.Uri): Promise<void> {
+    const construct: AngularConstructOrPlainFile = 'file';
     this.debugLogger.logToConsole('## Debug Rename Start ##');
 
     const detailsLoaded = await this.prepareRenameDetails(

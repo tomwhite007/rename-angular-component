@@ -80,42 +80,42 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
       vscode.commands.registerCommand(
         'rename-angular-component.renameComponent',
-        async (uri: vscode.Uri) => renamer.rename('component', uri)
+        async (uri: vscode.Uri) => renamer.rename(uri)
       )
     );
 
     context.subscriptions.push(
       vscode.commands.registerCommand(
         'rename-angular-component.renameDirective',
-        (uri: vscode.Uri) => renamer.rename('directive', uri)
+        (uri: vscode.Uri) => renamer.rename(uri)
       )
     );
 
     context.subscriptions.push(
       vscode.commands.registerCommand(
         'rename-angular-component.renameService',
-        (uri: vscode.Uri) => renamer.rename('service', uri)
+        (uri: vscode.Uri) => renamer.rename(uri)
       )
     );
 
     context.subscriptions.push(
       vscode.commands.registerCommand(
         'rename-angular-component.renameGuard',
-        (uri: vscode.Uri) => renamer.rename('guard', uri)
+        (uri: vscode.Uri) => renamer.rename(uri)
       )
     );
 
     context.subscriptions.push(
       vscode.commands.registerCommand(
         'rename-angular-component.renameModule',
-        (uri: vscode.Uri) => renamer.rename('module', uri)
+        (uri: vscode.Uri) => renamer.rename(uri)
       )
     );
 
     context.subscriptions.push(
       vscode.commands.registerCommand(
         'rename-angular-component.renameFile',
-        (uri: vscode.Uri) => renamer.rename('file', uri)
+        (uri: vscode.Uri) => renamer.rename(uri)
       )
     );
 

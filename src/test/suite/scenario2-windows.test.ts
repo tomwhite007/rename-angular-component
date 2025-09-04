@@ -16,7 +16,6 @@ suite('Suite Scenario 2', () => {
         {
           filePath:
             './apps/Shop/src/app/registration/registration.component.scss',
-          construct: 'component',
           newFilenameInput: 'tom-test.component',
         },
       ],

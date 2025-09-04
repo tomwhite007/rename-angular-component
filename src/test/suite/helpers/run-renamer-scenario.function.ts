@@ -2,7 +2,6 @@ import path = require('path');
 import vscode from 'vscode';
 import { ReferenceIndexBuilder } from '../../../move-ts-indexer/reference-index-builder';
 import { EXTENSION_NAME } from '../../../rename-angular-component/definitions/extension-name';
-import { AngularConstructOrPlainFile } from '../../../rename-angular-component/definitions/file.interfaces';
 import { FileMoveHandler } from '../../../rename-angular-component/file-manipulation/file-move-handler.class';
 import { DebugLogger } from '../../../rename-angular-component/logging/debug-logger.class';
 import { UserMessage } from '../../../rename-angular-component/logging/user-message.class';
@@ -11,7 +10,6 @@ import { timeoutPause } from '../../../utils/timeout-pause';
 
 export interface RenameCallConfig {
   filePath: string;
-  construct: AngularConstructOrPlainFile;
   newFilenameInput: string;
 }
 
@@ -47,7 +45,6 @@ export async function runRenamerScenario(
   for (const rename of renames) {
     renamer.testBypass = { newFilenameInput: rename.newFilenameInput };
     await renamer.rename(
-      rename.construct,
       vscode.Uri.file(path.join(projectRoot, rename.filePath))
     );
     // allow indexer to finish re-indexing in the background

@@ -16,7 +16,6 @@ suite('Suite Scenario 6', () => {
       renames: [
         {
           filePath: './src/app/app.component.css',
-          construct: 'component',
           newFilenameInput: 'tom-test.component',
         },
       ],

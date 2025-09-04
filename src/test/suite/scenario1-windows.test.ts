@@ -31,7 +31,6 @@ suite('Suite Scenario 1', () => {
         {
           filePath:
             './src/app/shared/book-ui/book-list/book-list.component.html',
-          construct: 'component',
           newFilenameInput: 'tom-test',
         },
       ],
@@ -54,7 +53,6 @@ suite('Suite Scenario 1', () => {
         {
           filePath:
             './src/app/shared/book-ui/book-list/book-list.component.html',
-          construct: 'component',
           newFilenameInput: 'tom-test',
         },
       ],

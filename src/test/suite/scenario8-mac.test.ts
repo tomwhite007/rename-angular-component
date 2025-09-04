@@ -16,13 +16,11 @@ suite('Suite Scenario 8', () => {
       renames: [
         {
           filePath: './src/app/test/test.scss',
-          construct: 'file',
           newFilenameInput: 'foo.component',
         },
         {
           filePath:
             './src/app/test-suffix.component/test-suffix.component.spec.ts',
-          construct: 'file',
           newFilenameInput: 'baa',
         },
       ],
@@ -43,24 +41,20 @@ suite('Suite Scenario 8', () => {
       renames: [
         {
           filePath: './src/app/test/test.scss',
-          construct: 'file',
           newFilenameInput: 'foo.component',
         },
         {
           filePath:
             './src/app/test-suffix.component/test-suffix.component.spec.ts',
-          construct: 'component',
           newFilenameInput: 'baa',
         },
         // now rename back to original
         {
           filePath: './src/app/foo.component/foo.component.scss',
-          construct: 'component',
           newFilenameInput: 'test',
         },
         {
           filePath: './src/app/baa/baa.spec.ts',
-          construct: 'file',
           newFilenameInput: 'test-suffix.component',
         },
       ],
@@ -81,13 +75,11 @@ suite('Suite Scenario 8', () => {
       renames: [
         {
           filePath: './src/app/test/test.scss',
-          construct: 'file',
           newFilenameInput: 'foo.component',
         },
         {
           filePath:
             './src/app/test-suffix.component/test-suffix.component.spec.ts',
-          construct: 'component',
           newFilenameInput: 'baa',
         },
       ],
@@ -109,24 +101,20 @@ suite('Suite Scenario 8', () => {
       renames: [
         {
           filePath: './src/app/test/test.scss',
-          construct: 'file',
           newFilenameInput: 'foo.component',
         },
         {
           filePath:
             './src/app/test-suffix.component/test-suffix.component.spec.ts',
-          construct: 'component',
           newFilenameInput: 'baa',
         },
         // now rename back to original
         {
           filePath: './src/app/foo/foo.component.scss',
-          construct: 'component',
           newFilenameInput: 'test',
         },
         {
           filePath: './src/app/baa/baa.spec.ts',
-          construct: 'file',
           newFilenameInput: 'test-suffix.component',
         },
       ],

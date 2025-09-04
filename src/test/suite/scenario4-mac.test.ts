@@ -17,7 +17,6 @@ suite('Suite Scenario 4', () => {
         {
           filePath:
             './projects/my-service-lib/src/lib/my-service-lib.service.ts',
-          construct: 'service',
           newFilenameInput: 'tom-test.service',
         },
       ],
@@ -40,7 +39,6 @@ suite('Suite Scenario 4', () => {
         {
           filePath:
             './projects/my-service-lib/src/lib/my-service-lib.service.ts',
-          construct: 'service',
           newFilenameInput: 'tom-test.service',
         },
       ],

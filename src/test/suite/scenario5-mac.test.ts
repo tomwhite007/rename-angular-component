@@ -16,29 +16,24 @@ suite('Suite Scenario 5', () => {
       renames: [
         {
           filePath: './src/app/products/products.component.spec.ts',
-          construct: 'component',
           newFilenameInput: 'tom-test.component',
         },
         {
           filePath:
             './projects/shared/src/lib/multiply-by-ten/multiply-by-ten.directive.ts',
-          construct: 'directive',
           newFilenameInput: 'dir-prop.directive',
         },
         {
           filePath:
             './projects/shared/src/lib/multiply-by-twenty/multiply-by-twenty.directive.spec.ts',
-          construct: 'directive',
           newFilenameInput: 'dir-identifier.directive',
         },
         {
           filePath: './src/app/tom-test.component/products.module.ts',
-          construct: 'module',
           newFilenameInput: 'tom-test.module',
         },
         {
           filePath: './src/app/tom-test.component/product.pipe.ts',
-          construct: 'file',
           newFilenameInput: 'formatter',
         },
       ],
@@ -60,29 +55,24 @@ suite('Suite Scenario 5', () => {
       renames: [
         {
           filePath: './src/app/products/products.component.spec.ts',
-          construct: 'component',
           newFilenameInput: 'tom-test.component',
         },
         {
           filePath:
             './projects/shared/src/lib/multiply-by-ten/multiply-by-ten.directive.ts',
-          construct: 'directive',
           newFilenameInput: 'dir-prop.directive',
         },
         {
           filePath:
             './projects/shared/src/lib/multiply-by-twenty/multiply-by-twenty.directive.spec.ts',
-          construct: 'directive',
           newFilenameInput: 'dir-identifier.directive',
         },
         {
           filePath: './src/app/tom-test/products.module.ts',
-          construct: 'module',
           newFilenameInput: 'tom-test.module',
         },
         {
           filePath: './src/app/tom-test/product.pipe.ts',
-          construct: 'file',
           newFilenameInput: 'formatter',
         },
       ],

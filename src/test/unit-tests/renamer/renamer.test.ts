@@ -112,11 +112,11 @@ describe('Renamer', () => {
         coreConstructNewFilePath: '/test/core/file/path/test.component.ts',
       };
 
-      await renamer.rename('component', vscode.Uri.file('/test/path'));
+      await renamer.rename(vscode.Uri.file('/test/path'));
 
       expect(
         mockPrepareRenameDetails.calledWith(
-          'component',
+          'file',
           sinon.match.instanceOf(vscode.Uri)
         )
       ).to.be.true;
@@ -127,10 +127,6 @@ describe('Renamer', () => {
           sinon.match.object
         )
       ).to.be.true;
-      // expect(mockUpdateSelectorsInTemplates.getCall(0).args[5]).to.deep.equal([
-      //   '/test/core/file/path/test.component',
-      //   '/test/core/file/path/old-consumer.component',
-      // ]);
       expect(mockWithProgress.called).to.be.true;
     });
 
@@ -154,11 +150,11 @@ describe('Renamer', () => {
         title: 'Rename Angular Component',
       };
 
-      await renamer.rename('component', vscode.Uri.file('/test/path'));
+      await renamer.rename(vscode.Uri.file('/test/path'));
 
       expect(
         mockPrepareRenameDetails.calledWith(
-          'component',
+          'file',
           sinon.match.instanceOf(vscode.Uri)
         )
       ).to.be.true;
@@ -182,7 +178,7 @@ describe('Renamer', () => {
         .stub(renamer as any, 'prepareRenameDetails')
         .resolves(false);
 
-      await renamer.rename('component', vscode.Uri.file('/test/path'));
+      await renamer.rename(vscode.Uri.file('/test/path'));
 
       expect(mockPrepareRenameDetails.called).to.be.true;
       expect(mockFileMoveHandler.runFileMoveJobs.called).to.be.false;
@@ -199,7 +195,7 @@ describe('Renamer', () => {
         .stub(renamer as any, 'prepareFileMoveJobs')
         .resolves(false);
 
-      await renamer.rename('component', vscode.Uri.file('/test/path'));
+      await renamer.rename(vscode.Uri.file('/test/path'));
 
       expect(mockPrepareRenameDetails.called).to.be.true;
       expect(mockPrepareFileMoveJobs.called).to.be.true;

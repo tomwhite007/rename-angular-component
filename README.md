@@ -75,6 +75,10 @@ If you have a problem using the extension or you find a bug, please [raise an is
 
 Thanks to you for reading this. Contributions are welcome.
 
+Thanks to [Aristeidis Bampakos GDE](https://github.com/bampakoa) for raising issue [34](https://github.com/tomwhite007/rename-angular-component/issues/34) (feature added in Version 3.0.0)
+
+Thanks to [@hablix](https://github.com/hablix) for raising issue [29](https://github.com/tomwhite007/rename-angular-component/issues/29) (fixed in Version 2.1.3), with thanks also to [@elmehdielhamdi](https://github.com/elmehdielhamdi) and [@MohRaouf](https://github.com/MohRaouf)
+
 ## Release Notes
 
 Latest version: 4.0.0 - 2025-09-10

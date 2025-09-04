@@ -1,6 +1,7 @@
 import assert = require('assert');
 import simpleGit from 'simple-git';
 import sinon from 'sinon';
+import { timeoutPause } from '../../../utils/timeout-pause';
 import { DISCARD_STAGED_CHANGES } from './constants-helper-config';
 import { stubGetConfiguration } from './mock-get-configuration';
 import { readUpsertDiffFile } from './read-upsert-diff-file.function';
@@ -8,7 +9,6 @@ import {
   RenameCallConfig,
   runRenamerScenario,
 } from './run-renamer-scenario.function';
-import { timeoutPause } from '../../../utils/timeout-pause';
 
 export interface TestScenarioConfig {
   projectRoot: string;
@@ -25,6 +25,8 @@ export async function genericTestScenario(config: TestScenarioConfig) {
     'standalone:',
     config.projectUsesStandaloneComponentsOnly
   );
+  console.log('>>> Project root:', config.projectRoot);
+
   stubGetConfiguration({
     followAngular20FolderAndSelectorNamingConvention:
       config.useNg20Convention ?? true,

@@ -33,13 +33,14 @@
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index1mac",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/run-integration-test-scenario",
         "/Users/tom/Development/vscode-ext/_rename-test-spas/simple-reactive-viewmodel-example"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests",
       "env": {
-        "VSCODE_RENAME_ANGULAR_TEST": "1"
+        "VSCODE_RENAME_ANGULAR_TEST": "1",
+        "TEST_SCENARIO": "runScenario1Mac"
       }
     },
     {
@@ -50,13 +51,14 @@
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index1windows",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/run-integration-test-scenario",
         "C:\\Development\\my-stuff\\simple-reactive-viewmodel-example"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests",
       "env": {
-        "VSCODE_RENAME_ANGULAR_TEST": "1"
+        "VSCODE_RENAME_ANGULAR_TEST": "1",
+        "TEST_SCENARIO": "runScenario1Windows"
       }
     },
     {
@@ -67,13 +69,14 @@
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index2mac",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/run-integration-test-scenario",
         "/Users/tom/Development/vscode-ext/_rename-test-spas/shp-wild-paths"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests",
       "env": {
-        "VSCODE_RENAME_ANGULAR_TEST": "1"
+        "VSCODE_RENAME_ANGULAR_TEST": "1",
+        "TEST_SCENARIO": "runScenario2Mac"
       }
     },
     {
@@ -84,13 +87,14 @@
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index2windows",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/run-integration-test-scenario",
         "C:\\Development\\my-stuff\\shp-wild-paths"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests",
       "env": {
-        "VSCODE_RENAME_ANGULAR_TEST": "1"
+        "VSCODE_RENAME_ANGULAR_TEST": "1",
+        "TEST_SCENARIO": "runScenario2Windows"
       }
     },
     {
@@ -101,13 +105,14 @@
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index3mac",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/run-integration-test-scenario",
         "/Users/tom/Development/vscode-ext/_rename-test-spas/dsls-spa"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests",
       "env": {
-        "VSCODE_RENAME_ANGULAR_TEST": "1"
+        "VSCODE_RENAME_ANGULAR_TEST": "1",
+        "TEST_SCENARIO": "runScenario3Mac"
       }
     },
     {
@@ -118,13 +123,14 @@
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index3windows",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/run-integration-test-scenario",
         "C:\\Development\\my-stuff\\dsls-spa"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests",
       "env": {
-        "VSCODE_RENAME_ANGULAR_TEST": "1"
+        "VSCODE_RENAME_ANGULAR_TEST": "1",
+        "TEST_SCENARIO": "runScenario3Windows"
       }
     },
     {
@@ -135,13 +141,14 @@
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index4mac",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/run-integration-test-scenario",
         "/Users/tom/Development/vscode-ext/_rename-test-spas/test-paths-app"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests",
       "env": {
-        "VSCODE_RENAME_ANGULAR_TEST": "1"
+        "VSCODE_RENAME_ANGULAR_TEST": "1",
+        "TEST_SCENARIO": "runScenario4Mac"
       }
     },
     {
@@ -152,13 +159,14 @@
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index4windows",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/run-integration-test-scenario",
         "C:\\Development\\my-stuff\\test-paths-app"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests",
       "env": {
-        "VSCODE_RENAME_ANGULAR_TEST": "1"
+        "VSCODE_RENAME_ANGULAR_TEST": "1",
+        "TEST_SCENARIO": "runScenario4Windows"
       }
     },
     {
@@ -169,13 +177,14 @@
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index5mac",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/run-integration-test-scenario",
         "/Users/tom/Development/vscode-ext/_rename-test-spas/test-rename-spa"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests",
       "env": {
-        "VSCODE_RENAME_ANGULAR_TEST": "1"
+        "VSCODE_RENAME_ANGULAR_TEST": "1",
+        "TEST_SCENARIO": "runScenario5Mac"
       }
     },
     {
@@ -186,13 +195,14 @@
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index5windows",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/run-integration-test-scenario",
         "C:\\Development\\my-stuff\\test-rename-spa"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests",
       "env": {
-        "VSCODE_RENAME_ANGULAR_TEST": "1"
+        "VSCODE_RENAME_ANGULAR_TEST": "1",
+        "TEST_SCENARIO": "runScenario5Windows"
       }
     },
     {
@@ -203,13 +213,14 @@
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index6mac",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/run-integration-test-scenario",
         "/Users/tom/Development/vscode-ext/_rename-test-spas/test-ng17-css"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests",
       "env": {
-        "VSCODE_RENAME_ANGULAR_TEST": "1"
+        "VSCODE_RENAME_ANGULAR_TEST": "1",
+        "TEST_SCENARIO": "runScenario6Mac"
       }
     },
     {
@@ -220,13 +231,14 @@
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index6windows",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/run-integration-test-scenario",
         "C:\\Development\\my-stuff\\test-ng17-css"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests",
       "env": {
-        "VSCODE_RENAME_ANGULAR_TEST": "1"
+        "VSCODE_RENAME_ANGULAR_TEST": "1",
+        "TEST_SCENARIO": "runScenario6Windows"
       }
     },
     {
@@ -237,13 +249,14 @@
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index7mac",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/run-integration-test-scenario",
         "/Users/tom/Development/vscode-ext/_rename-test-spas/ng20"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests",
       "env": {
-        "VSCODE_RENAME_ANGULAR_TEST": "1"
+        "VSCODE_RENAME_ANGULAR_TEST": "1",
+        "TEST_SCENARIO": "runScenario7Mac"
       }
     },
     {
@@ -254,13 +267,14 @@
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index7windows",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/run-integration-test-scenario",
         "C:\\Development\\my-stuff\\test-renamer-with-ng20"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests",
       "env": {
-        "VSCODE_RENAME_ANGULAR_TEST": "1"
+        "VSCODE_RENAME_ANGULAR_TEST": "1",
+        "TEST_SCENARIO": "runScenario7Windows"
       }
     },
     {
@@ -271,13 +285,14 @@
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index8mac",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/run-integration-test-scenario",
         "/Users/tom/Development/vscode-ext/_rename-test-spas/ng20-latest-circle-back"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests",
       "env": {
-        "VSCODE_RENAME_ANGULAR_TEST": "1"
+        "VSCODE_RENAME_ANGULAR_TEST": "1",
+        "TEST_SCENARIO": "runScenario8Mac"
       }
     },
     {
@@ -288,13 +303,14 @@
       "args": [
         "--disable-extensions",
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index8windows",
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/run-integration-test-scenario",
         "C:\\Development\\my-stuff\\ng20-latest-circle-back"
       ],
       "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "tasks: watch-tests",
       "env": {
-        "VSCODE_RENAME_ANGULAR_TEST": "1"
+        "VSCODE_RENAME_ANGULAR_TEST": "1",
+        "TEST_SCENARIO": "runScenario8Windows"
       }
     }
   ]

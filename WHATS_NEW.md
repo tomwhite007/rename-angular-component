@@ -42,7 +42,7 @@ That's ok, you can disable it in settings, or choose command: `Rename Angular Co
 
 ## 🆘 Need Help or found a bug?
 
-- **GitHub Issues**: Report bugs or request features on [GitHub](https://github.com/tomwhite007/rename-angular-component/issues). This is a major release, so you can expect a same-day response.
+- **GitHub Issues**: Report bugs or request features on [GitHub](https://github.com/tomwhite007/rename-angular-component/issues). This is a major release, so you can expect a rapid response.
 - **Documentation**: Check the [README](https://github.com/tomwhite007/rename-angular-component#readme) for detailed usage instructions
 - **Configuration**: Customize the extension behavior in VS Code settings
 

@@ -1,21 +1,21 @@
-import * as fs from 'fs-extra-promise';
-import * as path from 'path';
-import * as ts from 'typescript';
-import * as vscode from 'vscode';
-import { ReferenceIndex } from './reference-index';
+import fs from 'fs-extra-promise';
+import minimatch from 'minimatch';
+import path from 'path';
+import ts from 'typescript';
+import vscode from 'vscode';
 import {
   applyGenericEdits,
   GenericEdit,
   GenericEditsCallback,
 } from './apply-generic-edits';
-import { minimatch } from 'minimatch';
+import { ReferenceIndex } from './reference-index';
 import {
-  isPathToAnotherDir,
-  mergeReferenceArrays,
   asUnix,
-  isInDir,
   conf,
   flattenArray,
+  isInDir,
+  isPathToAnotherDir,
+  mergeReferenceArrays,
 } from './util/helper-functions';
 import { FoundItem, Reference } from './util/shared-interfaces';
 

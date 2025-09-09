@@ -1,10 +1,18 @@
+import { basename, dirname, join } from 'path';
 import { workspace } from 'vscode';
 import { escapeRegex } from '../../utils/escape-regex';
-import { likeFilesRegexPartialLookup } from '../definitions/file-regex.constants';
 import {
+  likeFilesRegexPartialLookup,
+  tsFileButNotSpec,
+} from '../definitions/file-regex.constants';
+import {
+  AngularConstructOrPlainFile,
+  DefinitionType,
   OriginalFileDetails,
-  AngularConstruct,
 } from '../definitions/file.interfaces';
+import { isFollowingAngular20FolderAndSelectorNamingConvention } from '../definitions/is-following-angular20-folder-naming-convention';
+import { getConstructFromDecorator } from '../in-file-edits/get-construct-from-decorator.function';
+import { getCoreFileDefinitionDetails } from '../in-file-edits/get-core-file-definition-details.function';
 import { windowsFilePathFix } from './windows-file-path-fix.function';
 
 interface FileDetails {
@@ -23,14 +31,18 @@ export interface FileToMove {
 export class FilesRelatedToStub {
   originalFileDetails!: OriginalFileDetails;
   folderNameSameAsStub = false;
+  newFolderPath?: string;
   fileDetails: FileDetails[] = [];
   constructFilesRegex!: RegExp;
   relatedFilesRegex!: RegExp;
+  derivedConstruct: AngularConstructOrPlainFile | null = null;
+  originalDefinitionName?: string;
+  definitionType: DefinitionType = null;
 
   static async init(
     fileDetails: OriginalFileDetails,
     projectRoot: string,
-    construct: AngularConstruct
+    construct: AngularConstructOrPlainFile
   ) {
     const instance = new FilesRelatedToStub();
     await instance.catalogueFilesInCurrentFolder(
@@ -44,11 +56,15 @@ export class FilesRelatedToStub {
   private async catalogueFilesInCurrentFolder(
     fileDetails: OriginalFileDetails,
     projectRoot: string,
-    construct: AngularConstruct
+    construct: AngularConstructOrPlainFile
   ) {
     this.originalFileDetails = fileDetails;
 
-    if (fileDetails.path.endsWith(fileDetails.stub)) {
+    const folderName = basename(fileDetails.path);
+    if (
+      folderName === fileDetails.stub ||
+      folderName === fileDetails.fileWithoutType
+    ) {
       this.folderNameSameAsStub = true;
     }
 
@@ -56,7 +72,7 @@ export class FilesRelatedToStub {
     const uris = await workspace.findFiles(glob, '**/node_modules/**', 10000);
 
     this.constructFilesRegex = RegExp(
-      `${escapeRegex(fileDetails.stub)}${
+      `${escapeRegex(fileDetails.fileWithoutType)}${
         likeFilesRegexPartialLookup[construct]
       }`
     );
@@ -64,31 +80,47 @@ export class FilesRelatedToStub {
       `${escapeRegex(fileDetails.stub)}${likeFilesRegexPartialLookup.any}`
     );
 
-    const isCoreConstructRegex = new RegExp(`\\.${construct}\\.ts$`);
-
-    uris.forEach((uri) => {
+    for (const uri of uris) {
       const filePath = windowsFilePathFix(uri.fsPath);
-      this.fileDetails.push({
-        filePath,
-        sameConstruct: !!filePath.match(this.constructFilesRegex),
-        sameStub: !!filePath.match(this.relatedFilesRegex),
-        isCoreConstruct: !!filePath.match(isCoreConstructRegex),
-      });
-    });
-  }
+      const sameConstruct = !!filePath.match(this.constructFilesRegex);
+      const sameStub = !!filePath.match(this.relatedFilesRegex);
+      const isTsFileButNotSpec = !!filePath.match(tsFileButNotSpec);
 
-  getFilesToMove(newStub: string) {
-    const folderReplaceRegex = new RegExp(
-      `(?<=\/)${escapeRegex(this.originalFileDetails.stub)}$`
-    );
-    const replaceStub = (filePath: string) => {
-      if (this.folderNameSameAsStub) {
-        filePath = filePath.replace(
-          this.originalFileDetails.path,
-          this.originalFileDetails.path.replace(folderReplaceRegex, newStub)
+      if (sameConstruct && sameStub && isTsFileButNotSpec) {
+        this.derivedConstruct = await this.deriveConstructFromFileContent(
+          filePath,
+          fileDetails.stub
         );
       }
-      return filePath.replace(this.constructFilesRegex, newStub);
+
+      this.fileDetails.push({
+        filePath,
+        sameConstruct,
+        sameStub,
+        isCoreConstruct:
+          sameConstruct &&
+          sameStub &&
+          isTsFileButNotSpec &&
+          !!this.derivedConstruct,
+      });
+    }
+  }
+
+  getFilesToMove(newStub: string, newFilenameInput: string) {
+    const replaceStub = (filePath: string) => {
+      if (this.folderNameSameAsStub) {
+        const newFolderName =
+          isFollowingAngular20FolderAndSelectorNamingConvention()
+            ? newFilenameInput
+            : newStub;
+        const parentPath = dirname(this.originalFileDetails.path);
+        this.newFolderPath = join(parentPath, newFolderName);
+        filePath = filePath.replace(
+          this.originalFileDetails.path,
+          this.newFolderPath
+        );
+      }
+      return filePath.replace(this.constructFilesRegex, newFilenameInput);
     };
 
     return this.fileDetails
@@ -99,6 +131,24 @@ export class FilesRelatedToStub {
         newFilePath: replaceStub(fd.filePath),
         isCoreConstruct: fd.isCoreConstruct,
       }));
+  }
+
+  async deriveConstructFromFileContent(
+    filePath: string,
+    stub: string
+  ): Promise<AngularConstructOrPlainFile | null> {
+    const coreFileDefinitionDetails = await getCoreFileDefinitionDetails(
+      filePath,
+      stub
+    );
+    if (!coreFileDefinitionDetails) {
+      return null;
+    }
+    const { decoratorName, definitionType, definitionName } =
+      coreFileDefinitionDetails;
+    this.originalDefinitionName = definitionName;
+    this.definitionType = definitionType;
+    return getConstructFromDecorator(decoratorName, definitionType);
   }
 
   private sortFileDetails(a: FileDetails, b: FileDetails) {

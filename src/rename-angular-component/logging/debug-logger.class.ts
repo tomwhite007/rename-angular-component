@@ -1,11 +1,16 @@
-import * as fs from 'fs-extra-promise';
-import * as path from 'path';
+import fs from 'fs-extra-promise';
+import path from 'path';
 
 export class DebugLogger {
   private preSaveCash = '';
   private debugFilePath?: string;
 
   constructor(private logToFile: boolean) {}
+
+  logToConsole(...text: string[]) {
+    console.log(...text);
+    this.log(...text);
+  }
 
   log(...text: string[]) {
     let fileContents = this.getCurrentFileContents();

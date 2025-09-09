@@ -1,5 +1,5 @@
 import path = require('path');
-import * as Mocha from 'mocha';
+import Mocha from 'mocha';
 
 export function runMochaScenarioFile(scenarioFile: string): Promise<void> {
   // Create the mocha test

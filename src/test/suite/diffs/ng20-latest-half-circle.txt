@@ -1,0 +1,171 @@
+diff --git a/src/app/app.html b/src/app/app.html
+index 6ac5c69..1c0ef83 100644
+--- a/src/app/app.html
++++ b/src/app/app.html
+@@ -1,2 +1,2 @@
+-<app-test />
+-<app-test-suffix />
++<app-foo.component />
++<app-baa />
+diff --git a/src/app/app.ts b/src/app/app.ts
+index d71e8b1..39bc19a 100644
+--- a/src/app/app.ts
++++ b/src/app/app.ts
+@@ -1,10 +1,10 @@
+ import { Component } from '@angular/core';
+-import { TestSuffixComponent } from './test-suffix.component/test-suffix.component';
+-import { Test } from './test/test';
++import { Baa } from './baa/baa';
++import { FooComponent } from './foo.component/foo.component';
+ 
+ @Component({
+   selector: 'app-root',
+-  imports: [Test, TestSuffixComponent],
++  imports: [FooComponent, Baa],
+   templateUrl: './app.html',
+   styleUrl: './app.scss',
+ })
+diff --git a/src/app/test-suffix.component/test-suffix.component.html b/src/app/baa/baa.html
+similarity index 100%
+rename from src/app/test-suffix.component/test-suffix.component.html
+rename to src/app/baa/baa.html
+diff --git a/src/app/test-suffix.component/test-suffix.component.scss b/src/app/baa/baa.scss
+similarity index 100%
+rename from src/app/test-suffix.component/test-suffix.component.scss
+rename to src/app/baa/baa.scss
+diff --git a/src/app/test/test.spec.ts b/src/app/baa/baa.spec.ts
+similarity index 64%
+rename from src/app/test/test.spec.ts
+rename to src/app/baa/baa.spec.ts
+index a469f82..96712c5 100644
+--- a/src/app/test/test.spec.ts
++++ b/src/app/baa/baa.spec.ts
+@@ -1,18 +1,18 @@
+ import { ComponentFixture, TestBed } from '@angular/core/testing';
+ 
+-import { Test } from './test';
++import { Baa } from './baa';
+ 
+-describe('Test', () => {
+-  let component: Test;
+-  let fixture: ComponentFixture<Test>;
++describe('Baa', () => {
++  let component: Baa;
++  let fixture: ComponentFixture<Baa>;
+ 
+   beforeEach(async () => {
+     await TestBed.configureTestingModule({
+-      imports: [Test]
++      imports: [Baa]
+     })
+     .compileComponents();
+ 
+-    fixture = TestBed.createComponent(Test);
++    fixture = TestBed.createComponent(Baa);
+     component = fixture.componentInstance;
+     fixture.detectChanges();
+   });
+diff --git a/src/app/baa/baa.ts b/src/app/baa/baa.ts
+new file mode 100644
+index 0000000..681c3fb
+--- /dev/null
++++ b/src/app/baa/baa.ts
+@@ -0,0 +1,9 @@
++import { Component } from '@angular/core';
++
++@Component({
++  selector: 'app-baa',
++  imports: [],
++  templateUrl: './baa.html',
++  styleUrl: './baa.scss',
++})
++export class Baa {}
+diff --git a/src/app/test/test.html b/src/app/foo.component/foo.component.html
+similarity index 100%
+rename from src/app/test/test.html
+rename to src/app/foo.component/foo.component.html
+diff --git a/src/app/test/test.scss b/src/app/foo.component/foo.component.scss
+similarity index 100%
+rename from src/app/test/test.scss
+rename to src/app/foo.component/foo.component.scss
+diff --git a/src/app/test-suffix.component/test-suffix.component.spec.ts b/src/app/foo.component/foo.component.spec.ts
+similarity index 52%
+rename from src/app/test-suffix.component/test-suffix.component.spec.ts
+rename to src/app/foo.component/foo.component.spec.ts
+index 95f8244..fc5b7b1 100644
+--- a/src/app/test-suffix.component/test-suffix.component.spec.ts
++++ b/src/app/foo.component/foo.component.spec.ts
+@@ -1,18 +1,18 @@
+ import { ComponentFixture, TestBed } from '@angular/core/testing';
+ 
+-import { TestSuffixComponent } from './test-suffix.component';
++import { FooComponent } from './foo.component';
+ 
+-describe('TestSuffixComponent', () => {
+-  let component: TestSuffixComponent;
+-  let fixture: ComponentFixture<TestSuffixComponent>;
++describe('FooComponent', () => {
++  let component: FooComponent;
++  let fixture: ComponentFixture<FooComponent>;
+ 
+   beforeEach(async () => {
+     await TestBed.configureTestingModule({
+-      imports: [TestSuffixComponent]
++      imports: [FooComponent]
+     })
+     .compileComponents();
+ 
+-    fixture = TestBed.createComponent(TestSuffixComponent);
++    fixture = TestBed.createComponent(FooComponent);
+     component = fixture.componentInstance;
+     fixture.detectChanges();
+   });
+diff --git a/src/app/foo.component/foo.component.ts b/src/app/foo.component/foo.component.ts
+new file mode 100644
+index 0000000..8abb976
+--- /dev/null
++++ b/src/app/foo.component/foo.component.ts
+@@ -0,0 +1,11 @@
++import { Component } from '@angular/core';
++
++@Component({
++  selector: 'app-foo.component',
++  imports: [],
++  templateUrl: './foo.component.html',
++  styleUrl: './foo.component.scss'
++})
++export class FooComponent {
++
++}
+diff --git a/src/app/test-suffix.component/test-suffix.component.ts b/src/app/test-suffix.component/test-suffix.component.ts
+deleted file mode 100644
+index 508a412..0000000
+--- a/src/app/test-suffix.component/test-suffix.component.ts
++++ /dev/null
+@@ -1,9 +0,0 @@
+-import { Component } from '@angular/core';
+-
+-@Component({
+-  selector: 'app-test-suffix',
+-  imports: [],
+-  templateUrl: './test-suffix.component.html',
+-  styleUrl: './test-suffix.component.scss',
+-})
+-export class TestSuffixComponent {}
+diff --git a/src/app/test/test.ts b/src/app/test/test.ts
+deleted file mode 100644
+index d60cbf8..0000000
+--- a/src/app/test/test.ts
++++ /dev/null
+@@ -1,11 +0,0 @@
+-import { Component } from '@angular/core';
+-
+-@Component({
+-  selector: 'app-test',
+-  imports: [],
+-  templateUrl: './test.html',
+-  styleUrl: './test.scss'
+-})
+-export class Test {
+-
+-}

@@ -1,6 +1,9 @@
 import assert = require('assert');
-import simpleGit, { CleanOptions, ResetMode } from 'simple-git';
+import simpleGit from 'simple-git';
+import sinon from 'sinon';
+import { timeoutPause } from '../../../utils/timeout-pause';
 import { DISCARD_STAGED_CHANGES } from './constants-helper-config';
+import { stubGetConfiguration } from './mock-get-configuration';
 import { readUpsertDiffFile } from './read-upsert-diff-file.function';
 import {
   RenameCallConfig,
@@ -11,9 +14,27 @@ export interface TestScenarioConfig {
   projectRoot: string;
   renames: RenameCallConfig[];
   fileDiffPath: string;
+  useNg20Convention: boolean;
+  projectUsesStandaloneComponentsOnly?: boolean;
 }
 
 export async function genericTestScenario(config: TestScenarioConfig) {
+  console.log(
+    '>>> Test Scenario - useNg20Convention:',
+    config.useNg20Convention,
+    'standalone:',
+    config.projectUsesStandaloneComponentsOnly
+  );
+  console.log('>>> Project root:', config.projectRoot);
+
+  stubGetConfiguration({
+    followAngular20FolderAndSelectorNamingConvention:
+      config.useNg20Convention ?? true,
+    projectUsesStandaloneComponentsOnly:
+      config.projectUsesStandaloneComponentsOnly ?? true,
+  });
+  await timeoutPause(1000);
+
   const git = simpleGit({
     baseDir: config.projectRoot,
   });
@@ -22,9 +43,6 @@ export async function genericTestScenario(config: TestScenarioConfig) {
       return;
     }
     await git.reset(['--hard', 'HEAD']);
-    // unstaged changes:
-    // await git.clean([CleanOptions.FORCE, CleanOptions.RECURSIVE]);
-    // await git.checkout('.');
   };
 
   const notClean = await git.diff(['--staged']);
@@ -42,4 +60,7 @@ export async function genericTestScenario(config: TestScenarioConfig) {
   await discardChanges();
 
   assert.strictEqual(diff, fileDiff);
+
+  sinon.restore();
+  await timeoutPause(1000);
 }

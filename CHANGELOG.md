@@ -1,10 +1,17 @@
 # Change Log
 
+## Latest version: [4.0.0] - 2025-09-10
+
+- **Angular 20 and backwards compatibility**: Support for new no-suffix component format and automatic '.component' suffix handling
+- **Enhanced selector updates**: Standalone component mode with configurable template update behavior, fixing Issues [48](https://github.com/tomwhite007/rename-angular-component/issues/48) and [7](https://github.com/tomwhite007/rename-angular-component/issues/7)
+- **Expanded file support**: Rename pipes, interfaces, enums, and any Angular CLI-generated file
+- **Improved selector management**: Automatic removal of '.component' from renamed selectors and folders for backward compatibility
+
 ## [3.0.0] - 2024-02-27
 
 - Update to latest VSCode extension lib deps
 - Add `styleUrl` decorator attribute to import edits
-- Replace string class names in test files per issue 34
+- Replace string class names in test files per issue [34](https://github.com/tomwhite007/rename-angular-component/issues/34)
 - Create new extension icon using latest ng 17 logo
 
 ## [2.1.3] - 2022-08-08

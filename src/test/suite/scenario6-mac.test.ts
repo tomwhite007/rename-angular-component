@@ -1,4 +1,4 @@
-import * as vscode from 'vscode';
+import vscode from 'vscode';
 import { genericTestScenario } from './helpers/generic-test-scenario.function';
 
 suite('Suite Scenario 6', () => {
@@ -16,12 +16,13 @@ suite('Suite Scenario 6', () => {
       renames: [
         {
           filePath: './src/app/app.component.css',
-          construct: 'component',
-          newStub: 'tom-test',
+          newFilenameInput: 'tom-test.component',
         },
       ],
       fileDiffPath:
         './src/test/suite/diffs/test-styleurl-and-jasminespy-app.txt',
+      useNg20Convention: false,
+      projectUsesStandaloneComponentsOnly: true,
     });
   });
 });

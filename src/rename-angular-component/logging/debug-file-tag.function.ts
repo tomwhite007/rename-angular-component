@@ -1,4 +1,4 @@
-import * as path from 'path';
+import path from 'path';
 import { dasherize } from '../../angular-cli/strings';
 
 export function debugFileTag(

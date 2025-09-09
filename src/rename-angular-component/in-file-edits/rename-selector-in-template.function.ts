@@ -1,13 +1,20 @@
 import { escapeRegex } from '../../utils/escape-regex';
+import { AngularConstructOrPlainFile } from '../definitions/file.interfaces';
 
 export function renameSelectorInTemplate(
   html: string,
   originalSelector: string,
-  newSelector: string
+  newSelector: string,
+  construct: AngularConstructOrPlainFile | null
 ) {
-  const regExBodyStr = `(?<![\\w\\-_])${escapeRegex(
-    originalSelector
-  )}(?![\\w\\-_])`;
+  let regExBodyStr = '';
+  if (construct === 'pipe') {
+    regExBodyStr = `(?<=\\| )${escapeRegex(originalSelector)}`;
+  } else {
+    regExBodyStr = `(?<![\\w\\-_])${escapeRegex(
+      originalSelector
+    )}(?![\\w\\-_])`;
+  }
 
   const findOne = new RegExp(regExBodyStr);
 

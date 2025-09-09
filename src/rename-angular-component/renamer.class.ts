@@ -1,69 +1,88 @@
-import * as vscode from 'vscode';
+import fs from 'fs-extra-promise';
+import path from 'path';
+import vscode from 'vscode';
+import { classify, dasherize } from '../angular-cli/strings';
+import { validateHtmlSelector } from '../angular-cli/validation';
+import { GenericEditsCallback } from '../move-ts-indexer/apply-generic-edits';
+import { FileItem } from '../move-ts-indexer/file-item';
+import { timeoutPause } from '../utils/timeout-pause';
 import {
-  AngularConstruct,
+  AngularConstructOrPlainFile,
   OriginalFileDetails,
 } from './definitions/file.interfaces';
 import { getProjectRoot } from './definitions/get-project-root-file-path.function';
-import { ReferenceIndexBuilder } from '../move-ts-indexer/reference-index-builder';
-import { FileItem } from '../move-ts-indexer/file-item';
-import * as fs from 'fs-extra-promise';
-import { getOriginalFileDetails } from './in-file-edits/get-original-file-details.function';
-import { windowsFilePathFix } from './file-manipulation/windows-file-path-fix.function';
-import { FilesRelatedToStub } from './file-manipulation/files-related-to-stub.class';
-import { findReplaceSelectorsInTemplateFiles } from './file-manipulation/find-replace-selectors-in-template-files.function';
+import { FileMoveHandler } from './file-manipulation/file-move-handler.class';
 import {
+  FilesRelatedToStub,
+  FileToMove,
+} from './file-manipulation/files-related-to-stub.class';
+import { updateSelectorsInTemplates } from './file-manipulation/selector-update-handler.function';
+import { windowsFilePathFix } from './file-manipulation/windows-file-path-fix.function';
+import {
+  getAngularCoreClassEdits,
   getClassNameEdits,
-  getCoreClassEdits,
   SelectorTransfer,
 } from './in-file-edits/custom-edits';
-import { checkForOpenUnsavedEditors } from './window/check-for-open-unsaved-editors.function';
-import * as path from 'path';
+import { getNewDefinitionName } from './in-file-edits/get-new-definition-name.function';
+import { getNewStubFromFileWithoutExtension } from './in-file-edits/get-new-stub-from-file-without-extension';
+import { getOriginalFileDetails } from './in-file-edits/get-original-file-details.function';
+import { removeExtension } from './in-file-edits/remove-extension';
+import { DebugLogger } from './logging/debug-logger.class';
+import { reportErrors } from './logging/error-handler.function';
 import { UserMessage } from './logging/user-message.class';
 import { noSelectedFileHandler } from './no-selected-file-handler/no-selected-file-handler.function';
-import { getOriginalClassName } from './in-file-edits/get-original-class-name.function';
-import { DebugLogger } from './logging/debug-logger.class';
-import { validateHtmlSelector } from '../angular-cli/validation';
-import { classify, dasherize } from '../angular-cli/strings';
-import { CONSTRUCTS_WITH_SELECTORS } from './definitions/constructs-with-selectors';
-import { timeoutPause } from '../utils/timeout-pause';
-import { getCoreFilePath } from './in-file-edits/get-core-file-path.function';
+import { checkForOpenUnsavedEditors } from './window/check-for-open-unsaved-editors.function';
+
+interface RenameContext {
+  construct: AngularConstructOrPlainFile | null;
+  title: string;
+  originalFileDetails: Readonly<OriginalFileDetails>;
+  filesRelatedToStub?: FilesRelatedToStub;
+  projectRoot: string;
+  newStub: string;
+  newFilenameInput: string;
+  processTimerStart: number;
+  fileMoveJobs: FileItem[];
+  selectorTransfer: SelectorTransfer;
+  coreConstructNewFilePath?: string;
+  newClassName?: string;
+}
 
 export class Renamer {
-  private construct!: AngularConstruct;
-  private title!: string;
-  private originalFileDetails!: Readonly<OriginalFileDetails>;
-  private projectRoot!: string;
-  private newStub!: string;
-  private processTimerStart!: number;
-  private renameFolder!: boolean;
-  private fileMoveJobs!: FileItem[];
-  private selectorTransfer!: SelectorTransfer;
-  public testBypass?: { stub: string };
+  private context: Partial<RenameContext> = {};
+  public testBypass?: { newFilenameInput: string };
 
   constructor(
-    private indexer: ReferenceIndexBuilder,
     private indexerInitialisePromise: Thenable<any>,
     private userMessage: UserMessage,
-    private debugLogger: DebugLogger
+    private debugLogger: DebugLogger,
+    private fileMoveHandler: FileMoveHandler
   ) {}
 
-  async rename(_construct: AngularConstruct, selectedUri: vscode.Uri) {
-    console.log('Rename process start');
-    this.debugLogger.log('## Debug Rename Start ##');
+  async rename(selectedUri: vscode.Uri): Promise<void> {
+    const construct: AngularConstructOrPlainFile = 'file';
+    this.debugLogger.logToConsole('## Debug Rename Start ##');
 
-    const detailsLoaded = await this.prepRenameDetails(_construct, selectedUri);
+    const detailsLoaded = await this.prepareRenameDetails(
+      construct,
+      selectedUri
+    );
     if (!detailsLoaded) {
       this.debugLogger.log(
-        'setRenameDetails returned false, stopping.',
+        'prepareRenameDetails returned false, stopping.',
         '## Debug Rename End ##'
       );
       return;
     }
 
+    await this.executeRenameWithProgress();
+  }
+
+  private async executeRenameWithProgress(): Promise<void> {
     await vscode.window.withProgress(
       {
         location: vscode.ProgressLocation.Notification,
-        title: this.title + ' in progress',
+        title: `${this.context.title} in progress`,
         cancellable: false,
       },
       async (progress) => {
@@ -71,315 +90,418 @@ export class Renamer {
         await timeoutPause();
 
         try {
-          const fileMoveJobsReady = await this.prepFileMoveJobs();
-          if (!fileMoveJobsReady) {
-            return;
-          }
-
-          await this.runFileMoveJobs(progress);
-
-          await this.updateSelectorsInTemplates();
-
-          // delete original folder
-          if (this.renameFolder) {
-            fs.remove(this.originalFileDetails.path);
-          }
-
-          // report process completed
-          progress.report({ increment: 100 });
-          const renameTime =
-            Math.round((Date.now() - this.processTimerStart) / 10) / 100;
-          this.userMessage.logInfoToChannel([
-            '',
-            `${this.title} completed in ${renameTime} seconds`,
-          ]);
-
-          this.debugLogger.log('## Debug Rename Completed ##');
-
-          await timeoutPause(50);
-          console.log('Rename process end');
-        } catch (e: any) {
-          this.reportErrors(e);
-          console.log('Rename process ended with errors');
-        }
-      }
-    );
-  }
-
-  private async runFileMoveJobs(
-    progress: vscode.Progress<{
-      message?: string | undefined;
-      increment?: number | undefined;
-    }>
-  ) {
-    progress.report({ increment: 20 });
-    await timeoutPause();
-    const progressIncrement = Math.floor(70 / this.fileMoveJobs.length);
-    let currentProgress = 20;
-    this.userMessage.logInfoToChannel(['File edits:'], false);
-    this.indexer.startNewMoves();
-    for await (const item of this.fileMoveJobs) {
-      currentProgress += progressIncrement;
-      progress.report({ increment: currentProgress });
-      await timeoutPause(10);
-      await item.move(this.indexer);
-    }
-    this.logFileEditsToOutput(this.indexer.endNewMoves());
-  }
-
-  private logFileEditsToOutput(files: string[]) {
-    files = files.map(
-      (file) =>
-        this.fileMoveJobs.find((job) => job.sourcePath === file)?.targetPath ??
-        file
-    );
-    files = [...new Set(files.sort())];
-    this.userMessage.logInfoToChannel(files);
-  }
-
-  private async updateSelectorsInTemplates() {
-    // update selectors for components and directives
-    if (CONSTRUCTS_WITH_SELECTORS.includes(this.construct)) {
-      if (
-        this.selectorTransfer.oldSelector &&
-        this.selectorTransfer.newSelector
-      ) {
-        if (
-          this.selectorTransfer.oldSelector !==
-          this.selectorTransfer.newSelector
-        ) {
-          await findReplaceSelectorsInTemplateFiles(
-            this.selectorTransfer.oldSelector,
-            this.selectorTransfer.newSelector,
-            this.userMessage
+          await this.performRenameOperation(progress);
+        } catch (error: any) {
+          reportErrors(
+            error,
+            this.context.title!,
+            this.userMessage,
+            this.debugLogger
           );
-        } else {
-          this.userMessage.logInfoToChannel([
-            ``,
-            `Original Selector doesn't match Angular CLI naming convention for a ${this.construct}. Unexpected Selector not replaced.`,
-          ]);
+          console.log('Rename process ended with errors', error);
         }
-
-        this.debugLogger.log(
-          'oldSelector: ' + this.selectorTransfer.oldSelector,
-          'newSelector: ' + this.selectorTransfer.newSelector
-        );
-      } else {
-        throw new Error("Selector edit not found. Couldn't amend selector.");
       }
+    );
+  }
+
+  private async performRenameOperation(
+    progress: vscode.Progress<{ increment: number }>
+  ): Promise<void> {
+    const fileMoveJobsReady = await this.prepareFileMoveJobs();
+    if (!fileMoveJobsReady) {
+      return;
+    }
+
+    const filePathsAffected = await this.fileMoveHandler.runFileMoveJobs(
+      this.context.fileMoveJobs!,
+      progress
+    );
+    const baseFilePathsAffected = filePathsAffected.map((filePath) =>
+      filePath.replace(/(\.module)?\.ts$/, '')
+    );
+    this.debugLogger.log(
+      'baseFilePathsAffected: ',
+      JSON.stringify(baseFilePathsAffected)
+    );
+
+    await updateSelectorsInTemplates(
+      this.context.construct!,
+      this.context.selectorTransfer!,
+      this.userMessage,
+      this.debugLogger,
+      this.context.coreConstructNewFilePath!,
+      baseFilePathsAffected
+    );
+
+    await this.cleanupOriginalFolder();
+    await this.reportCompletion(progress);
+  }
+
+  private async cleanupOriginalFolder(): Promise<void> {
+    const { originalFileDetails, filesRelatedToStub } = this.context;
+    const newFolderPath = filesRelatedToStub?.newFolderPath
+      ? windowsFilePathFix(filesRelatedToStub.newFolderPath)
+      : undefined;
+    const isPathChanged =
+      originalFileDetails!.path !== newFolderPath &&
+      newFolderPath !== undefined;
+
+    if (isPathChanged) {
+      this.debugLogger.logToConsole(
+        'Deleting original folder: ',
+        originalFileDetails!.path,
+        'newFolderPath: ',
+        filesRelatedToStub?.newFolderPath ?? 'undefined'
+      );
+      await fs.remove(originalFileDetails!.path);
     }
   }
 
-  private async prepFileMoveJobs(): Promise<boolean> {
+  private async reportCompletion(
+    progress: vscode.Progress<{ increment: number }>
+  ): Promise<void> {
+    progress.report({ increment: 100 });
+
+    const renameTime = this.calculateRenameTime();
+    const unrecognisedDefinitionMessage =
+      this.getUnrecognisedDefinitionMessage();
+
+    this.userMessage.logInfoToChannel([
+      ...unrecognisedDefinitionMessage,
+      '',
+      `${this.context.title} completed in ${renameTime} seconds`,
+    ]);
+
+    this.debugLogger.log('## Debug Rename Completed ##');
+    await timeoutPause(50);
+    console.log('Rename process end');
+  }
+
+  private calculateRenameTime(): number {
+    return (
+      Math.round((Date.now() - this.context.processTimerStart!) / 10) / 100
+    );
+  }
+
+  private getUnrecognisedDefinitionMessage(): string[] {
+    const unrecognisedDefinition =
+      !this.context.filesRelatedToStub?.definitionType;
+
+    return unrecognisedDefinition
+      ? [
+          '',
+          `This extension currently only supports renaming classes, functions, variables, interfaces, and enums that have the same name as the file they are in.`,
+          `In this case, I could only rename the file, not any definition in the file.`,
+        ]
+      : [];
+  }
+
+  private async prepareFileMoveJobs(): Promise<boolean> {
+    if (!this.context.filesRelatedToStub) {
+      this.debugLogger.log('filesRelatedToStub is not set, stopping.');
+      return false;
+    }
+
+    this.logFileMovePreparation();
+
+    const filesToMove = this.context.filesRelatedToStub.getFilesToMove(
+      this.context.newStub!,
+      this.context.newFilenameInput!
+    );
+
     this.debugLogger.log(
-      'find related glob: ',
-      `${this.originalFileDetails.path.replace(
-        this.projectRoot + '/',
-        ''
-      )}/**/*`
-    );
-
-    const filesRelatedToStub = await FilesRelatedToStub.init(
-      this.originalFileDetails,
-      this.projectRoot,
-      this.construct
-    );
-    this.renameFolder = filesRelatedToStub.folderNameSameAsStub;
-
-    const filesToMove = filesRelatedToStub.getFilesToMove(
-      this.newStub as string
-    );
-
-    this.debugLogger.log(
-      'renameFolder: ' + this.renameFolder,
+      'newFolderPath: ' + this.context.filesRelatedToStub.newFolderPath,
       '',
       'filesToMove: ',
       JSON.stringify(filesToMove)
     );
 
-    if (!filesToMove.find((f) => f.isCoreConstruct)) {
-      const errMsg = `The ${this.construct} class file must use the same file naming convention as '${this.originalFileDetails.file}' for this process to run.`;
-      this.userMessage.popupMessage(errMsg);
-      this.debugLogger.log(errMsg);
+    this.createFileMoveJobs(filesToMove);
+
+    this.debugLogger.log(
+      'fileMoveJobs: ',
+      JSON.stringify(this.context.fileMoveJobs)
+    );
+
+    if (this.hasConflictingFiles()) {
+      vscode.window.showErrorMessage(
+        'Renamer: Not allowed to overwrite existing files'
+      );
+      this.debugLogger.logToConsole(
+        'l.exists(): Not allowed to overwrite existing files'
+      );
       return false;
     }
 
-    const coreFilePath = getCoreFilePath(filesToMove);
-    const oldClassName = await getOriginalClassName(
-      this.originalFileDetails.stub,
-      coreFilePath as string,
-      this.construct
+    return true;
+  }
+
+  private logFileMovePreparation(): void {
+    this.debugLogger.log(
+      'find related glob: ',
+      `${this.context.originalFileDetails!.path.replace(
+        this.context.projectRoot! + '/',
+        ''
+      )}/**/*`
     );
-    const newClassName = `${classify(this.newStub)}${classify(this.construct)}`;
+  }
 
-    this.selectorTransfer = new SelectorTransfer();
+  private createFileMoveJobs(filesToMove: any[]): void {
+    const oldClassName =
+      this.context.filesRelatedToStub!.originalDefinitionName!;
+    const newClassName = getNewDefinitionName(
+      this.context.newFilenameInput!,
+      this.context.construct!,
+      this.context.filesRelatedToStub!.definitionType
+    );
+    this.context.newClassName = newClassName;
 
-    this.fileMoveJobs = filesToMove.map((f) => {
-      const additionalEdits = {
-        importsEdits:
-          path.extname(f.filePath) === '.ts'
-            ? (() => getClassNameEdits(oldClassName, newClassName))()
-            : undefined,
-        movedFileEdits: f.isCoreConstruct
-          ? (() =>
-              getCoreClassEdits(
-                oldClassName,
-                newClassName,
-                this.originalFileDetails.stub,
-                this.newStub,
-                this.construct,
-                this.selectorTransfer
-              ))()
-          : undefined,
-      };
+    this.context.selectorTransfer = new SelectorTransfer();
 
+    this.context.fileMoveJobs = filesToMove.map((file: FileToMove) => {
+      const additionalEdits = this.createAdditionalEdits(
+        file,
+        oldClassName,
+        newClassName
+      );
+
+      if (file.isCoreConstruct) {
+        this.context.coreConstructNewFilePath = file.newFilePath;
+      }
       return new FileItem(
-        windowsFilePathFix(f.filePath, true),
-        windowsFilePathFix(f.newFilePath, true),
-        fs.statSync(f.filePath).isDirectory(),
+        windowsFilePathFix(file.filePath, true),
+        windowsFilePathFix(file.newFilePath, true),
+        fs.statSync(file.filePath).isDirectory(),
         oldClassName,
         newClassName,
         additionalEdits
       );
     });
+  }
 
-    this.debugLogger.log('fileMoveJobs: ', JSON.stringify(this.fileMoveJobs));
+  private createAdditionalEdits(
+    file: FileToMove,
+    oldClassName: string,
+    newClassName: string
+  ): {
+    importsEdits?: GenericEditsCallback;
+    movedFileEdits?: GenericEditsCallback;
+  } {
+    return {
+      importsEdits:
+        path.extname(file.filePath) === '.ts'
+          ? getClassNameEdits(oldClassName, newClassName)
+          : undefined,
+      movedFileEdits: file.isCoreConstruct
+        ? getAngularCoreClassEdits(
+            oldClassName,
+            newClassName,
+            this.context.originalFileDetails!.stub,
+            this.context.originalFileDetails!.fileWithoutType,
+            this.context.newStub!,
+            this.context.newFilenameInput!,
+            this.context.construct!,
+            this.context.selectorTransfer!
+          )
+        : undefined,
+    };
+  }
 
-    if (this.fileMoveJobs.some((l) => l.exists())) {
-      vscode.window.showErrorMessage('Not allowed to overwrite existing files');
+  private hasConflictingFiles(): boolean {
+    return this.context.fileMoveJobs!.some(
+      (job) => job.sourcePath !== job.targetPath && job.exists()
+    );
+  }
 
+  private async prepareRenameDetails(
+    construct: AngularConstructOrPlainFile,
+    selectedUri: vscode.Uri
+  ): Promise<boolean> {
+    try {
+      const resolvedUri = await this.resolveSelectedUri(construct, selectedUri);
+      if (!resolvedUri) {
+        return false;
+      }
+
+      await this.initializeContext(resolvedUri, construct);
+
+      if (!(await this.validateAndGetUserInput())) {
+        return false;
+      }
+
+      await this.waitForIndexer();
+      this.logRenameDetails();
+
+      return true;
+    } catch (error: any) {
+      console.warn('prepareRenameDetails error: ', error);
       this.debugLogger.log(
-        'l.exists(): Not allowed to overwrite existing files'
+        'prepareRenameDetails error: ',
+        JSON.stringify(error, Object.getOwnPropertyNames(error))
       );
+      return false;
+    }
+  }
 
+  private async resolveSelectedUri(
+    construct: AngularConstructOrPlainFile,
+    selectedUri: vscode.Uri
+  ): Promise<vscode.Uri | null> {
+    if (!selectedUri) {
+      const userEntered = await noSelectedFileHandler(
+        construct,
+        this.context.title!,
+        this.userMessage
+      );
+      return userEntered || null;
+    }
+    return selectedUri;
+  }
+
+  private async initializeContext(
+    selectedUri: vscode.Uri,
+    construct: AngularConstructOrPlainFile
+  ): Promise<void> {
+    this.context.originalFileDetails = getOriginalFileDetails(selectedUri.path);
+    this.context.projectRoot = windowsFilePathFix(
+      getProjectRoot(selectedUri) as string
+    );
+    this.debugLogger.setWorkspaceRoot(this.context.projectRoot);
+
+    this.context.filesRelatedToStub = await FilesRelatedToStub.init(
+      this.context.originalFileDetails!,
+      this.context.projectRoot!,
+      construct
+    );
+
+    this.context.construct = this.context.filesRelatedToStub!.derivedConstruct;
+    this.context.title = `Rename ${
+      this.context.construct
+        ? `Angular ${classify(this.context.construct)}`
+        : 'file'
+    }`;
+  }
+
+  private async validateAndGetUserInput(): Promise<boolean> {
+    if (checkForOpenUnsavedEditors()) {
+      this.userMessage.popupMessage(
+        `Please save any edits before using ${this.context.title}`
+      );
+      return false;
+    }
+
+    const userInput = await this.getUserInput();
+    if (!userInput) {
+      return false;
+    }
+
+    if (!this.validateUserInput(userInput)) {
+      return false;
+    }
+
+    this.context.newFilenameInput = removeExtension(userInput);
+    this.context.processTimerStart = Date.now();
+    this.context.newStub = getNewStubFromFileWithoutExtension(
+      this.context.newFilenameInput
+    );
+
+    if (!this.validateSelector()) {
+      return false;
+    }
+
+    this.userMessage.setOperationTitle(this.context.title!);
+    return true;
+  }
+
+  private async getUserInput(): Promise<string | undefined> {
+    const inputSuffixNote = this.getInputSuffixNote();
+    const unrecognisedDefinitionMessage =
+      this.getUnrecognisedDefinitionWarning();
+    const constructText = this.context.construct
+      ? `${this.context.construct} `
+      : '';
+
+    return (
+      this.testBypass?.newFilenameInput ??
+      (await vscode.window.showInputBox({
+        title: this.context.title,
+        prompt: `Enter the new ${constructText}filename. ${inputSuffixNote} ${unrecognisedDefinitionMessage}`,
+        value: this.context.originalFileDetails!.fileWithoutType,
+      }))
+    );
+  }
+
+  private getInputSuffixNote(): string {
+    return !!this.context.construct &&
+      this.context.originalFileDetails!.fileWithoutType.endsWith(
+        `.${this.context.construct}`
+      )
+      ? `(Angular '.${this.context.construct}' suffix is optional)`
+      : '';
+  }
+
+  private getUnrecognisedDefinitionWarning(): string {
+    const unrecognisedDefinition =
+      !this.context.filesRelatedToStub?.definitionType;
+
+    return unrecognisedDefinition
+      ? `This extension currently only supports renaming classes, functions, variables, interfaces, and enums
+          that have the same name as the file they are in. In this case, I can only rename the file, not any definition in the file.`
+      : '';
+  }
+
+  private validateUserInput(userInput: string): boolean {
+    if (!userInput) {
+      this.userMessage.popupMessage(
+        `New ${this.context.construct} name not entered. Stopped.`
+      );
+      return false;
+    }
+
+    if (this.context.originalFileDetails!.fileWithoutType === userInput) {
+      this.userMessage.popupMessage(
+        `${classify(
+          this.context.construct ?? 'New file'
+        )} name same as original. Stopped.`
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  private validateSelector(): boolean {
+    if (!validateHtmlSelector('app-' + dasherize(this.context.newStub!))) {
+      this.userMessage.popupMessage(
+        `Please enter a name that formats to a valid Selector name (W3C standards). \n
+        Must start name with a letter, then letters, numbers, full stop, dash or underscore, ending with a letter or number.`
+      );
       return false;
     }
     return true;
   }
 
-  private reportErrors(e: any) {
-    const raiseIssueMsgs = [
-      `If it looks like a new issue, we'd appreciate you raising it here: https://github.com/tomwhite007/rename-angular-component/issues`,
-      `We're actively fixing any bugs reported.`,
-    ];
-
-    const msg: string = e.message;
-    if (msg.startsWith('Class Name') || msg.startsWith('Selector')) {
-      this.userMessage.logInfoToChannel(['', msg, ...raiseIssueMsgs]);
-      return;
-    }
-
-    console.log('error in Renamer:', e);
-    this.userMessage.logInfoToChannel([
-      `Sorry, an error occurred during the ${this.title} process`,
-      `We recommend reverting the changes made if there are any`,
-      ...raiseIssueMsgs,
-    ]);
-    this.debugLogger.log(
-      'Renamer error: ',
-      JSON.stringify(e, Object.getOwnPropertyNames(e))
+  private async waitForIndexer(): Promise<void> {
+    const indexTime = await this.indexerInitialisePromise;
+    this.userMessage.logInfoToChannel(
+      [
+        `Index files completed in ${Math.round(indexTime * 100) / 100} seconds`,
+        '',
+      ],
+      false
     );
   }
 
-  private async prepRenameDetails(
-    _construct: AngularConstruct,
-    selectedUri: vscode.Uri
-  ): Promise<boolean> {
-    try {
-      this.construct = _construct;
-      this.title = `Rename Angular ${classify(this.construct)}`;
-
-      // Handle if called from command menu
-      if (!selectedUri) {
-        const userEntered = await noSelectedFileHandler(
-          this.construct,
-          this.title,
-          this.userMessage
-        );
-        if (userEntered) {
-          selectedUri = userEntered;
-        } else {
-          return false;
-        }
-      }
-
-      this.originalFileDetails = getOriginalFileDetails(selectedUri.path);
-      this.projectRoot = windowsFilePathFix(
-        getProjectRoot(selectedUri) as string
-      );
-      this.debugLogger.setWorkspaceRoot(this.projectRoot);
-
-      if (checkForOpenUnsavedEditors()) {
-        this.userMessage.popupMessage(
-          `Please save any edits before using ${this.title}`
-        );
-        return false;
-      }
-
-      const inputResult =
-        this.testBypass?.stub ?? // test harness input text
-        (await vscode.window.showInputBox({
-          title: this.title,
-          prompt: `Enter the new ${this.construct} name.`,
-          value: this.originalFileDetails.stub,
-        }));
-      this.processTimerStart = Date.now();
-
-      if (!inputResult) {
-        this.userMessage.popupMessage(
-          `New ${this.construct} name not entered. Stopped.`
-        );
-        return false;
-      }
-      if (this.originalFileDetails.stub === inputResult) {
-        this.userMessage.popupMessage(
-          `${classify(this.construct)} name same as original. Stopped.`
-        );
-        return false;
-      }
-      if (!validateHtmlSelector('app-' + dasherize(inputResult))) {
-        this.userMessage.popupMessage(
-          `Please enter a name that formats to a valid Selector name (W3C standards). \n
-          Must start name with a letter, then letters, numbers, full stop, dash or underscore, ending with a letter or number.`
-        );
-        return false;
-      }
-      // make sure it's kebab, and lose the dots
-      this.newStub = dasherize(inputResult.replace('.', '-') ?? '');
-
-      this.userMessage.setOperationTitle(this.title);
-
-      // wait for indexer initialise to complete
-      const indexTime = await this.indexerInitialisePromise;
-      this.userMessage.logInfoToChannel(
-        [
-          `Index files completed in ${
-            Math.round(indexTime * 100) / 100
-          } seconds`,
-          '',
-        ],
-        false
-      );
-
-      this.debugLogger.log(
-        'projectRoot: ' + this.projectRoot,
-        '',
-        'originalFileDetails:',
-        JSON.stringify(this.originalFileDetails),
-        '',
-        'inputResult: ' + inputResult,
-        '',
-        'newStub: ' + this.newStub
-      );
-
-      return true;
-    } catch (e: any) {
-      console.warn('setRenameDetails error: ', e);
-      this.debugLogger.log(
-        'setRenameDetails error: ',
-        JSON.stringify(e, Object.getOwnPropertyNames(e))
-      );
-      return false;
-    }
+  private logRenameDetails(): void {
+    this.debugLogger.log(
+      'projectRoot: ' + this.context.projectRoot,
+      '',
+      'originalFileDetails:',
+      JSON.stringify(this.context.originalFileDetails),
+      '',
+      'inputResult: ' + this.context.newFilenameInput,
+      '',
+      'newStub: ' + this.context.newStub
+    );
   }
 }

@@ -1,0 +1,383 @@
+diff --git a/projects/shared/src/lib/dir-identifier.directive/dir-identifier.directive.spec.ts b/projects/shared/src/lib/dir-identifier.directive/dir-identifier.directive.spec.ts
+new file mode 100644
+index 0000000..c1dceff
+--- /dev/null
++++ b/projects/shared/src/lib/dir-identifier.directive/dir-identifier.directive.spec.ts
+@@ -0,0 +1,8 @@
++import { DirIdentifierDirective } from './dir-identifier.directive';
++
++describe('DirIdentifierDirective', () => {
++  it('should create an instance', () => {
++    const directive = new DirIdentifierDirective();
++    expect(directive).toBeTruthy();
++  });
++});
+diff --git a/projects/shared/src/lib/multiply-by-twenty/multiply-by-twenty.directive.ts b/projects/shared/src/lib/dir-identifier.directive/dir-identifier.directive.ts
+similarity index 68%
+rename from projects/shared/src/lib/multiply-by-twenty/multiply-by-twenty.directive.ts
+rename to projects/shared/src/lib/dir-identifier.directive/dir-identifier.directive.ts
+index bee0500..3179c37 100644
+--- a/projects/shared/src/lib/multiply-by-twenty/multiply-by-twenty.directive.ts
++++ b/projects/shared/src/lib/dir-identifier.directive/dir-identifier.directive.ts
+@@ -7,10 +7,10 @@ import {
+ } from '@angular/core';
+ 
+ @Directive({
+-  selector: '[libMultiplyByTwenty]',
++  selector: '[libDirIdentifierDirective]',
+ })
+-export class MultiplyByTwentyDirective implements OnInit {
+-  @Input('libMultiplyByTwenty') multiplier: number = 0;
++export class DirIdentifierDirective implements OnInit {
++  @Input('libDirIdentifierDirective') multiplier: number = 0;
+   @HostBinding()
+   result = 0;
+ 
+diff --git a/projects/shared/src/lib/dir-prop.directive/dir-prop.directive.spec.ts b/projects/shared/src/lib/dir-prop.directive/dir-prop.directive.spec.ts
+new file mode 100644
+index 0000000..9430eed
+--- /dev/null
++++ b/projects/shared/src/lib/dir-prop.directive/dir-prop.directive.spec.ts
+@@ -0,0 +1,8 @@
++import { DirPropDirective } from './dir-prop.directive';
++
++describe('DirPropDirective', () => {
++  it('should create an instance', () => {
++    const directive = new DirPropDirective();
++    expect(directive).toBeTruthy();
++  });
++});
+diff --git a/projects/shared/src/lib/dir-prop.directive/dir-prop.directive.ts b/projects/shared/src/lib/dir-prop.directive/dir-prop.directive.ts
+new file mode 100644
+index 0000000..7804da1
+--- /dev/null
++++ b/projects/shared/src/lib/dir-prop.directive/dir-prop.directive.ts
+@@ -0,0 +1,24 @@
++import {
++  Directive,
++  ElementRef,
++  HostBinding,
++  Input,
++  OnInit,
++} from '@angular/core';
++
++@Directive({
++  selector: '[libDirPropDirective]',
++})
++export class DirPropDirective implements OnInit {
++  @Input() libDirPropDirective: number = 0;
++  @HostBinding()
++  result = 0;
++
++  constructor(private el: ElementRef) {}
++
++  ngOnInit(): void {
++    this.result = this.libDirPropDirective * 10;
++
++    this.el.nativeElement.innerHTML = `${this.libDirPropDirective} multiplied by 10 is <br> = ${this.result}`;
++  }
++}
+diff --git a/projects/shared/src/lib/dir-prop.directive/index.ts b/projects/shared/src/lib/dir-prop.directive/index.ts
+new file mode 100644
+index 0000000..8d2a9b8
+--- /dev/null
++++ b/projects/shared/src/lib/dir-prop.directive/index.ts
+@@ -0,0 +1 @@
++export * from './dir-prop.directive';
+diff --git a/projects/shared/src/lib/multiply-by-ten/index.ts b/projects/shared/src/lib/multiply-by-ten/index.ts
+deleted file mode 100644
+index 72e7240..0000000
+--- a/projects/shared/src/lib/multiply-by-ten/index.ts
++++ /dev/null
+@@ -1 +0,0 @@
+-export * from './multiply-by-ten.directive';
+diff --git a/projects/shared/src/lib/multiply-by-ten/multiply-by-ten.directive.spec.ts b/projects/shared/src/lib/multiply-by-ten/multiply-by-ten.directive.spec.ts
+deleted file mode 100644
+index f2e9bfb..0000000
+--- a/projects/shared/src/lib/multiply-by-ten/multiply-by-ten.directive.spec.ts
++++ /dev/null
+@@ -1,8 +0,0 @@
+-import { MultiplyByTenDirective } from './multiply-by-ten.directive';
+-
+-describe('MultiplyByTenDirective', () => {
+-  it('should create an instance', () => {
+-    const directive = new MultiplyByTenDirective();
+-    expect(directive).toBeTruthy();
+-  });
+-});
+diff --git a/projects/shared/src/lib/multiply-by-ten/multiply-by-ten.directive.ts b/projects/shared/src/lib/multiply-by-ten/multiply-by-ten.directive.ts
+deleted file mode 100644
+index 4cec28e..0000000
+--- a/projects/shared/src/lib/multiply-by-ten/multiply-by-ten.directive.ts
++++ /dev/null
+@@ -1,24 +0,0 @@
+-import {
+-  Directive,
+-  ElementRef,
+-  HostBinding,
+-  Input,
+-  OnInit,
+-} from '@angular/core';
+-
+-@Directive({
+-  selector: '[libMultiplyByTen]',
+-})
+-export class MultiplyByTenDirective implements OnInit {
+-  @Input() libMultiplyByTen: number = 0;
+-  @HostBinding()
+-  result = 0;
+-
+-  constructor(private el: ElementRef) {}
+-
+-  ngOnInit(): void {
+-    this.result = this.libMultiplyByTen * 10;
+-
+-    this.el.nativeElement.innerHTML = `${this.libMultiplyByTen} multiplied by 10 is <br> = ${this.result}`;
+-  }
+-}
+diff --git a/projects/shared/src/lib/multiply-by-twenty/multiply-by-twenty.directive.spec.ts b/projects/shared/src/lib/multiply-by-twenty/multiply-by-twenty.directive.spec.ts
+deleted file mode 100644
+index 429df7f..0000000
+--- a/projects/shared/src/lib/multiply-by-twenty/multiply-by-twenty.directive.spec.ts
++++ /dev/null
+@@ -1,8 +0,0 @@
+-import { MultiplyByTwentyDirective } from './multiply-by-twenty.directive';
+-
+-describe('MultiplyByTwentyDirective', () => {
+-  it('should create an instance', () => {
+-    const directive = new MultiplyByTwentyDirective();
+-    expect(directive).toBeTruthy();
+-  });
+-});
+diff --git a/projects/shared/src/lib/shared.module.ts b/projects/shared/src/lib/shared.module.ts
+index ca2efdc..375f489 100644
+--- a/projects/shared/src/lib/shared.module.ts
++++ b/projects/shared/src/lib/shared.module.ts
+@@ -1,15 +1,15 @@
+ import { NgModule } from '@angular/core';
+ import { SharedComponent } from './shared.component';
+-import { MultiplyByTenDirective } from './multiply-by-ten';
+-import { MultiplyByTwentyDirective } from './multiply-by-twenty/multiply-by-twenty.directive';
++import { DirPropDirective } from './dir-prop.directive';
++import { DirIdentifierDirective } from './dir-identifier.directive/dir-identifier.directive';
+ 
+ @NgModule({
+   declarations: [
+     SharedComponent,
+-    MultiplyByTenDirective,
+-    MultiplyByTwentyDirective,
++    DirPropDirective,
++    DirIdentifierDirective,
+   ],
+   imports: [],
+-  exports: [SharedComponent, MultiplyByTenDirective, MultiplyByTwentyDirective],
++  exports: [SharedComponent, DirPropDirective, DirIdentifierDirective],
+ })
+ export class SharedModule {}
+diff --git a/src/app/app-routing.module.ts b/src/app/app-routing.module.ts
+index a81169d..a1a3ea3 100644
+--- a/src/app/app-routing.module.ts
++++ b/src/app/app-routing.module.ts
+@@ -5,7 +5,7 @@ const routes: Routes = [
+   {
+     path: 'products',
+     loadChildren: () =>
+-      import('./products/products.module').then((m) => m.ProductsModule),
++      import('./tom-test.component/tom-test.module').then((m) => m.TomTestModule),
+   },
+ ];
+ 
+diff --git a/src/app/products/product.pipe.spec.ts b/src/app/products/product.pipe.spec.ts
+deleted file mode 100644
+index 98309a8..0000000
+--- a/src/app/products/product.pipe.spec.ts
++++ /dev/null
+@@ -1,8 +0,0 @@
+-import { ProductPipe } from './product.pipe';
+-
+-describe('ProductPipe', () => {
+-  it('create an instance', () => {
+-    const pipe = new ProductPipe();
+-    expect(pipe).toBeTruthy();
+-  });
+-});
+diff --git a/src/app/products/products.component.html b/src/app/products/products.component.html
+deleted file mode 100644
+index d43afff..0000000
+--- a/src/app/products/products.component.html
++++ /dev/null
+@@ -1,7 +0,0 @@
+-<p>products works!</p>
+-
+-<p [libMultiplyByTen]="99"></p>
+-
+-<p [libMultiplyByTwenty]="99"></p>
+-
+-<p>product: {{ 99 | product }}</p>
+diff --git a/src/app/products/products.component.ts b/src/app/products/products.component.ts
+deleted file mode 100644
+index b42ad70..0000000
+--- a/src/app/products/products.component.ts
++++ /dev/null
+@@ -1,15 +0,0 @@
+-import { Component, OnInit } from '@angular/core';
+-
+-@Component({
+-  selector: 'app-products',
+-  templateUrl: './products.component.html',
+-  styleUrls: ['./products.component.scss']
+-})
+-export class ProductsComponent implements OnInit {
+-
+-  constructor() { }
+-
+-  ngOnInit(): void {
+-  }
+-
+-}
+diff --git a/src/app/tom-test.component/formatter.spec.ts b/src/app/tom-test.component/formatter.spec.ts
+new file mode 100644
+index 0000000..8fa674c
+--- /dev/null
++++ b/src/app/tom-test.component/formatter.spec.ts
+@@ -0,0 +1,8 @@
++import { FormatterPipe } from './formatter';
++
++describe('FormatterPipe', () => {
++  it('create an instance', () => {
++    const pipe = new FormatterPipe();
++    expect(pipe).toBeTruthy();
++  });
++});
+diff --git a/src/app/products/product.pipe.ts b/src/app/tom-test.component/formatter.ts
+similarity index 66%
+rename from src/app/products/product.pipe.ts
+rename to src/app/tom-test.component/formatter.ts
+index 03aadfa..eedf0c3 100644
+--- a/src/app/products/product.pipe.ts
++++ b/src/app/tom-test.component/formatter.ts
+@@ -1,9 +1,9 @@
+ import { Pipe, PipeTransform } from '@angular/core';
+ 
+ @Pipe({
+-  name: 'product'
++  name: 'formatter'
+ })
+-export class ProductPipe implements PipeTransform {
++export class FormatterPipe implements PipeTransform {
+ 
+   transform(value: unknown, ...args: unknown[]): unknown {
+     return null;
+diff --git a/src/app/products/products-routing.module.ts b/src/app/tom-test.component/products-routing.module.ts
+similarity index 63%
+rename from src/app/products/products-routing.module.ts
+rename to src/app/tom-test.component/products-routing.module.ts
+index 72d8bd3..0bd5c33 100644
+--- a/src/app/products/products-routing.module.ts
++++ b/src/app/tom-test.component/products-routing.module.ts
+@@ -1,8 +1,8 @@
+ import { NgModule } from '@angular/core';
+ import { RouterModule, Routes } from '@angular/router';
+-import { ProductsComponent } from './products.component';
++import { TomTestComponent } from './tom-test.component';
+ 
+-const routes: Routes = [{ path: '', component: ProductsComponent }];
++const routes: Routes = [{ path: '', component: TomTestComponent }];
+ 
+ @NgModule({
+   imports: [RouterModule.forChild(routes)],
+diff --git a/src/app/tom-test.component/tom-test.component.html b/src/app/tom-test.component/tom-test.component.html
+new file mode 100644
+index 0000000..7b05d9a
+--- /dev/null
++++ b/src/app/tom-test.component/tom-test.component.html
+@@ -0,0 +1,7 @@
++<p>products works!</p>
++
++<p [libDirPropDirective]="99"></p>
++
++<p [libDirIdentifierDirective]="99"></p>
++
++<p>product: {{ 99 | formatter }}</p>
+diff --git a/src/app/products/products.component.scss b/src/app/tom-test.component/tom-test.component.scss
+similarity index 100%
+rename from src/app/products/products.component.scss
+rename to src/app/tom-test.component/tom-test.component.scss
+diff --git a/src/app/products/products.component.spec.ts b/src/app/tom-test.component/tom-test.component.spec.ts
+similarity index 53%
+rename from src/app/products/products.component.spec.ts
+rename to src/app/tom-test.component/tom-test.component.spec.ts
+index 8a96dbf..311f201 100644
+--- a/src/app/products/products.component.spec.ts
++++ b/src/app/tom-test.component/tom-test.component.spec.ts
+@@ -1,19 +1,19 @@
+ import { ComponentFixture, TestBed } from '@angular/core/testing';
+ 
+-import { ProductsComponent } from './products.component';
++import { TomTestComponent } from './tom-test.component';
+ 
+-describe('notChangeProductsComponent ProductsComponent', () => {
+-  let component: ProductsComponent;
+-  let fixture: ComponentFixture<ProductsComponent>;
++describe('notChangeProductsComponent TomTestComponent', () => {
++  let component: TomTestComponent;
++  let fixture: ComponentFixture<TomTestComponent>;
+ 
+   beforeEach(async () => {
+     await TestBed.configureTestingModule({
+-      declarations: [ProductsComponent],
++      declarations: [TomTestComponent],
+     }).compileComponents();
+   });
+ 
+   beforeEach(() => {
+-    fixture = TestBed.createComponent(ProductsComponent);
++    fixture = TestBed.createComponent(TomTestComponent);
+     component = fixture.componentInstance;
+     fixture.detectChanges();
+   });
+diff --git a/src/app/tom-test.component/tom-test.component.ts b/src/app/tom-test.component/tom-test.component.ts
+new file mode 100644
+index 0000000..5ca9532
+--- /dev/null
++++ b/src/app/tom-test.component/tom-test.component.ts
+@@ -0,0 +1,15 @@
++import { Component, OnInit } from '@angular/core';
++
++@Component({
++  selector: 'app-tom-test.component',
++  templateUrl: './tom-test.component.html',
++  styleUrls: ['./tom-test.component.scss']
++})
++export class TomTestComponent implements OnInit {
++
++  constructor() { }
++
++  ngOnInit(): void {
++  }
++
++}
+diff --git a/src/app/products/products.module.ts b/src/app/tom-test.component/tom-test.module.ts
+similarity index 60%
+rename from src/app/products/products.module.ts
+rename to src/app/tom-test.component/tom-test.module.ts
+index ee94bd8..3a17f60 100644
+--- a/src/app/products/products.module.ts
++++ b/src/app/tom-test.component/tom-test.module.ts
+@@ -2,12 +2,12 @@ import { NgModule } from '@angular/core';
+ import { CommonModule } from '@angular/common';
+ 
+ import { ProductsRoutingModule } from './products-routing.module';
+-import { ProductsComponent } from './products.component';
++import { TomTestComponent } from './tom-test.component';
+ import { SharedModule } from '@shared';
+-import { ProductPipe } from './product.pipe';
++import { FormatterPipe } from './formatter';
+ 
+ @NgModule({
+-  declarations: [ProductsComponent, ProductPipe],
++  declarations: [TomTestComponent, FormatterPipe],
+   imports: [CommonModule, ProductsRoutingModule, SharedModule],
+ })
+-export class ProductsModule {}
++export class TomTestModule {}

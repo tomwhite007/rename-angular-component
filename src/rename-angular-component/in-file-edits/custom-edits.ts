@@ -1,33 +1,43 @@
-import * as ts from 'typescript';
-import { classify } from '../../angular-cli/strings';
+import ts from 'typescript';
+import { camelize, classify } from '../../angular-cli/strings';
 import {
-  GenericEditsCallback,
   GenericEdit,
+  GenericEditsCallback,
 } from '../../move-ts-indexer/apply-generic-edits';
+import {
+  FoundItem,
+  FoundItemType,
+} from '../../move-ts-indexer/util/shared-interfaces';
 import { escapeRegex } from '../../utils/escape-regex';
-import { AngularConstruct } from '../definitions/file.interfaces';
+import { AngularConstructOrPlainFile } from '../definitions/file.interfaces';
+import { isFollowingAngular20FolderAndSelectorNamingConvention } from '../definitions/is-following-angular20-folder-naming-convention';
 import { generateNewSelector } from './generate-new-selector.function';
 import { getSelectorType } from './get-selector-type.function';
 import { stripSelectorBraces } from './strip-selector-braces.function';
-import { FoundItem } from '../../move-ts-indexer/util/shared-interfaces';
 
 type StringLiteralAttributesInScope = 'selector' | 'templateUrl' | 'styleUrl';
 
 export class SelectorTransfer {
   oldSelector?: string;
   newSelector?: string;
+  generatedSelectorIsSameAsOld?: boolean;
 }
 
-export function getCoreClassEdits(
+export function getAngularCoreClassEdits(
   originalClassName: string,
   newClassName: string,
   originalFileStub: string,
+  originalFileWithoutType: string,
   newFileStub: string,
-  construct: AngularConstruct,
+  newFilenameInput: string,
+  construct: AngularConstructOrPlainFile | null,
   selectorTransfer: SelectorTransfer,
   debugLogToFile?: (...args: string[]) => void
 ): GenericEditsCallback {
   return (fileName: string, sourceText: string) => {
+    if (!construct) {
+      return [];
+    }
     const foundItems = getCoreClassFoundItems(
       fileName,
       sourceText,
@@ -49,12 +59,28 @@ export function getCoreClassEdits(
             break;
           case 'selector':
             selectorTransfer.oldSelector = foundItem.itemText;
+            const newSelectorText =
+              isFollowingAngular20FolderAndSelectorNamingConvention()
+                ? newFilenameInput
+                : newFileStub;
+
             selectorTransfer.newSelector = generateNewSelector(
               foundItem.itemText,
               originalFileStub,
-              newFileStub
+              originalFileWithoutType,
+              newSelectorText
             );
+
             replacement = `'${selectorTransfer.newSelector}'`;
+            break;
+          case 'name':
+            if (construct === 'pipe') {
+              selectorTransfer.oldSelector = foundItem.itemText;
+              selectorTransfer.newSelector = camelize(
+                newFileStub.replace(/\-pipe$/, '')
+              );
+              replacement = `'${selectorTransfer.newSelector}'`;
+            }
             break;
           case 'templateUrl':
           case 'styleUrl':
@@ -63,9 +89,9 @@ export function getCoreClassEdits(
               new RegExp(
                 `(?<=\\/|^)${escapeRegex(
                   originalFileStub
-                )}(?=.${construct}.(html|scss|css|sass|less)$)`
+                )}(\\.\\S+)?(?=\\.(html|scss|css|sass|less)$)`
               ),
-              newFileStub
+              newFilenameInput
             )}'`;
             break;
           case 'attributeInput':
@@ -81,6 +107,12 @@ export function getCoreClassEdits(
             }
             break;
         }
+
+        selectorTransfer.generatedSelectorIsSameAsOld =
+          !!selectorTransfer.oldSelector &&
+          !!selectorTransfer.newSelector &&
+          selectorTransfer.oldSelector === selectorTransfer.newSelector &&
+          originalFileStub === newFileStub;
 
         if (replacement === foundItem.itemText || !replacement) {
           return null;
@@ -105,7 +137,7 @@ function getCoreClassFoundItems(
   sourceText: string,
   originalClassName: string,
   newClassName: string,
-  construct: AngularConstruct
+  construct: AngularConstructOrPlainFile | null
 ): FoundItem[] {
   const file = ts.createSourceFile(
     fileName,
@@ -134,14 +166,15 @@ function getCoreClassFoundItems(
         node.name?.escapedText === originalClassName ||
         classNameChangedAlready
       ) {
-        const decoratorPropertiesRequired = [
+        const decoratorPropertiesRequired: FoundItem['itemType'][] = [
           'selector',
           'templateUrl',
           'styleUrl',
           'styleUrls',
+          'name',
         ];
 
-        const decoratorName = classify(construct);
+        const decoratorName = classify(construct ?? '');
 
         // get decorator props for decoratorName
         node.modifiers?.find((decorator) => {
@@ -159,7 +192,9 @@ function getCoreClassFoundItems(
                 if (
                   ts.isPropertyAssignment(prop) &&
                   ts.isIdentifier(prop.name) &&
-                  decoratorPropertiesRequired.includes(prop.name.text)
+                  decoratorPropertiesRequired.includes(
+                    prop.name.text as FoundItemType
+                  )
                 ) {
                   // 'selector', 'templateUrl' and 'styleUrl' are StringLiteral
                   if (ts.isStringLiteral(prop.initializer)) {

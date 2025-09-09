@@ -1,0 +1,54 @@
+diff --git a/projects/my-service-lib/src/lib/my-service-lib.service.spec.ts b/projects/my-service-lib/src/lib/tom-test.service.spec.ts
+similarity index 50%
+rename from projects/my-service-lib/src/lib/my-service-lib.service.spec.ts
+rename to projects/my-service-lib/src/lib/tom-test.service.spec.ts
+index d4d84af..fa081b9 100644
+--- a/projects/my-service-lib/src/lib/my-service-lib.service.spec.ts
++++ b/projects/my-service-lib/src/lib/tom-test.service.spec.ts
+@@ -1,13 +1,13 @@
+ import { TestBed } from '@angular/core/testing';
+ 
+-import { MyServiceLibService } from './my-service-lib.service';
++import { TomTestService } from './tom-test.service';
+ 
+-describe('MyServiceLibService', () => {
+-  let service: MyServiceLibService;
++describe('TomTestService', () => {
++  let service: TomTestService;
+ 
+   beforeEach(() => {
+     TestBed.configureTestingModule({});
+-    service = TestBed.inject(MyServiceLibService);
++    service = TestBed.inject(TomTestService);
+   });
+ 
+   it('should be created', () => {
+diff --git a/projects/my-service-lib/src/lib/my-service-lib.service.ts b/projects/my-service-lib/src/lib/tom-test.service.ts
+similarity index 75%
+rename from projects/my-service-lib/src/lib/my-service-lib.service.ts
+rename to projects/my-service-lib/src/lib/tom-test.service.ts
+index acc0b95..39bd8fb 100644
+--- a/projects/my-service-lib/src/lib/my-service-lib.service.ts
++++ b/projects/my-service-lib/src/lib/tom-test.service.ts
+@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
+ @Injectable({
+   providedIn: 'root'
+ })
+-export class MyServiceLibService {
++export class TomTestService {
+ 
+   constructor() { }
+ }
+diff --git a/projects/my-service-lib/src/public-api.ts b/projects/my-service-lib/src/public-api.ts
+index 971b69b..87f9b41 100644
+--- a/projects/my-service-lib/src/public-api.ts
++++ b/projects/my-service-lib/src/public-api.ts
+@@ -2,7 +2,7 @@
+  * Public API Surface of my-service-lib
+  */
+ 
+-export * from './lib/my-service-lib.service';
++export * from './lib/tom-test.service';
+ export * from './lib/my-service-lib.component';
+ export * from './lib/my-service-lib.module';
+ export * from './lib/services/my-test-lib.service';

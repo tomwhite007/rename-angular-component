@@ -1,9 +1,9 @@
 {
   "name": "rename-angular-component",
   "displayName": "Rename Angular Component",
-  "description": "Rename Angular Components, Directives and Services",
+  "description": "Rename Angular Components, Directives, Pipes and Services",
   "publisher": "tomwhite007",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -16,7 +16,7 @@
     "theme": "dark"
   },
   "engines": {
-    "vscode": "^1.85.0"
+    "vscode": "^1.99.0"
   },
   "categories": [
     "Other"
@@ -37,6 +37,9 @@
     "workspace"
   ],
   "main": "./dist/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "contributes": {
     "commands": [
       {
@@ -58,33 +61,60 @@
       {
         "command": "rename-angular-component.renameModule",
         "title": "Rename Angular Module"
+      },
+      {
+        "command": "rename-angular-component.renameFile",
+        "title": "Rename Angular file"
+      },
+      {
+        "command": "rename-angular-component.showWhatsNew",
+        "title": "Rename Angular Component: Show the current What's New screen"
+      },
+      {
+        "command": "rename-angular-component.disableWhatsNew",
+        "title": "Rename Angular Component: Disable What's New popup"
+      },
+      {
+        "command": "rename-angular-component.resetWhatsNew",
+        "title": "Rename Angular Component: Show What's New screen on startup (reset)"
       }
     ],
     "menus": {
+      "commandPalette": [
+        {
+          "command": "rename-angular-component.showWhatsNew",
+          "when": "true"
+        }
+      ],
       "explorer/context": [
         {
-          "when": "resourceFilename =~ /^.+\\.component\\.(spec.ts|scss|css|sass|less|html|ts)$/",
+          "when": "renameAngularComponent.isAngularProject && resourceFilename =~ /^.+\\.component\\.(spec.ts|scss|css|sass|less|html|ts)$/",
           "command": "rename-angular-component.renameComponent",
           "group": "navigation"
         },
         {
-          "when": "resourceFilename =~ /^.+\\.directive\\.(spec.ts|ts)$/",
+          "when": "renameAngularComponent.isAngularProject && resourceFilename =~ /^.+\\.directive\\.(spec.ts|ts)$/",
           "command": "rename-angular-component.renameDirective",
           "group": "navigation"
         },
         {
-          "when": "resourceFilename =~ /^.+\\.service\\.(spec.ts|ts)$/",
+          "when": "renameAngularComponent.isAngularProject && resourceFilename =~ /^.+\\.service\\.(spec.ts|ts)$/",
           "command": "rename-angular-component.renameService",
           "group": "navigation"
         },
         {
-          "when": "resourceFilename =~ /^.+\\.guard\\.(spec.ts|ts)$/",
+          "when": "renameAngularComponent.isAngularProject && resourceFilename =~ /^.+\\.guard\\.(spec.ts|ts)$/",
           "command": "rename-angular-component.renameGuard",
           "group": "navigation"
         },
         {
-          "when": "resourceFilename =~ /^.+\\.module\\.(spec.ts|ts)$/",
+          "when": "renameAngularComponent.isAngularProject && resourceFilename =~ /^.+\\.module\\.(spec.ts|ts)$/",
           "command": "rename-angular-component.renameModule",
+          "group": "navigation"
+        },
+        {
+          "when": "renameAngularComponent.isAngularProject && resourceFilename =~ /^((?!\\.component\\.|\\.directive\\.|\\.service\\.|\\.guard\\.|\\.module\\.).)+\\.(spec\\.ts|scss|css|sass|less|html|ts)$/",
+          "command": "rename-angular-component.renameFile",
           "group": "navigation"
         }
       ]
@@ -102,45 +132,67 @@
           "type": "boolean",
           "default": true,
           "description": "Update imports/exports with direct local paths even if wildcard path exists"
+        },
+        "renameAngularComponent.followAngular20FolderAndSelectorNamingConvention": {
+          "type": "boolean",
+          "default": false,
+          "description": "Since Angular 20.x, CLI generated folder names include any dot-suffix in the folder name, and the selector - which breaks the build. \re.g. `my-component.component.ts` will be in a folder called `my-component.component/`. \rSet this to false to generate the folder name, and selector without the dot-suffix."
+        },
+        "renameAngularComponent.projectUsesStandaloneComponentsOnly": {
+          "type": "boolean",
+          "default": true,
+          "description": "Untick this if your project uses modules. Then all selectors will be updated in templates, instead of just the Components that import the renamed Component."
+        },
+        "renameAngularComponent.showWhatsNewPopup": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the 'What's New' screen when the extension is updated to a new version."
         }
       }
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run package",
-    "compile": "webpack",
-    "watch": "webpack --watch",
-    "package": "webpack --mode production --devtool hidden-source-map",
+    "vscode:prepublish": "yarn run package",
+    "compile": "yarn run check-types && yarn run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "yarn run check-types && yarn run lint && node esbuild.js --production",
+    "generate-vsix": "vsce package --out release/",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
-    "pretest": "npm run compile-tests && npm run compile && npm run lint",
-    "lint": "eslint src --ext ts",
-    "test": "vscode-test",
-    "build": "mkdir -p build && vsce package --out build/"
+    "pretest": "yarn run compile-tests && yarn run compile && yarn run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vscode-test --config=unit-tests.vscode-test.mjs",
+    "test-watch": "vscode-test --config=unit-tests.vscode-test.mjs --watch"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.42",
+    "@types/chai": "^5.2.1",
     "@types/fs-extra-promise": "^1.0.13",
     "@types/minimatch": "^5.1.2",
     "@types/mocha": "^10.0.6",
-    "@types/node": "18.x",
-    "@types/vscode": "^1.85.0",
-    "@typescript-eslint/eslint-plugin": "^6.15.0",
-    "@typescript-eslint/parser": "^6.15.0",
-    "@vscode/test-cli": "^0.0.4",
-    "@vscode/test-electron": "^2.3.8",
-    "eslint": "^8.56.0",
-    "glob": "^10.3.10",
+    "@types/node": "20.x",
+    "@types/sinon": "^17.0.4",
+    "@types/vscode": "^1.99.0",
+    "@typescript-eslint/eslint-plugin": "^8.28.0",
+    "@typescript-eslint/parser": "^8.28.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1",
+    "chai": "5.2.0",
+    "esbuild": "^0.25.1",
+    "eslint": "^9.23.0",
+    "glob": "^11.0.2",
     "mocha": "^10.2.0",
-    "simple-git": "^3.22.0",
-    "ts-loader": "^9.5.1",
-    "typescript": "^5.3.3",
-    "webpack": "^5.89.0",
-    "webpack-cli": "^5.1.4"
+    "npm-run-all": "^4.1.5",
+    "simple-git": "^3.27.0",
+    "sinon": "^20.0.0",
+    "typescript": "^5.8.2"
   },
   "dependencies": {
     "bluebird": "^3.7.2",
     "fs-extra-promise": "^1.0.1",
-    "replace-in-file": "^7.1.0"
+    "replace-in-file": "^8.3.0"
   }
 }

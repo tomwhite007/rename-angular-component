@@ -66,6 +66,8 @@ This extension contributes the following settings:
 
 1. [Extension does not support WSL](https://github.com/tomwhite007/rename-angular-component/issues/28)
 2. [Does not work in a VS Code devcontainer](https://github.com/tomwhite007/rename-angular-component/issues/52)
+3. [Rename project root, app component can break app.routes](https://github.com/tomwhite007/rename-angular-component/issues/57)
+4. [Modules and pipes should remove -module or -pipe postfix from folder if entered by user](https://github.com/tomwhite007/rename-angular-component/issues/58). This new feature is coming next.
 
 ## Support
 

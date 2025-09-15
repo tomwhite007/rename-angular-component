@@ -77,6 +77,10 @@
       {
         "command": "rename-angular-component.resetWhatsNew",
         "title": "Rename Angular Component: Show What's New screen on startup (reset)"
+      },
+      {
+        "command": "rename-angular-component.renameAllSuffixes",
+        "title": "Rename all Angular suffixes to v20 styleguide"
       }
     ],
     "menus": {
@@ -84,6 +88,10 @@
         {
           "command": "rename-angular-component.showWhatsNew",
           "when": "true"
+        },
+        {
+          "command": "rename-angular-component.renameAllSuffixes",
+          "when": "renameAngularComponent.isAngularProject"
         }
       ],
       "explorer/context": [
@@ -165,7 +173,8 @@
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
     "test": "vscode-test --config=unit-tests.vscode-test.mjs",
-    "test-watch": "vscode-test --config=unit-tests.vscode-test.mjs --watch"
+    "test-watch": "vscode-test --config=unit-tests.vscode-test.mjs --watch",
+    "update-suffix-tools": "cp -r /Users/tom/Development/vscode-ext/_rename-test-spas/test-rename-spa/tools src/rename-angular-component/suffix-removal/"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.42",

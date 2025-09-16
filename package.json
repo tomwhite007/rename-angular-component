@@ -173,8 +173,7 @@
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
     "test": "vscode-test --config=unit-tests.vscode-test.mjs",
-    "test-watch": "vscode-test --config=unit-tests.vscode-test.mjs --watch",
-    "update-suffix-tools": "cp -r /Users/tom/Development/vscode-ext/_rename-test-spas/test-rename-spa/tools src/rename-angular-component/suffix-removal/"
+    "test-watch": "vscode-test --config=unit-tests.vscode-test.mjs --watch"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.42",

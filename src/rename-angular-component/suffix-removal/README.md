@@ -31,16 +31,6 @@ The script supports removing various Angular suffixes:
 - `resolver` - Removes `.resolver` from files (converts to `-resolver`)
 - `class`, `enum`, `interface` - File-only renames (no class name changes)
 
-## Updating the Tools
-
-To update the suffix removal tools from the external source:
-
-```bash
-yarn update-suffix-tools
-```
-
-This copies the latest version of the tools from `/Users/tom/Development/vscode-ext/_rename-test-spas/test-rename-spa/tools/`.
-
 ## Example
 
 For a file `app.component.ts` with class `AppComponent`:

@@ -1,6 +1,5 @@
-import { spawn } from 'child_process';
-import * as path from 'path';
 import * as vscode from 'vscode';
+import AngularFileRenamer from './tools/rename-angular-files';
 
 /**
  * Handler for the suffix removal command
@@ -64,7 +63,7 @@ export class SuffixRemovalHandler {
           cancellable: false,
         },
         async (progress) => {
-          return this.runScript(
+          return this.runRenamer(
             workspaceFolder.uri.fsPath,
             suffix,
             dryRunChoice.value,
@@ -79,86 +78,97 @@ export class SuffixRemovalHandler {
   }
 
   /**
-   * Run the suffix removal script
+   * Run the suffix removal using the AngularFileRenamer class directly
    */
-  private async runScript(
+  private async runRenamer(
     workspacePath: string,
     suffix: string,
     dryRun: boolean,
     progress: vscode.Progress<{ message?: string; increment?: number }>
   ): Promise<void> {
-    return new Promise((resolve, reject) => {
-      // Path to the script
-      const scriptPath = path.join(
-        __dirname,
-        'tools',
-        'dist',
-        'rename-angular-files.js'
-      );
-
-      // Build command arguments
-      const args = [suffix];
-      if (dryRun) {
-        args.push('--dry-run');
-      }
-
+    try {
       progress.report({
-        message: `Running suffix removal script for "${suffix}"...`,
+        message: `Running suffix removal for "${suffix}"...`,
       });
 
       this.debugLogger.logToConsole(
-        `Running script: node ${scriptPath} ${args.join(' ')}`
+        `Running suffix removal: ${suffix} (dryRun: ${dryRun})`
       );
 
-      // Spawn the Node.js process
-      const child = spawn('node', [scriptPath, ...args], {
-        cwd: workspacePath,
-        stdio: ['pipe', 'pipe', 'pipe'],
-      });
+      // Change to the workspace directory
+      const originalCwd = process.cwd();
+      process.chdir(workspacePath);
+
+      // Create an instance of the AngularFileRenamer
+      const renamer = new AngularFileRenamer(suffix, dryRun);
+
+      // Capture console output
+      const originalLog = console.log;
+      const originalError = console.error;
+      const originalWarn = console.warn;
 
       let output = '';
-      let errorOutput = '';
 
-      child.stdout.on('data', (data) => {
-        const message = data.toString();
-        output += message;
-        this.debugLogger.logToConsole(`Script output: ${message}`);
-      });
+      // Override console methods to capture output
+      console.log = (...args) => {
+        const message = args.join(' ');
+        output += message + '\n';
+        originalLog(...args);
+        this.debugLogger.logToConsole(`Renamer output: ${message}`);
+      };
 
-      child.stderr.on('data', (data) => {
-        const message = data.toString();
-        errorOutput += message;
-        this.debugLogger.logToConsole(`Script error: ${message}`);
-      });
+      console.error = (...args) => {
+        const message = args.join(' ');
+        output += message + '\n';
+        originalError(...args);
+        this.debugLogger.logToConsole(`Renamer error: ${message}`);
+      };
 
-      child.on('close', (code) => {
-        if (code === 0) {
-          // Show success message with output
-          const message = dryRun
-            ? `Dry run completed for suffix "${suffix}". Check the output panel for details.`
-            : `Successfully renamed files with suffix "${suffix}". Check the output panel for details.`;
+      console.warn = (...args) => {
+        const message = args.join(' ');
+        output += message + '\n';
+        originalWarn(...args);
+        this.debugLogger.logToConsole(`Renamer warning: ${message}`);
+      };
 
-          vscode.window.showInformationMessage(message);
+      try {
+        // Execute the renamer
+        await renamer.execute();
 
-          // Show output in a new document
-          this.showOutput(output, suffix, dryRun);
+        // Restore original console methods
+        console.log = originalLog;
+        console.error = originalError;
+        console.warn = originalWarn;
 
-          resolve();
-        } else {
-          const errorMessage = `Script failed with exit code ${code}. Error: ${errorOutput}`;
-          this.debugLogger.logToConsole(errorMessage);
-          vscode.window.showErrorMessage(errorMessage);
-          reject(new Error(errorMessage));
-        }
-      });
+        // Restore original working directory
+        process.chdir(originalCwd);
 
-      child.on('error', (error) => {
-        const errorMessage = `Failed to start script: ${error.message}`;
-        this.debugLogger.logToConsole(errorMessage);
-        vscode.window.showErrorMessage(errorMessage);
-        reject(error);
-      });
-    });
+        // Show success message
+        const message = dryRun
+          ? `Dry run completed for suffix "${suffix}". Check the output panel for details.`
+          : `Successfully renamed files with suffix "${suffix}". Check the output panel for details.`;
+
+        vscode.window.showInformationMessage(message);
+
+        // Show output in a new document
+        this.showOutput(output, suffix, dryRun);
+      } catch (error) {
+        // Restore original console methods
+        console.log = originalLog;
+        console.error = originalError;
+        console.warn = originalWarn;
+
+        // Restore original working directory
+        process.chdir(originalCwd);
+
+        throw error;
+      }
+    } catch (error) {
+      const errorMessage = `Suffix removal failed: ${error}`;
+      this.debugLogger.logToConsole(errorMessage);
+      vscode.window.showErrorMessage(errorMessage);
+      throw error;
+    }
   }
 
   /**

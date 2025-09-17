@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
-import AngularFileRenamer from './tools/rename-angular-files';
+import AngularFileRenamer, {
+  renameAllAngularFiles,
+} from './tools/rename-angular-files';
 
 /**
  * Handler for the suffix removal command
@@ -22,11 +24,14 @@ export class SuffixRemovalHandler {
       // Show input box to get the suffix to remove
       const suffix = await vscode.window.showInputBox({
         prompt:
-          'Enter the suffix to remove (e.g., component, service, directive)',
-        placeHolder: 'component',
+          'Enter the suffix to remove (e.g., component, service, directive) or enter all',
+        placeHolder: 'all',
         validateInput: (value) => {
           if (!value || value.trim().length === 0) {
             return 'Please enter a suffix to remove';
+          }
+          if (value.toLowerCase() === 'all') {
+            return null; // 'all' is valid
           }
           if (!/^[a-zA-Z]+$/.test(value)) {
             return 'Suffix should only contain letters';
@@ -99,6 +104,12 @@ export class SuffixRemovalHandler {
       const originalCwd = process.cwd();
       process.chdir(workspacePath);
 
+      // Check if user wants to process all Angular file types
+      if (suffix.toLowerCase() === 'all') {
+        await this.runAllAngularFiles(dryRun, progress);
+        return;
+      }
+
       // Create an instance of the AngularFileRenamer
       const renamer = new AngularFileRenamer(suffix, dryRun);
 
@@ -165,6 +176,85 @@ export class SuffixRemovalHandler {
       }
     } catch (error) {
       const errorMessage = `Suffix removal failed: ${error}`;
+      this.debugLogger.logToConsole(errorMessage);
+      vscode.window.showErrorMessage(errorMessage);
+      throw error;
+    }
+  }
+
+  /**
+   * Run the rename operation for all Angular file types
+   */
+  private async runAllAngularFiles(
+    dryRun: boolean,
+    progress: vscode.Progress<{ message?: string; increment?: number }>
+  ): Promise<void> {
+    try {
+      progress.report({
+        message: 'Running comprehensive Angular file rename...',
+      });
+
+      this.debugLogger.logToConsole(
+        `Running comprehensive Angular file rename (dryRun: ${dryRun})`
+      );
+
+      // Capture console output
+      const originalLog = console.log;
+      const originalError = console.error;
+      const originalWarn = console.warn;
+
+      let output = '';
+
+      // Override console methods to capture output
+      console.log = (...args) => {
+        const message = args.join(' ');
+        output += message + '\n';
+        originalLog(...args);
+        this.debugLogger.logToConsole(`All files output: ${message}`);
+      };
+
+      console.error = (...args) => {
+        const message = args.join(' ');
+        output += message + '\n';
+        originalError(...args);
+        this.debugLogger.logToConsole(`All files error: ${message}`);
+      };
+
+      console.warn = (...args) => {
+        const message = args.join(' ');
+        output += message + '\n';
+        originalWarn(...args);
+        this.debugLogger.logToConsole(`All files warning: ${message}`);
+      };
+
+      try {
+        // Execute the comprehensive rename operation
+        await renameAllAngularFiles(dryRun);
+
+        // Restore original console methods
+        console.log = originalLog;
+        console.error = originalError;
+        console.warn = originalWarn;
+
+        // Show success message
+        const message = dryRun
+          ? `Dry run completed for all Angular file types. Check the output panel for details.`
+          : `Successfully renamed all Angular files. Check the output panel for details.`;
+
+        vscode.window.showInformationMessage(message);
+
+        // Show output in a new document
+        this.showOutput(output, 'all', dryRun);
+      } catch (error) {
+        // Restore original console methods
+        console.log = originalLog;
+        console.error = originalError;
+        console.warn = originalWarn;
+
+        throw error;
+      }
+    } catch (error) {
+      const errorMessage = `Comprehensive Angular file rename failed: ${error}`;
       this.debugLogger.logToConsole(errorMessage);
       vscode.window.showErrorMessage(errorMessage);
       throw error;

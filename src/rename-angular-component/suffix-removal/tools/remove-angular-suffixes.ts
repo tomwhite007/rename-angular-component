@@ -23,7 +23,7 @@ interface UserMessageInterface {
  * Example: npx ts-node rename-angular-files.ts service --dry-run
  */
 
-class AngularFileRenamer {
+class AngularFileSuffixRemover {
   private suffix: string;
   private dryRun: boolean;
   private projectRoot: string;
@@ -699,7 +699,7 @@ function logMessage(message: string, userMessage?: UserMessageInterface): void {
 /**
  * Wrapper function to rename all Angular file types
  */
-async function renameAllAngularFiles(
+async function removeAllAngularSuffixes(
   dryRun: boolean = false,
   userMessage?: UserMessageInterface
 ): Promise<void> {
@@ -736,7 +736,7 @@ async function renameAllAngularFiles(
     logMessage('='.repeat(50), userMessage);
 
     try {
-      const renamer = new AngularFileRenamer(type, dryRun, userMessage);
+      const renamer = new AngularFileSuffixRemover(type, dryRun, userMessage);
       await renamer.execute();
 
       // Count changes from the renamer's changes array
@@ -828,12 +828,12 @@ When using 'all', the script processes file types in this order:
   }
 
   if (suffix === 'all') {
-    renameAllAngularFiles(dryRun).catch((error) => {
+    removeAllAngularSuffixes(dryRun).catch((error) => {
       console.error('❌ Fatal error:', (error as Error).message);
       process.exit(1);
     });
   } else {
-    const renamer = new AngularFileRenamer(suffix, dryRun);
+    const renamer = new AngularFileSuffixRemover(suffix, dryRun);
     renamer.execute().catch((error) => {
       console.error('❌ Fatal error:', (error as Error).message);
       process.exit(1);
@@ -845,5 +845,5 @@ if (require.main === module) {
   main();
 }
 
-export default AngularFileRenamer;
-export { renameAllAngularFiles };
+export default AngularFileSuffixRemover;
+export { removeAllAngularSuffixes as renameAllAngularFiles };

@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import { UserMessage } from '../logging/user-message.class';
-import AngularFileRenamer, {
+import AngularFileSuffixRemover, {
   renameAllAngularFiles,
-} from './tools/rename-angular-files';
+} from './tools/remove-angular-suffixes';
 
 /**
  * Handler for the suffix removal command
@@ -112,7 +112,11 @@ export class SuffixRemovalHandler {
       }
 
       // Create an instance of the AngularFileRenamer
-      const renamer = new AngularFileRenamer(suffix, dryRun, this.userMessage);
+      const renamer = new AngularFileSuffixRemover(
+        suffix,
+        dryRun,
+        this.userMessage
+      );
 
       // Capture console output
       const originalLog = console.log;

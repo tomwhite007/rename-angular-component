@@ -111,50 +111,27 @@ export class SuffixRemovalHandler {
         return;
       }
 
-      // Create an instance of the AngularFileRenamer
+      // Create a custom user message interface that captures output
+      let output = '';
+      const capturingUserMessage = {
+        logInfoToChannel: (textLines: string[]) => {
+          // Log to the original user message
+          this.userMessage.logInfoToChannel(textLines);
+          // Also capture for the output document
+          output += textLines.join('\n') + '\n';
+        },
+      };
+
+      // Create an instance of the AngularFileRenamer with capturing user message
       const renamer = new AngularFileSuffixRemover(
         suffix,
         dryRun,
-        this.userMessage
+        capturingUserMessage
       );
-
-      // Capture console output
-      const originalLog = console.log;
-      const originalError = console.error;
-      const originalWarn = console.warn;
-
-      let output = '';
-
-      // Override console methods to capture output
-      console.log = (...args) => {
-        const message = args.join(' ');
-        output += message + '\n';
-        originalLog(...args);
-        this.userMessage.logInfoToChannel([`Renamer output: ${message}`]);
-      };
-
-      console.error = (...args) => {
-        const message = args.join(' ');
-        output += message + '\n';
-        originalError(...args);
-        this.userMessage.logInfoToChannel([`Renamer error: ${message}`]);
-      };
-
-      console.warn = (...args) => {
-        const message = args.join(' ');
-        output += message + '\n';
-        originalWarn(...args);
-        this.userMessage.logInfoToChannel([`Renamer warning: ${message}`]);
-      };
 
       try {
         // Execute the renamer
         await renamer.execute();
-
-        // Restore original console methods
-        console.log = originalLog;
-        console.error = originalError;
-        console.warn = originalWarn;
 
         // Restore original working directory
         process.chdir(originalCwd);
@@ -165,15 +142,7 @@ export class SuffixRemovalHandler {
           : `Successfully renamed files with suffix "${suffix}". Check the output panel for details.`;
 
         vscode.window.showInformationMessage(message);
-
-        // Show output in a new document
-        this.showOutput(output, suffix, dryRun);
       } catch (error) {
-        // Restore original console methods
-        console.log = originalLog;
-        console.error = originalError;
-        console.warn = originalWarn;
-
         // Restore original working directory
         process.chdir(originalCwd);
 
@@ -203,43 +172,9 @@ export class SuffixRemovalHandler {
         `Running comprehensive Angular file rename (dryRun: ${dryRun})`,
       ]);
 
-      // Capture console output
-      const originalLog = console.log;
-      const originalError = console.error;
-      const originalWarn = console.warn;
-
-      let output = '';
-
-      // Override console methods to capture output
-      console.log = (...args) => {
-        const message = args.join(' ');
-        output += message + '\n';
-        originalLog(...args);
-        this.userMessage.logInfoToChannel([`All files output: ${message}`]);
-      };
-
-      console.error = (...args) => {
-        const message = args.join(' ');
-        output += message + '\n';
-        originalError(...args);
-        this.userMessage.logInfoToChannel([`All files error: ${message}`]);
-      };
-
-      console.warn = (...args) => {
-        const message = args.join(' ');
-        output += message + '\n';
-        originalWarn(...args);
-        this.userMessage.logInfoToChannel([`All files warning: ${message}`]);
-      };
-
       try {
-        // Execute the comprehensive rename operation
+        // Execute the comprehensive rename operation with capturing user message
         await renameAllAngularFiles(dryRun, this.userMessage);
-
-        // Restore original console methods
-        console.log = originalLog;
-        console.error = originalError;
-        console.warn = originalWarn;
 
         // Show success message
         const message = dryRun
@@ -247,15 +182,7 @@ export class SuffixRemovalHandler {
           : `Successfully renamed all Angular files. Check the output panel for details.`;
 
         vscode.window.showInformationMessage(message);
-
-        // Show output in a new document
-        this.showOutput(output, 'all', dryRun);
       } catch (error) {
-        // Restore original console methods
-        console.log = originalLog;
-        console.error = originalError;
-        console.warn = originalWarn;
-
         throw error;
       }
     } catch (error) {
@@ -264,28 +191,5 @@ export class SuffixRemovalHandler {
       vscode.window.showErrorMessage(errorMessage);
       throw error;
     }
-  }
-
-  /**
-   * Show the script output in a new document
-   */
-  private async showOutput(
-    output: string,
-    suffix: string,
-    dryRun: boolean
-  ): Promise<void> {
-    const doc = await vscode.workspace.openTextDocument({
-      content: output,
-      language: 'plaintext',
-    });
-
-    const title = dryRun
-      ? `Suffix Removal Preview - ${suffix}`
-      : `Suffix Removal Results - ${suffix}`;
-
-    await vscode.window.showTextDocument(doc, {
-      preview: false,
-      viewColumn: vscode.ViewColumn.Beside,
-    });
   }
 }

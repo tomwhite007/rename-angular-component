@@ -22,28 +22,68 @@ export class SuffixRemovalHandler {
         return;
       }
 
-      // Show input box to get the suffix to remove
-      const suffix = await vscode.window.showInputBox({
-        prompt:
-          'Enter the suffix to remove (e.g., component, service, directive) or enter all',
-        placeHolder: 'all',
-        validateInput: (value) => {
-          if (!value || value.trim().length === 0) {
-            return 'Please enter a suffix to remove';
-          }
-          if (value.toLowerCase() === 'all') {
-            return null; // 'all' is valid
-          }
-          if (!/^[a-zA-Z]+$/.test(value)) {
-            return 'Suffix should only contain letters';
-          }
-          return null;
-        },
-      });
+      // Show dropdown to select the suffix to remove
+      const suffixChoice = await vscode.window.showQuickPick(
+        [
+          {
+            label: 'All Angular file types',
+            value: 'all',
+            description:
+              'Process all Angular file types (component, service, directive, pipe, guard, interceptor, resolver, module)',
+          },
+          {
+            label: 'Component',
+            value: 'component',
+            description: 'Remove .component suffix from files and class names',
+          },
+          {
+            label: 'Service',
+            value: 'service',
+            description: 'Remove .service suffix from files and class names',
+          },
+          {
+            label: 'Directive',
+            value: 'directive',
+            description: 'Remove .directive suffix from files and class names',
+          },
+          {
+            label: 'Pipe',
+            value: 'pipe',
+            description: 'Remove .pipe suffix from files and class names',
+          },
+          {
+            label: 'Guard',
+            value: 'guard',
+            description: 'Remove .guard suffix from files and class names',
+          },
+          {
+            label: 'Interceptor',
+            value: 'interceptor',
+            description:
+              'Remove .interceptor suffix from files and class names',
+          },
+          {
+            label: 'Resolver',
+            value: 'resolver',
+            description: 'Remove .resolver suffix from files and class names',
+          },
+          {
+            label: 'Module',
+            value: 'module',
+            description: 'Remove .module suffix from files and class names',
+          },
+        ],
+        {
+          placeHolder: 'Select the Angular file type to rename',
+          title: 'Angular Suffix Removal',
+        }
+      );
 
-      if (!suffix) {
+      if (!suffixChoice) {
         return; // User cancelled
       }
+
+      const suffix = suffixChoice.value;
 
       // Ask if this should be a dry run
       const dryRunChoice = await vscode.window.showQuickPick(

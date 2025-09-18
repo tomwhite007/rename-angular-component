@@ -101,6 +101,43 @@ export class SuffixRemovalHandler {
         return; // User cancelled
       }
 
+      // Ask for filename prefixes to exclude (optional)
+      const exclusionInput = await vscode.window.showInputBox({
+        prompt:
+          'Enter filename prefixes to exclude (comma-separated, optional)',
+        placeHolder: 'e.g., profile, user, customer',
+        value: '',
+        validateInput: (value) => {
+          if (!value || value.trim().length === 0) {
+            return null; // Empty is valid (no exclusions)
+          }
+          // Basic validation - check for valid characters and comma separation
+          const prefixes = value
+            .split(',')
+            .map((p) => p.trim())
+            .filter((p) => p.length > 0);
+          for (const prefix of prefixes) {
+            if (!/^[a-zA-Z0-9_-]+$/.test(prefix)) {
+              return 'Prefixes should only contain letters, numbers, underscores, and hyphens';
+            }
+          }
+          return null;
+        },
+      });
+
+      if (exclusionInput === undefined) {
+        return; // User cancelled
+      }
+
+      // Parse exclusion prefixes
+      const exclusionPrefixes =
+        exclusionInput && exclusionInput.trim().length > 0
+          ? exclusionInput
+              .split(',')
+              .map((p) => p.trim())
+              .filter((p) => p.length > 0)
+          : [];
+
       // Show progress
       await vscode.window.withProgress(
         {
@@ -113,6 +150,7 @@ export class SuffixRemovalHandler {
             workspaceFolder.uri.fsPath,
             suffix,
             dryRunChoice.value,
+            exclusionPrefixes,
             progress
           );
         }
@@ -130,6 +168,7 @@ export class SuffixRemovalHandler {
     workspacePath: string,
     suffix: string,
     dryRun: boolean,
+    exclusionPrefixes: string[],
     progress: vscode.Progress<{ message?: string; increment?: number }>
   ): Promise<void> {
     try {
@@ -139,6 +178,9 @@ export class SuffixRemovalHandler {
 
       this.userMessage.logInfoToChannel([
         `Running suffix removal: ${suffix} (dryRun: ${dryRun})`,
+        exclusionPrefixes.length > 0
+          ? `Excluding files with prefixes: ${exclusionPrefixes.join(', ')}`
+          : 'No exclusions specified',
       ]);
 
       // Change to the workspace directory
@@ -147,7 +189,7 @@ export class SuffixRemovalHandler {
 
       // Check if user wants to process all Angular file types
       if (suffix.toLowerCase() === 'all') {
-        await this.runAllAngularFiles(dryRun, progress);
+        await this.runAllAngularFiles(dryRun, exclusionPrefixes, progress);
         return;
       }
 
@@ -166,7 +208,8 @@ export class SuffixRemovalHandler {
       const renamer = new AngularFileSuffixRemover(
         suffix,
         dryRun,
-        capturingUserMessage
+        capturingUserMessage,
+        exclusionPrefixes
       );
 
       try {
@@ -201,6 +244,7 @@ export class SuffixRemovalHandler {
    */
   private async runAllAngularFiles(
     dryRun: boolean,
+    exclusionPrefixes: string[],
     progress: vscode.Progress<{ message?: string; increment?: number }>
   ): Promise<void> {
     try {
@@ -210,11 +254,18 @@ export class SuffixRemovalHandler {
 
       this.userMessage.logInfoToChannel([
         `Running comprehensive Angular file rename (dryRun: ${dryRun})`,
+        exclusionPrefixes.length > 0
+          ? `Excluding files with prefixes: ${exclusionPrefixes.join(', ')}`
+          : 'No exclusions specified',
       ]);
 
       try {
         // Execute the comprehensive rename operation with capturing user message
-        await renameAllAngularFiles(dryRun, this.userMessage);
+        await renameAllAngularFiles(
+          dryRun,
+          this.userMessage,
+          exclusionPrefixes
+        );
 
         // Show success message
         const message = dryRun

@@ -28,6 +28,7 @@ class AngularFileSuffixRemover {
   private dryRun: boolean;
   private projectRoot: string;
   private userMessage?: UserMessageInterface;
+  private exclusionPrefixes: string[];
   public changes: ChangeRecord[] = [];
   private readonly fileExtensions = [
     '.ts',
@@ -42,12 +43,14 @@ class AngularFileSuffixRemover {
   constructor(
     suffix: string,
     dryRun: boolean = false,
-    userMessage?: UserMessageInterface
+    userMessage?: UserMessageInterface,
+    exclusionPrefixes: string[] = []
   ) {
     this.suffix = suffix;
     this.dryRun = dryRun;
     this.projectRoot = process.cwd();
     this.userMessage = userMessage;
+    this.exclusionPrefixes = exclusionPrefixes;
   }
 
   /**
@@ -59,6 +62,40 @@ class AngularFileSuffixRemover {
     } else {
       console.log(message);
     }
+  }
+
+  /**
+   * Check if a file should be excluded based on its filename prefix
+   */
+  private shouldExcludeFile(filename: string): boolean {
+    if (this.exclusionPrefixes.length === 0) {
+      return false;
+    }
+
+    const baseName = path.basename(filename, path.extname(filename));
+
+    // Check if the filename starts with any of the exclusion prefixes
+    return this.exclusionPrefixes.some((prefix) =>
+      baseName.toLowerCase().startsWith(prefix.toLowerCase())
+    );
+  }
+
+  /**
+   * Check if a file path (from import statement) should be excluded
+   */
+  private shouldExcludeImportPath(importPath: string): boolean {
+    if (this.exclusionPrefixes.length === 0) {
+      return false;
+    }
+
+    // Extract the filename from the import path
+    const fileName = path.basename(importPath);
+    const baseName = path.basename(fileName, path.extname(fileName));
+
+    // Check if the filename starts with any of the exclusion prefixes
+    return this.exclusionPrefixes.some((prefix) =>
+      baseName.toLowerCase().startsWith(prefix.toLowerCase())
+    );
   }
 
   /**
@@ -118,7 +155,11 @@ class AngularFileSuffixRemover {
 
         if (stat.isDirectory() && !this.shouldSkipDirectory(item)) {
           searchDirectory(fullPath);
-        } else if (stat.isFile() && this.hasSuffix(item)) {
+        } else if (
+          stat.isFile() &&
+          this.hasSuffix(item) &&
+          !this.shouldExcludeFile(fullPath)
+        ) {
           files.push(fullPath);
         }
       }
@@ -494,6 +535,11 @@ class AngularFileSuffixRemover {
         'g'
       );
       newContent = newContent.replace(importRegex, (match, importPath) => {
+        // Check if this import path should be excluded
+        if (this.shouldExcludeImportPath(importPath)) {
+          return match; // Don't update excluded imports
+        }
+
         let newImportPath: string;
         // For pipe, module, guard, interceptor, resolver files, replace .suffix with -suffix
         if (
@@ -519,6 +565,10 @@ class AngularFileSuffixRemover {
         'g'
       );
       newContent = newContent.replace(templateUrlRegex, (match, url) => {
+        // Check if this templateUrl should be excluded
+        if (this.shouldExcludeImportPath(url)) {
+          return match; // Don't update excluded templateUrls
+        }
         const newUrl = url.replace(`.${this.suffix}`, '');
         hasChanges = true;
         return match.replace(url, newUrl);
@@ -529,6 +579,10 @@ class AngularFileSuffixRemover {
         'g'
       );
       newContent = newContent.replace(styleUrlsRegex, (match, url) => {
+        // Check if this styleUrls should be excluded
+        if (this.shouldExcludeImportPath(url)) {
+          return match; // Don't update excluded styleUrls
+        }
         const newUrl = url.replace(`.${this.suffix}`, '');
         hasChanges = true;
         return match.replace(url, newUrl);
@@ -544,7 +598,15 @@ class AngularFileSuffixRemover {
         (match, arrayContent) => {
           const newArrayContent = arrayContent.replace(
             new RegExp(`(['"][^'"]*\\.${this.suffix}\\.[^'"]*['"])`, 'g'),
-            (fileMatch: string) => fileMatch.replace(`.${this.suffix}`, '')
+            (fileMatch: string) => {
+              // Extract the file path from the match (remove quotes)
+              const filePath = fileMatch.slice(1, -1);
+              // Check if this file should be excluded
+              if (this.shouldExcludeImportPath(filePath)) {
+                return fileMatch; // Don't update excluded files
+              }
+              return fileMatch.replace(`.${this.suffix}`, '');
+            }
           );
           if (newArrayContent !== arrayContent) {
             hasChanges = true;
@@ -560,6 +622,11 @@ class AngularFileSuffixRemover {
         'g'
       );
       newContent = newContent.replace(requireRegex, (match, requirePath) => {
+        // Check if this require path should be excluded
+        if (this.shouldExcludeImportPath(requirePath)) {
+          return match; // Don't update excluded requires
+        }
+
         let newRequirePath: string;
         // For pipe, module, guard, interceptor, resolver files, replace .suffix with -suffix
         if (
@@ -585,6 +652,11 @@ class AngularFileSuffixRemover {
         'g'
       );
       newContent = newContent.replace(lazyLoadRegex, (match, importPath) => {
+        // Check if this lazy load path should be excluded
+        if (this.shouldExcludeImportPath(importPath)) {
+          return match; // Don't update excluded lazy load paths
+        }
+
         let newImportPath: string;
         // For pipe, module, guard, interceptor, resolver files, replace .suffix with -suffix
         if (
@@ -701,7 +773,8 @@ function logMessage(message: string, userMessage?: UserMessageInterface): void {
  */
 async function removeAllAngularSuffixes(
   dryRun: boolean = false,
-  userMessage?: UserMessageInterface
+  userMessage?: UserMessageInterface,
+  exclusionPrefixes: string[] = []
 ): Promise<void> {
   logMessage(
     '🚀 Starting comprehensive Angular file rename operation',
@@ -736,7 +809,12 @@ async function removeAllAngularSuffixes(
     logMessage('='.repeat(50), userMessage);
 
     try {
-      const renamer = new AngularFileSuffixRemover(type, dryRun, userMessage);
+      const renamer = new AngularFileSuffixRemover(
+        type,
+        dryRun,
+        userMessage,
+        exclusionPrefixes
+      );
       await renamer.execute();
 
       // Count changes from the renamer's changes array

@@ -143,7 +143,7 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     // Register suffix removal command
-    const suffixRemovalHandler = new SuffixRemovalHandler(debugLogger);
+    const suffixRemovalHandler = new SuffixRemovalHandler(userMessage);
     context.subscriptions.push(
       vscode.commands.registerCommand(
         'rename-angular-component.renameAllSuffixes',

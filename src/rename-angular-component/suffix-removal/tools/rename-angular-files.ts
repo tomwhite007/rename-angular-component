@@ -10,6 +10,10 @@ interface ChangeRecord {
   newClassName?: string;
 }
 
+interface UserMessageInterface {
+  logInfoToChannel(textLines: string[]): void;
+}
+
 /**
  * Script to rename Angular files by removing a specified suffix (e.g., .component, .service, .directive)
  * and update all references throughout the project, including class names.
@@ -23,6 +27,7 @@ class AngularFileRenamer {
   private suffix: string;
   private dryRun: boolean;
   private projectRoot: string;
+  private userMessage?: UserMessageInterface;
   public changes: ChangeRecord[] = [];
   private readonly fileExtensions = [
     '.ts',
@@ -34,34 +39,50 @@ class AngularFileRenamer {
     '.spec.ts',
   ];
 
-  constructor(suffix: string, dryRun: boolean = false) {
+  constructor(
+    suffix: string,
+    dryRun: boolean = false,
+    userMessage?: UserMessageInterface
+  ) {
     this.suffix = suffix;
     this.dryRun = dryRun;
     this.projectRoot = process.cwd();
+    this.userMessage = userMessage;
+  }
+
+  /**
+   * Log a message using userMessage if available, otherwise fallback to console.log
+   */
+  private log(message: string): void {
+    if (this.userMessage) {
+      this.userMessage.logInfoToChannel([message]);
+    } else {
+      console.log(message);
+    }
   }
 
   /**
    * Main execution method
    */
   async execute(): Promise<void> {
-    console.log(`🔄 Starting rename operation for suffix: "${this.suffix}"`);
+    this.log(`🔄 Starting rename operation for suffix: "${this.suffix}"`);
     if (this.dryRun) {
-      console.log('🔍 Running in dry-run mode - no files will be modified');
+      this.log('🔍 Running in dry-run mode - no files will be modified');
     }
-    console.log('');
+    this.log('');
 
     try {
       // Find all files with the specified suffix
       const filesToRename = this.findFilesWithSuffix();
 
       if (filesToRename.length === 0) {
-        console.log(`❌ No files found with suffix "${this.suffix}"`);
+        this.log(`❌ No files found with suffix "${this.suffix}"`);
         return;
       }
 
-      console.log(`📁 Found ${filesToRename.length} files to rename:`);
-      filesToRename.forEach((file) => console.log(`   - ${file}`));
-      console.log('');
+      this.log(`📁 Found ${filesToRename.length} files to rename:`);
+      filesToRename.forEach((file) => this.log(`   - ${file}`));
+      this.log('');
 
       // Group files by their base name (without suffix)
       const fileGroups = this.groupFilesByBaseName(filesToRename);
@@ -77,10 +98,7 @@ class AngularFileRenamer {
       // Summary
       this.printSummary();
     } catch (error) {
-      console.error(
-        '❌ Error during rename operation:',
-        (error as Error).message
-      );
+      this.log(`❌ Error during rename operation: ${(error as Error).message}`);
       process.exit(1);
     }
   }
@@ -157,7 +175,7 @@ class AngularFileRenamer {
     baseName: string,
     files: string[]
   ): Promise<void> {
-    console.log(`📦 Processing group: ${baseName}`);
+    this.log(`📦 Processing group: ${baseName}`);
 
     // Find the main TypeScript file to extract class name
     const mainTsFile = files.find((f) => f.endsWith(`.${this.suffix}.ts`));
@@ -170,7 +188,7 @@ class AngularFileRenamer {
         className = classInfo.className;
         newClassName = classInfo.newClassName;
         const nameType = classInfo.isClass ? 'Class' : 'Function';
-        console.log(`   🏷️  ${nameType}: ${className} → ${newClassName}`);
+        this.log(`   🏷️  ${nameType}: ${className} → ${newClassName}`);
       } else if (
         [
           'class',
@@ -183,7 +201,7 @@ class AngularFileRenamer {
           'resolver',
         ].includes(this.suffix)
       ) {
-        console.log(
+        this.log(
           `   📝 File-only rename (no name change for ${this.suffix} files)`
         );
       }
@@ -209,7 +227,7 @@ class AngularFileRenamer {
 
       const newFilePath = path.join(parsed.dir, newFileName);
 
-      console.log(`   ${path.basename(file)} → ${newFileName}`);
+      this.log(`   ${path.basename(file)} → ${newFileName}`);
 
       if (!this.dryRun) {
         // Rename the file
@@ -233,7 +251,7 @@ class AngularFileRenamer {
         }
       }
     }
-    console.log('');
+    this.log('');
   }
 
   /**
@@ -325,7 +343,7 @@ class AngularFileRenamer {
 
       return null;
     } catch (error) {
-      console.warn(
+      this.log(
         `⚠️  Warning: Could not extract class/function name from ${filePath}: ${
           (error as Error).message
         }`
@@ -391,7 +409,7 @@ class AngularFileRenamer {
           newClassName: newClassName,
         });
         const nameType = isClass ? 'class' : 'function';
-        console.log(
+        this.log(
           `   ✅ Updated ${nameType} name in ${path.relative(
             this.projectRoot,
             filePath
@@ -399,7 +417,7 @@ class AngularFileRenamer {
         );
       }
     } catch (error) {
-      console.warn(
+      this.log(
         `⚠️  Warning: Could not update class/function name in ${filePath}: ${
           (error as Error).message
         }`
@@ -418,7 +436,7 @@ class AngularFileRenamer {
    * Update all references to the renamed files and classes
    */
   private async updateAllReferences(): Promise<void> {
-    console.log('🔗 Updating references...');
+    this.log('🔗 Updating references...');
 
     // Find all TypeScript and JavaScript files
     const allFiles = this.findAllSourceFiles();
@@ -613,14 +631,14 @@ class AngularFileRenamer {
           type: 'update_references',
           file: filePath,
         });
-        console.log(
+        this.log(
           `   ✅ Updated references in ${path.relative(
             this.projectRoot,
             filePath
           )}`
         );
       } else if (hasChanges && this.dryRun) {
-        console.log(
+        this.log(
           `   🔍 Would update references in ${path.relative(
             this.projectRoot,
             filePath
@@ -628,7 +646,7 @@ class AngularFileRenamer {
         );
       }
     } catch (error) {
-      console.warn(
+      this.log(
         `⚠️  Warning: Could not process ${filePath}: ${
           (error as Error).message
         }`
@@ -640,8 +658,8 @@ class AngularFileRenamer {
    * Print summary of changes
    */
   private printSummary(): void {
-    console.log('');
-    console.log('📊 Summary:');
+    this.log('');
+    this.log('📊 Summary:');
 
     const renameCount = this.changes.filter((c) => c.type === 'rename').length;
     const updateCount = this.changes.filter(
@@ -651,31 +669,51 @@ class AngularFileRenamer {
       (c) => c.type === 'update_class_name'
     ).length;
 
-    console.log(`   📁 Files renamed: ${renameCount}`);
-    console.log(`   🏷️  Class names updated: ${classUpdateCount}`);
-    console.log(`   🔗 Files with updated references: ${updateCount}`);
-    console.log(`   📝 Total changes: ${this.changes.length}`);
+    this.log(`   📁 Files renamed: ${renameCount}`);
+    this.log(`   🏷️  Class names updated: ${classUpdateCount}`);
+    this.log(`   🔗 Files with updated references: ${updateCount}`);
+    this.log(`   📝 Total changes: ${this.changes.length}`);
 
     if (this.dryRun) {
-      console.log('');
-      console.log('🔍 This was a dry run. No files were actually modified.');
-      console.log('   Run without --dry-run to apply the changes.');
+      this.log('');
+      this.log('🔍 This was a dry run. No files were actually modified.');
+      this.log('   Run without --dry-run to apply the changes.');
     } else {
-      console.log('');
-      console.log('✅ Rename operation completed successfully!');
+      this.log('');
+      this.log('✅ Rename operation completed successfully!');
     }
+  }
+}
+
+/**
+ * Helper function to log messages in renameAllAngularFiles
+ */
+function logMessage(message: string, userMessage?: UserMessageInterface): void {
+  if (userMessage) {
+    userMessage.logInfoToChannel([message]);
+  } else {
+    console.log(message);
   }
 }
 
 /**
  * Wrapper function to rename all Angular file types
  */
-async function renameAllAngularFiles(dryRun: boolean = false): Promise<void> {
-  console.log('🚀 Starting comprehensive Angular file rename operation');
+async function renameAllAngularFiles(
+  dryRun: boolean = false,
+  userMessage?: UserMessageInterface
+): Promise<void> {
+  logMessage(
+    '🚀 Starting comprehensive Angular file rename operation',
+    userMessage
+  );
   if (dryRun) {
-    console.log('🔍 Running in dry-run mode - no files will be modified');
+    logMessage(
+      '🔍 Running in dry-run mode - no files will be modified',
+      userMessage
+    );
   }
-  console.log('');
+  logMessage('', userMessage);
 
   // Define all Angular file types in the order they should be processed
   // Order matters: modules should be processed last since other files might import them
@@ -694,11 +732,11 @@ async function renameAllAngularFiles(dryRun: boolean = false): Promise<void> {
   let processedTypes = 0;
 
   for (const type of angularTypes) {
-    console.log(`\n📋 Processing ${type} files...`);
-    console.log('='.repeat(50));
+    logMessage(`\n📋 Processing ${type} files...`, userMessage);
+    logMessage('='.repeat(50), userMessage);
 
     try {
-      const renamer = new AngularFileRenamer(type, dryRun);
+      const renamer = new AngularFileRenamer(type, dryRun, userMessage);
       await renamer.execute();
 
       // Count changes from the renamer's changes array
@@ -707,36 +745,44 @@ async function renameAllAngularFiles(dryRun: boolean = false): Promise<void> {
       processedTypes++;
 
       if (changes > 0) {
-        console.log(
-          `✅ ${type} files processed successfully (${changes} changes)`
+        logMessage(
+          `✅ ${type} files processed successfully (${changes} changes)`,
+          userMessage
         );
       } else {
-        console.log(`ℹ️  No ${type} files found to rename`);
+        logMessage(`ℹ️  No ${type} files found to rename`, userMessage);
       }
     } catch (error) {
-      console.error(
-        `❌ Error processing ${type} files:`,
-        (error as Error).message
+      logMessage(
+        `❌ Error processing ${type} files: ${(error as Error).message}`,
+        userMessage
       );
       // Continue with other types even if one fails
     }
   }
 
   // Summary
-  console.log('\n' + '='.repeat(50));
-  console.log('📊 Comprehensive Rename Summary:');
-  console.log(
-    `   📁 File types processed: ${processedTypes}/${angularTypes.length}`
+  logMessage('\n' + '='.repeat(50), userMessage);
+  logMessage('📊 Comprehensive Rename Summary:', userMessage);
+  logMessage(
+    `   📁 File types processed: ${processedTypes}/${angularTypes.length}`,
+    userMessage
   );
-  console.log(`   📝 Total changes made: ${totalChanges}`);
+  logMessage(`   📝 Total changes made: ${totalChanges}`, userMessage);
 
   if (dryRun) {
-    console.log('');
-    console.log('🔍 This was a dry run. No files were actually modified.');
-    console.log('   Run without --dry-run to apply all changes.');
+    logMessage('', userMessage);
+    logMessage(
+      '🔍 This was a dry run. No files were actually modified.',
+      userMessage
+    );
+    logMessage('   Run without --dry-run to apply all changes.', userMessage);
   } else {
-    console.log('');
-    console.log('✅ Comprehensive Angular file rename completed successfully!');
+    logMessage('', userMessage);
+    logMessage(
+      '✅ Comprehensive Angular file rename completed successfully!',
+      userMessage
+    );
   }
 }
 

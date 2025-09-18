@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { UserMessage } from '../logging/user-message.class';
 import AngularFileRenamer, {
   renameAllAngularFiles,
 } from './tools/rename-angular-files';
@@ -7,7 +8,7 @@ import AngularFileRenamer, {
  * Handler for the suffix removal command
  */
 export class SuffixRemovalHandler {
-  constructor(private debugLogger: any) {}
+  constructor(private userMessage: UserMessage) {}
 
   /**
    * Execute the suffix removal script
@@ -77,7 +78,7 @@ export class SuffixRemovalHandler {
         }
       );
     } catch (error) {
-      this.debugLogger.logToConsole(`Error in suffix removal: ${error}`);
+      this.userMessage.logInfoToChannel([`Error in suffix removal: ${error}`]);
       vscode.window.showErrorMessage(`Error during suffix removal: ${error}`);
     }
   }
@@ -96,9 +97,9 @@ export class SuffixRemovalHandler {
         message: `Running suffix removal for "${suffix}"...`,
       });
 
-      this.debugLogger.logToConsole(
-        `Running suffix removal: ${suffix} (dryRun: ${dryRun})`
-      );
+      this.userMessage.logInfoToChannel([
+        `Running suffix removal: ${suffix} (dryRun: ${dryRun})`,
+      ]);
 
       // Change to the workspace directory
       const originalCwd = process.cwd();
@@ -111,7 +112,7 @@ export class SuffixRemovalHandler {
       }
 
       // Create an instance of the AngularFileRenamer
-      const renamer = new AngularFileRenamer(suffix, dryRun);
+      const renamer = new AngularFileRenamer(suffix, dryRun, this.userMessage);
 
       // Capture console output
       const originalLog = console.log;
@@ -125,21 +126,21 @@ export class SuffixRemovalHandler {
         const message = args.join(' ');
         output += message + '\n';
         originalLog(...args);
-        this.debugLogger.logToConsole(`Renamer output: ${message}`);
+        this.userMessage.logInfoToChannel([`Renamer output: ${message}`]);
       };
 
       console.error = (...args) => {
         const message = args.join(' ');
         output += message + '\n';
         originalError(...args);
-        this.debugLogger.logToConsole(`Renamer error: ${message}`);
+        this.userMessage.logInfoToChannel([`Renamer error: ${message}`]);
       };
 
       console.warn = (...args) => {
         const message = args.join(' ');
         output += message + '\n';
         originalWarn(...args);
-        this.debugLogger.logToConsole(`Renamer warning: ${message}`);
+        this.userMessage.logInfoToChannel([`Renamer warning: ${message}`]);
       };
 
       try {
@@ -176,7 +177,7 @@ export class SuffixRemovalHandler {
       }
     } catch (error) {
       const errorMessage = `Suffix removal failed: ${error}`;
-      this.debugLogger.logToConsole(errorMessage);
+      this.userMessage.logInfoToChannel([errorMessage]);
       vscode.window.showErrorMessage(errorMessage);
       throw error;
     }
@@ -194,9 +195,9 @@ export class SuffixRemovalHandler {
         message: 'Running comprehensive Angular file rename...',
       });
 
-      this.debugLogger.logToConsole(
-        `Running comprehensive Angular file rename (dryRun: ${dryRun})`
-      );
+      this.userMessage.logInfoToChannel([
+        `Running comprehensive Angular file rename (dryRun: ${dryRun})`,
+      ]);
 
       // Capture console output
       const originalLog = console.log;
@@ -210,26 +211,26 @@ export class SuffixRemovalHandler {
         const message = args.join(' ');
         output += message + '\n';
         originalLog(...args);
-        this.debugLogger.logToConsole(`All files output: ${message}`);
+        this.userMessage.logInfoToChannel([`All files output: ${message}`]);
       };
 
       console.error = (...args) => {
         const message = args.join(' ');
         output += message + '\n';
         originalError(...args);
-        this.debugLogger.logToConsole(`All files error: ${message}`);
+        this.userMessage.logInfoToChannel([`All files error: ${message}`]);
       };
 
       console.warn = (...args) => {
         const message = args.join(' ');
         output += message + '\n';
         originalWarn(...args);
-        this.debugLogger.logToConsole(`All files warning: ${message}`);
+        this.userMessage.logInfoToChannel([`All files warning: ${message}`]);
       };
 
       try {
         // Execute the comprehensive rename operation
-        await renameAllAngularFiles(dryRun);
+        await renameAllAngularFiles(dryRun, this.userMessage);
 
         // Restore original console methods
         console.log = originalLog;
@@ -255,7 +256,7 @@ export class SuffixRemovalHandler {
       }
     } catch (error) {
       const errorMessage = `Comprehensive Angular file rename failed: ${error}`;
-      this.debugLogger.logToConsole(errorMessage);
+      this.userMessage.logInfoToChannel([errorMessage]);
       vscode.window.showErrorMessage(errorMessage);
       throw error;
     }

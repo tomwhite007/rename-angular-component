@@ -77,6 +77,10 @@
       {
         "command": "rename-angular-component.resetWhatsNew",
         "title": "Rename Angular Component: Show What's New screen on startup (reset)"
+      },
+      {
+        "command": "rename-angular-component.renameAllSuffixes",
+        "title": "Rename all Angular suffixes to v20 styleguide"
       }
     ],
     "menus": {
@@ -84,6 +88,10 @@
         {
           "command": "rename-angular-component.showWhatsNew",
           "when": "true"
+        },
+        {
+          "command": "rename-angular-component.renameAllSuffixes",
+          "when": "renameAngularComponent.isAngularProject"
         }
       ],
       "explorer/context": [

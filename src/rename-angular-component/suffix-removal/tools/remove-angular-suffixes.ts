@@ -65,7 +65,7 @@ class AngularFileSuffixRemover {
   }
 
   /**
-   * Check if a file should be excluded based on its filename prefix
+   * Check if a file should be excluded based on its filename pattern
    */
   private shouldExcludeFile(filename: string): boolean {
     if (this.exclusionPrefixes.length === 0) {
@@ -74,10 +74,19 @@ class AngularFileSuffixRemover {
 
     const baseName = path.basename(filename, path.extname(filename));
 
-    // Check if the filename starts with any of the exclusion prefixes
-    return this.exclusionPrefixes.some((prefix) =>
-      baseName.toLowerCase().startsWith(prefix.toLowerCase())
-    );
+    // Check if the filename matches any of the exclusion patterns
+    return this.exclusionPrefixes.some((pattern) => {
+      const lowerPattern = pattern.toLowerCase();
+      const lowerBaseName = baseName.toLowerCase();
+
+      // If the pattern contains a dot, treat it as an exact filename match
+      if (lowerPattern.includes('.')) {
+        return lowerBaseName === lowerPattern;
+      }
+
+      // Otherwise, use prefix matching (backward compatibility)
+      return lowerBaseName.startsWith(lowerPattern);
+    });
   }
 
   /**
@@ -88,14 +97,24 @@ class AngularFileSuffixRemover {
       return false;
     }
 
-    // Extract the filename from the import path
+    // Extract the filename from the import path (keep the full filename without directory)
     const fileName = path.basename(importPath);
-    const baseName = path.basename(fileName, path.extname(fileName));
+    // Remove only the actual file extension (.ts, .js, etc.) but keep Angular suffixes (.component, .service, etc.)
+    const baseName = this.removeFileExtension(fileName);
 
-    // Check if the filename starts with any of the exclusion prefixes
-    return this.exclusionPrefixes.some((prefix) =>
-      baseName.toLowerCase().startsWith(prefix.toLowerCase())
-    );
+    // Check if the filename matches any of the exclusion patterns
+    return this.exclusionPrefixes.some((pattern) => {
+      const lowerPattern = pattern.toLowerCase();
+      const lowerBaseName = baseName.toLowerCase();
+
+      // If the pattern contains a dot, treat it as an exact filename match
+      if (lowerPattern.includes('.')) {
+        return lowerBaseName === lowerPattern;
+      }
+
+      // Otherwise, use prefix matching (backward compatibility)
+      return lowerBaseName.startsWith(lowerPattern);
+    });
   }
 
   /**
@@ -471,6 +490,32 @@ class AngularFileSuffixRemover {
    */
   private capitalize(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  /**
+   * Remove only the actual file extension (.ts, .js, etc.) but keep Angular suffixes (.component, .service, etc.)
+   */
+  private removeFileExtension(fileName: string): string {
+    // List of actual file extensions to remove
+    const fileExtensions = [
+      '.ts',
+      '.js',
+      '.html',
+      '.scss',
+      '.css',
+      '.sass',
+      '.less',
+      '.spec.ts',
+    ];
+
+    for (const ext of fileExtensions) {
+      if (fileName.toLowerCase().endsWith(ext.toLowerCase())) {
+        return fileName.slice(0, -ext.length);
+      }
+    }
+
+    // If no recognized extension found, return the original filename
+    return fileName;
   }
 
   /**

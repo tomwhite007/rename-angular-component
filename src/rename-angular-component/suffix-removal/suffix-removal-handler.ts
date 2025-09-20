@@ -101,24 +101,24 @@ export class SuffixRemovalHandler {
         return; // User cancelled
       }
 
-      // Ask for filename prefixes to exclude (optional)
+      // Ask for filename patterns to exclude (optional)
       const exclusionInput = await vscode.window.showInputBox({
         prompt:
-          'Enter filename prefixes to exclude (comma-separated, optional)',
-        placeHolder: 'e.g., profile, user, customer',
+          'Enter filename patterns to exclude (comma-separated, optional)',
+        placeHolder: 'e.g., profile.component, user, customer.service',
         value: '',
         validateInput: (value) => {
           if (!value || value.trim().length === 0) {
             return null; // Empty is valid (no exclusions)
           }
           // Basic validation - check for valid characters and comma separation
-          const prefixes = value
+          const patterns = value
             .split(',')
             .map((p) => p.trim())
             .filter((p) => p.length > 0);
-          for (const prefix of prefixes) {
-            if (!/^[a-zA-Z0-9_-]+$/.test(prefix)) {
-              return 'Prefixes should only contain letters, numbers, underscores, and hyphens';
+          for (const pattern of patterns) {
+            if (!/^[a-zA-Z0-9_.-]+$/.test(pattern)) {
+              return 'Patterns should only contain letters, numbers, underscores, hyphens, and dots';
             }
           }
           return null;
@@ -129,7 +129,7 @@ export class SuffixRemovalHandler {
         return; // User cancelled
       }
 
-      // Parse exclusion prefixes
+      // Parse exclusion patterns
       const exclusionPrefixes =
         exclusionInput && exclusionInput.trim().length > 0
           ? exclusionInput
@@ -179,7 +179,7 @@ export class SuffixRemovalHandler {
       this.userMessage.logInfoToChannel([
         `Running suffix removal: ${suffix} (dryRun: ${dryRun})`,
         exclusionPrefixes.length > 0
-          ? `Excluding files with prefixes: ${exclusionPrefixes.join(', ')}`
+          ? `Excluding files with patterns: ${exclusionPrefixes.join(', ')}`
           : 'No exclusions specified',
       ]);
 
@@ -255,7 +255,7 @@ export class SuffixRemovalHandler {
       this.userMessage.logInfoToChannel([
         `Running comprehensive Angular file rename (dryRun: ${dryRun})`,
         exclusionPrefixes.length > 0
-          ? `Excluding files with prefixes: ${exclusionPrefixes.join(', ')}`
+          ? `Excluding files with patterns: ${exclusionPrefixes.join(', ')}`
           : 'No exclusions specified',
       ]);
 

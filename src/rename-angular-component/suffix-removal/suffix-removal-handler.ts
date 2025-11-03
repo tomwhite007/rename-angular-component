@@ -1,3 +1,4 @@
+import * as path from 'path';
 import * as vscode from 'vscode';
 import { UserMessage } from '../logging/user-message.class';
 import AngularFileSuffixRemover, {
@@ -8,13 +9,19 @@ import AngularFileSuffixRemover, {
  * Handler for the suffix removal command
  */
 export class SuffixRemovalHandler {
-  constructor(private userMessage: UserMessage) {}
+  constructor(
+    private userMessage: UserMessage,
+    private context: vscode.ExtensionContext
+  ) {}
 
   /**
    * Execute the suffix removal script
    */
   async execute(): Promise<void> {
     try {
+      // Show the README.md file first
+      await this.showReadme();
+
       // Get the workspace folder
       const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
       if (!workspaceFolder) {
@@ -281,6 +288,35 @@ export class SuffixRemovalHandler {
       this.userMessage.logInfoToChannel([errorMessage]);
       vscode.window.showErrorMessage(errorMessage);
       throw error;
+    }
+  }
+
+  /**
+   * Show the README.md file in preview mode
+   */
+  private async showReadme(): Promise<void> {
+    try {
+      const readmePath = path.join(
+        this.context.extensionPath,
+        'src',
+        'rename-angular-component',
+        'suffix-removal',
+        'README.md'
+      );
+
+      // Check if the file exists
+      try {
+        await vscode.workspace.fs.stat(vscode.Uri.file(readmePath));
+      } catch {
+        // File doesn't exist, nothing to show
+        return;
+      }
+
+      // Open the markdown file in preview mode
+      const uri = vscode.Uri.file(readmePath);
+      await vscode.commands.executeCommand('markdown.showPreview', uri);
+    } catch (error) {
+      console.error('Error showing README:', error);
     }
   }
 }

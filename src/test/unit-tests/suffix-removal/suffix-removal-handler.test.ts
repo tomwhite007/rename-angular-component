@@ -46,7 +46,10 @@ describe('SuffixRemovalHandler', () => {
       .stub(vscode.workspace, 'workspaceFolders')
       .value([mockWorkspaceFolder]);
 
-    handler = new SuffixRemovalHandler(mockUserMessage);
+    handler = new SuffixRemovalHandler(
+      mockUserMessage,
+      {} as vscode.ExtensionContext
+    );
   });
 
   afterEach(() => {

@@ -41,8 +41,7 @@ Based on the same naming convention in the [Angular Style Guide](https://angular
 - Rename the element, attribute or class selectors inside the class decorator metadata, and in all HTML templates in the repository (provided the selector follows the correct naming convention)
 - Fix all import paths and their class names
 - **Angular 20 compatibility**: Automatically handles the transition between old '.component' suffix and new no-suffix format, or vice versa
-- **Enhanced selector updates**: Standalone Component mode updates selectors only where the component is imported
-- **Expanded file support**: Rename any Angular CLI-generated file following the "Rule of One" principle
+- **Angular 20 compatibility - New Command**: "Rename all Angular suffixes to v20 styleguide"
 
 _Example - Changes to Component file after rename:_
 
@@ -83,9 +82,7 @@ Thanks to [@hablix](https://github.com/hablix) for raising issue [29](https://gi
 
 ## Release Notes
 
-Latest version: 4.0.0 - 2025-09-10
+## Latest version: 4.1.0 - 2025-11-08
 
-- **Angular 20 compatibility**: Support for new no-suffix component format and automatic '.component' suffix handling
-- **Enhanced selector updates**: Standalone component mode with configurable template update behavior
-- **Expanded file support**: Rename pipes, interfaces, enums, and any Angular CLI-generated file
-- **Improved selector management**: Automatic removal of '.component' from renamed selectors and folders for backward compatibility
+- Feature: Script to convert all .component suffixes to the Angular 20 no-suffix format (Experimental)
+- Bugfix: Rename same file to remove suffix can not update lazy loaded import paths in route config files.

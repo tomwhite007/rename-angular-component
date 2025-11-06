@@ -1,11 +1,16 @@
 # Change Log
 
-## Latest version: [4.0.0] - 2025-09-10
+## Latest version: [4.1.0] - 2025-11-08
 
-- **Angular 20 and backwards compatibility**: Support for new no-suffix component format and automatic '.component' suffix handling
-- **Enhanced selector updates**: Standalone component mode with configurable template update behavior, fixing Issues [48](https://github.com/tomwhite007/rename-angular-component/issues/48) and [7](https://github.com/tomwhite007/rename-angular-component/issues/7)
-- **Expanded file support**: Rename pipes, interfaces, enums, and any Angular CLI-generated file
-- **Improved selector management**: Automatic removal of '.component' from renamed selectors and folders for backward compatibility
+- Feature: Script to convert all .component suffixes to the Angular 20 no-suffix format (Experimental)
+- Bugfix: Rename same file to remove suffix can not update lazy loaded import paths in route config files.
+
+## [4.0.0] - 2025-09-10
+
+- Angular 20 and backwards compatibility: Support for new no-suffix component format and automatic '.component' suffix handling
+- Enhanced selector updates: Standalone component mode with configurable template update behavior, fixing Issues [48](https://github.com/tomwhite007/rename-angular-component/issues/48) and [7](https://github.com/tomwhite007/rename-angular-component/issues/7)
+- Expanded file support: Rename pipes, interfaces, enums, and any Angular CLI-generated file
+- Improved selector management: Automatic removal of '.component' from renamed selectors and folders for backward compatibility
 
 ## [3.0.0] - 2024-02-27
 

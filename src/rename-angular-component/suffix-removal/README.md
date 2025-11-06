@@ -11,7 +11,7 @@ This feature provides a VS Code command to rename Angular files by removing suff
 
 ## ⚠️ Note: This feature is Experimental - please make sure you can revert changes using Git before you begin
 
-In the future, this script will include the ability to run on a single project folder or library, but for now, it applies changes to the entire repo, which can lead to too many namespace collisions on large projects.
+In the future, this script will include the ability to run on a single project folder or library, but for now, it applies changes to the entire repo, which can lead to too many namespace collisions on large projects. You can follow [this discussion thread for more info](https://github.com/tomwhite007/rename-angular-component/discussions/61).
 
 Namespace collisions occur when a two Angular files, like UserService and UserComponent have their suffix removed, which results in an import to `inject(User)` inside a class named `User`. You can filter these out using the prefix filter described below, but it won't scale very well because of the data-entry required.
 

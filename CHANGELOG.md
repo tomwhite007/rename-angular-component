@@ -3,7 +3,8 @@
 ## Latest version: [4.1.0] - 2025-11-08
 
 - Feature: Script to convert all .component suffixes to the Angular 20 no-suffix format (Experimental)
-- Bugfix: Rename same file to remove suffix can not update lazy loaded import paths in route config files.
+- Fix: Rename same file to remove suffix can not update lazy loaded import paths in route config files.
+- Fix: Rename project root, app component can break app.routes
 
 ## [4.0.0] - 2025-09-10
 

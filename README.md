@@ -41,7 +41,7 @@ Based on the same naming convention in the [Angular Style Guide](https://angular
 - Rename the element, attribute or class selectors inside the class decorator metadata, and in all HTML templates in the repository (provided the selector follows the correct naming convention)
 - Fix all import paths and their class names
 - **Angular 20 compatibility**: Automatically handles the transition between old '.component' suffix and new no-suffix format, or vice versa
-- **Angular 20 compatibility - New Command**: "Rename all Angular suffixes to v20 styleguide"
+- **Angular 20 compatibility - New Command**: "Rename all Angular suffixes to v20 styleguide" - a script to convert all legacy Angular files in your repo
 
 _Example - Changes to Component file after rename:_
 
@@ -65,8 +65,7 @@ This extension contributes the following settings:
 
 1. [Extension does not support WSL](https://github.com/tomwhite007/rename-angular-component/issues/28)
 2. [Does not work in a VS Code devcontainer](https://github.com/tomwhite007/rename-angular-component/issues/52)
-3. [Rename project root, app component can break app.routes](https://github.com/tomwhite007/rename-angular-component/issues/57)
-4. [Modules and pipes should remove -module or -pipe postfix from folder if entered by user](https://github.com/tomwhite007/rename-angular-component/issues/58). This new feature is coming next.
+3. [Modules and pipes should remove -module or -pipe postfix from folder if entered by user](https://github.com/tomwhite007/rename-angular-component/issues/58). 
 
 ## Support
 
@@ -85,4 +84,5 @@ Thanks to [@hablix](https://github.com/hablix) for raising issue [29](https://gi
 ## Latest version: 4.1.0 - 2025-11-08
 
 - Feature: Script to convert all .component suffixes to the Angular 20 no-suffix format (Experimental)
-- Bugfix: Rename same file to remove suffix can not update lazy loaded import paths in route config files.
+- Fix: Rename same file to remove suffix can not update lazy loaded import paths in route config files.
+- Fix: Rename project root, app component can break app.routes

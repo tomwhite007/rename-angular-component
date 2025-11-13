@@ -8,6 +8,7 @@ import { isAngularProject } from './rename-angular-component/file-manipulation/i
 import { DebugLogger } from './rename-angular-component/logging/debug-logger.class';
 import { UserMessage } from './rename-angular-component/logging/user-message.class';
 import { Renamer } from './rename-angular-component/renamer.class';
+import { SuffixRemovalHandler } from './rename-angular-component/suffix-removal/suffix-removal-handler';
 import { WhatsNewHandler } from './whats-new/whats-new-handler';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -138,6 +139,15 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.commands.registerCommand(
         'rename-angular-component.resetWhatsNew',
         () => whatsNewHandler.resetStoredVersion()
+      )
+    );
+
+    // Register suffix removal command
+    const suffixRemovalHandler = new SuffixRemovalHandler(userMessage, context);
+    context.subscriptions.push(
+      vscode.commands.registerCommand(
+        'rename-angular-component.renameAllSuffixes',
+        () => suffixRemovalHandler.execute()
       )
     );
   });

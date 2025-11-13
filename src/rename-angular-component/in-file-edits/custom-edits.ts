@@ -119,7 +119,10 @@ export function getAngularCoreClassEdits(
         }
 
         if (debugLogToFile) {
-          debugLogToFile('replacement: ' + replacement);
+          debugLogToFile(
+            'foundItem.itemType: ' + foundItem.itemType,
+            'replacement: ' + replacement
+          );
         }
 
         return {

@@ -22,18 +22,18 @@ export class WhatsNewHandler {
       WhatsNewHandler.LAST_VERSION_KEY
     );
 
-    // TODO: Uncomment this after 4.0.0 is released
     // If lastVersion is undefined, this is a fresh install - just save the version
-    // if (lastVersion === undefined) {
-    //   await this.updateStoredVersion(currentVersion);
-    //   return;
-    // }
-
-    // Only show What's New if this is an actual update (version changed)
-    if (lastVersion !== currentVersion) {
-      await this.showWhatsNew();
+    if (lastVersion === undefined) {
       await this.updateStoredVersion(currentVersion);
+      return;
     }
+
+    // TODO: Uncomment this for next major breaking change
+    // Only show What's New if this is an actual update (version changed)
+    // if (lastVersion !== currentVersion) {
+    //   await this.showWhatsNew();
+    //   await this.updateStoredVersion(currentVersion);
+    // }
   }
 
   public async showWhatsNewManually(): Promise<void> {

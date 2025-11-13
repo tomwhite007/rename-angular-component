@@ -997,14 +997,21 @@ export class ReferenceIndexBuilder {
         ts.isStringLiteral(node.arguments[0])
       ) {
         const importPathNode = node.arguments[0];
-        result.push({
+        const foundItem: FoundItem = {
           itemType: 'importPath',
           itemText: importPathNode.text,
           location: {
             start: importPathNode.pos,
             end: importPathNode.end,
           },
-        });
+        };
+        this.debugLogger.log(
+          'recurseForAngularRouterImport Found import path: ',
+          JSON.stringify(foundItem),
+          'fileName: ',
+          fileName
+        );
+        result.push(foundItem);
       } else {
         ts.forEachChild(node, recurseForAngularRouterImport);
       }

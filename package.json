@@ -3,7 +3,7 @@
   "displayName": "Rename Angular Component",
   "description": "Rename Angular Components, Directives, Pipes and Services",
   "publisher": "tomwhite007",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -77,6 +77,10 @@
       {
         "command": "rename-angular-component.resetWhatsNew",
         "title": "Rename Angular Component: Show What's New screen on startup (reset)"
+      },
+      {
+        "command": "rename-angular-component.renameAllSuffixes",
+        "title": "Rename all Angular suffixes to v20 styleguide"
       }
     ],
     "menus": {
@@ -84,6 +88,10 @@
         {
           "command": "rename-angular-component.showWhatsNew",
           "when": "true"
+        },
+        {
+          "command": "rename-angular-component.renameAllSuffixes",
+          "when": "renameAngularComponent.isAngularProject"
         }
       ],
       "explorer/context": [

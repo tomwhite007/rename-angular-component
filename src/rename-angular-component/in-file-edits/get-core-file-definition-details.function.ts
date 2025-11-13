@@ -160,17 +160,30 @@ function hasDecorator(node: ts.ClassDeclaration): boolean {
 }
 
 function getDecoratorName(node: ts.ClassDeclaration): string {
-  const decorator = node.modifiers?.find((modifier) =>
-    ts.isDecorator(modifier)
-  );
+  const decorator = node.modifiers
+    ?.map((modifier) => isRenameableDecorator(modifier))
+    .find((name) => !!name);
 
+  return decorator ?? '';
+}
+
+function isRenameableDecorator(nodeModifier: ts.Node): string {
+  const renameableDecorators = [
+    'Component',
+    'Directive',
+    'Injectable',
+    'Pipe',
+    'NgModule',
+    'Guard',
+  ];
   if (
-    decorator &&
-    ts.isDecorator(decorator) &&
-    ts.isCallExpression(decorator.expression) &&
-    ts.isIdentifier(decorator.expression.expression)
+    nodeModifier &&
+    ts.isDecorator(nodeModifier) &&
+    ts.isCallExpression(nodeModifier.expression) &&
+    ts.isIdentifier(nodeModifier.expression.expression) &&
+    renameableDecorators.includes(nodeModifier.expression.expression.text)
   ) {
-    return decorator.expression.expression.text;
+    return nodeModifier.expression.expression.text;
   }
 
   return '';

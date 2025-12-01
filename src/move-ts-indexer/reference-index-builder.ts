@@ -1012,7 +1012,7 @@ export class ReferenceIndexBuilder {
           itemText: importPathNode.text,
           location: {
             start: pathStart,
-            end: importPathNode.end,
+            end: importPathNode.getEnd(),
           },
         };
         this.debugLogger.log(

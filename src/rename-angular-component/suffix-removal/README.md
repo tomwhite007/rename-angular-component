@@ -9,6 +9,8 @@
 
 This feature provides a VS Code command to rename Angular files by removing suffixes (like `.component`, `.service`, `.directive`) to follow Angular v20 styleguide conventions.
 
+> **💡 Tip:** This README automatically opens when you run the suffix removal command. To disable this behavior, set `renameAngularComponent.showSuffixRemovalReadme` to `false` in your VS Code settings.
+
 ## ⚠️ Note: This feature is Experimental - please make sure you can revert changes using Git before you begin
 
 In the future, this script will include the ability to run on a single project folder or library, but for now, it applies changes to the entire repo, which can lead to too many namespace collisions on large projects. You can follow [this discussion thread for more info](https://github.com/tomwhite007/rename-angular-component/discussions/61).

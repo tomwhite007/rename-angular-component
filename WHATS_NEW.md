@@ -7,17 +7,23 @@
   </div>
 </div>
 
-## 🎉 Welcome to version 4.0.0
+## 🎉 Welcome to version 4.2.0
 
 Thank you for installing the latest version of Rename Angular Component.
 
+## 🐛 Bug Fixes
+
+- **Fixed router lazy import quotes**: Resolved an issue where renamed router lazy imports sometimes lost the first quote, causing compile errors.
+- **Abstract class support**: The Angular 20 suffix removal script now properly handles abstract classes.
+
 ## ✨ New Features
 
-### 👍 Angular 20 Style Guide and old '.component' suffix
+### 🚀 Angular 20 Suffix Removal Script
+
+- **Bulk suffix removal**: A new command to convert all **'.component'** suffixes (and other Angular suffixes) to the Angular 20 no-suffix format in a single operation. Access it via Command Palette: "Rename all Angular suffixes to v20 styleguide".
 
 - **Component suffix can be removed or added**: This extension now allows you to migrate in either direction between the old **'.component'** and the new no-suffix format.
 - **Any dot-suffix can be used for rename**: Have you ever wanted to add **'.page'** or **'.facade'** as the suffix on a component or service? Now you can - in one step. You can control your own naming conventions.
-- **Coming soon...** A migration script to [convert all existing **'.component'** files](https://github.com/tomwhite007/rename-angular-component/issues/56) in your project to the new Angular 20 suffixless format in a single operation.
 
 ### 🌈 Enhanced Selector updates
 

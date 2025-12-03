@@ -11,11 +11,11 @@ This feature provides a VS Code command to rename Angular files by removing suff
 
 > **💡 Tip:** This README automatically opens when you run the suffix removal command. To disable this behavior, set `renameAngularComponent.showSuffixRemovalReadme` to `false` in your VS Code settings.
 
-## ⚠️ Note: This feature is Experimental - please make sure you can revert changes using Git before you begin
+## ⚠️ Note: Please make sure you can revert changes using Git before you begin
 
-In the future, this script will include the ability to run on a single project folder or library, but for now, it applies changes to the entire repo, which can lead to too many namespace collisions on large projects. You can follow [this discussion thread for more info](https://github.com/tomwhite007/rename-angular-component/discussions/61).
+This script applies changes to the entire repo, which can lead to too many namespace collisions on large projects.
 
-Namespace collisions occur when a two Angular files, like UserService and UserComponent have their suffix removed, which results in an import to `inject(User)` inside a class named `User`. You can filter these out using the prefix filter described below, but it won't scale very well because of the data-entry required.
+Namespace collisions occur when a two Angular files, like UserService and UserComponent have their suffix removed, which results in an import to `inject(User)` inside a class named `User`. You can filter these out using the prefix filter described below, but it won't scale very well because of the data-entry required. You can follow [this discussion thread for more info](https://github.com/tomwhite007/rename-angular-component/discussions/61).
 
 ## 🛠️ Usage
 
@@ -46,3 +46,16 @@ For a file `app.component.ts` with class `AppComponent`:
 - Input suffix: `component`
 - Result: File renamed to `app.ts` with class renamed to `App`
 - All imports and references are updated automatically
+
+## After Success
+
+Here are some considerations for next steps after you have successfully removed all your Angular suffixes and patched any namespace collisions:
+
+- Change the order of the imports to satisfy eslint import-x/order.alphabetize rule after removing the file suffixes
+- Add the following rules to eslint.config.js
+  - '@angular-eslint/component-class-suffix': 'off',
+  - '@angular-eslint/directive-class-suffix': 'off',
+- Remove any schematics that use suffixes from angular.json
+- Update the file names with any suffixes within `include` and `exclude` of the tsconfig files
+- Update the file names with any suffixes in .gitignore
+- Consder leaving a nice review on the VS Code / VSIX Marketplace for the Rename Angular Component extension

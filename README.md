@@ -65,7 +65,7 @@ This extension contributes the following settings:
 
 1. [Extension does not support WSL](https://github.com/tomwhite007/rename-angular-component/issues/28)
 2. [Does not work in a VS Code devcontainer](https://github.com/tomwhite007/rename-angular-component/issues/52)
-3. [Modules and pipes should remove -module or -pipe postfix from folder if entered by user](https://github.com/tomwhite007/rename-angular-component/issues/58). 
+3. [Modules and pipes should remove -module or -pipe postfix from folder if entered by user](https://github.com/tomwhite007/rename-angular-component/issues/58).
 
 ## Support
 
@@ -79,10 +79,11 @@ Thanks to [Aristeidis Bampakos GDE](https://github.com/bampakoa) for raising iss
 
 Thanks to [@hablix](https://github.com/hablix) for raising issue [29](https://github.com/tomwhite007/rename-angular-component/issues/29) (fixed in Version 2.1.3), with thanks also to [@elmehdielhamdi](https://github.com/elmehdielhamdi) and [@MohRaouf](https://github.com/MohRaouf)
 
+Thanks to [wein2011](https://github.com/wein2011) for improvements to the [Angular 20 Suffix Removal Readme guide](src/rename-angular-component/suffix-removal/README.md).
+
 ## Release Notes
 
-## Latest version: 4.1.0 - 2025-11-08
+## Latest version: 4.2.0 - 2025-12-04
 
-- Feature: Script to convert all .component suffixes to the Angular 20 no-suffix format (Experimental)
-- Fix: Rename same file to remove suffix can not update lazy loaded import paths in route config files.
-- Fix: Rename project root, app component can break app.routes
+- Fix: Renamed router lazy imports sometimes lose first quote causing compile error.
+- Fix: Allow Angular 20 suffix removal script to cope with abstract classes.

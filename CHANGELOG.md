@@ -1,6 +1,11 @@
 # Change Log
 
-## Latest version: [4.1.0] - 2025-11-08
+## Latest version: [4.2.0] - 2025-12-04
+
+- Fix: Renamed router lazy imports sometimes lose first quote causing compile error.
+- Fix: Allow Angular 20 suffix removal script to cope with abstract classes.
+
+## [4.1.0] - 2025-11-08
 
 - Feature: Script to convert all .component suffixes to the Angular 20 no-suffix format (Experimental)
 - Fix: Rename same file to remove suffix can not update lazy loaded import paths in route config files.

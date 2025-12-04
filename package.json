@@ -3,7 +3,7 @@
   "displayName": "Rename Angular Component",
   "description": "Rename Angular Components, Directives, Pipes and Services",
   "publisher": "tomwhite007",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -155,6 +155,11 @@
           "type": "boolean",
           "default": true,
           "description": "Show the 'What's New' screen when the extension is updated to a new version."
+        },
+        "renameAngularComponent.showSuffixRemovalReadme": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the README.md file when running the suffix removal command."
         }
       }
     }

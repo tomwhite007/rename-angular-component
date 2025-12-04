@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
+import { conf } from '../../move-ts-indexer/util/helper-functions';
 import { UserMessage } from '../logging/user-message.class';
 import AngularFileSuffixRemover, {
   renameAllAngularFiles,
@@ -295,6 +296,11 @@ export class SuffixRemovalHandler {
    * Show the README.md file in preview mode
    */
   private async showReadme(): Promise<void> {
+    // Check if showing the README is disabled via configuration
+    if (!conf('showSuffixRemovalReadme', true)) {
+      return;
+    }
+
     try {
       const readmePath = path.join(
         this.context.extensionPath,

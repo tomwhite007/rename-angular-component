@@ -332,7 +332,7 @@ class AngularFileSuffixRemover {
       // For pipe and module files, check for class declarations (both are typically classes)
       if (['pipe', 'module'].includes(this.suffix)) {
         const classRegex = new RegExp(
-          `export\\s+(?:default\\s+)?class\\s+(\\w*${this.capitalize(
+          `export\\s+(?:default\\s+)?(?:abstract\\s+)?class\\s+(\\w*${this.capitalize(
             this.suffix
           )})\\b`,
           'g'
@@ -353,7 +353,7 @@ class AngularFileSuffixRemover {
       if (['guard', 'interceptor', 'resolver'].includes(this.suffix)) {
         // First, look for export class declarations
         const classRegex = new RegExp(
-          `export\\s+(?:default\\s+)?class\\s+(\\w*${this.capitalize(
+          `export\\s+(?:default\\s+)?(?:abstract\\s+)?class\\s+(\\w*${this.capitalize(
             this.suffix
           )})\\b`,
           'g'
@@ -391,7 +391,7 @@ class AngularFileSuffixRemover {
 
       // For other file types (component, service, directive), look for export class declarations
       const classRegex = new RegExp(
-        `export\\s+(?:default\\s+)?class\\s+(\\w*${this.capitalize(
+        `export\\s+(?:default\\s+)?(?:abstract\\s+)?class\\s+(\\w*${this.capitalize(
           this.suffix
         )})\\b`,
         'g'
@@ -440,7 +440,7 @@ class AngularFileSuffixRemover {
       if (isClass) {
         // Update class declaration
         const classDeclarationRegex = new RegExp(
-          `export\\s+(?:default\\s+)?class\\s+${oldClassName}\\b`,
+          `export\\s+(?:default\\s+)?(?:abstract\\s+)?class\\s+${oldClassName}\\b`,
           'g'
         );
         newContent = newContent.replace(classDeclarationRegex, (match) => {

@@ -317,9 +317,15 @@ export class ReferenceIndexBuilder {
         );
       });
       beforeReplacements.forEach((beforeReplacement) => {
+        // Check if start position points to a quote character (regular imports)
+        // or already points to the first character of the path (router imports)
+        const startChar = text[beforeReplacement.location.start];
+        const endChar = text[beforeReplacement.location.end - 1];
+        const startOffset = startChar === '"' || startChar === "'" ? 1 : 0;
+        const endOffset = endChar === '"' || endChar === "'" ? 1 : 0;
         const edit = {
-          start: beforeReplacement.location.start + 1,
-          end: beforeReplacement.location.end - 1,
+          start: beforeReplacement.location.start + startOffset,
+          end: beforeReplacement.location.end - endOffset,
           replacement: after,
         };
         edits.push(edit);
@@ -997,12 +1003,16 @@ export class ReferenceIndexBuilder {
         ts.isStringLiteral(node.arguments[0])
       ) {
         const importPathNode = node.arguments[0];
+        // Get the start position of the opening quote (excluding leading whitespace)
+        // Then add 1 to get the first character of the import path (after the quote)
+        const quoteStart = importPathNode.getStart(file);
+        const pathStart = quoteStart + 1;
         const foundItem: FoundItem = {
           itemType: 'importPath',
           itemText: importPathNode.text,
           location: {
-            start: importPathNode.pos,
-            end: importPathNode.end,
+            start: pathStart,
+            end: importPathNode.getEnd(),
           },
         };
         this.debugLogger.log(

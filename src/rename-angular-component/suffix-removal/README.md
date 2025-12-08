@@ -64,20 +64,21 @@ Here are some considerations for next steps after you have successfully removed 
 
 If you encounter namespace collisions after running the suffix removal tool, you can use an AI agent to help identify and fix them systematically. Here's a prompt and strategies for effective repair:
 
-### AI Agent Prompt
+## AI Agent Prompt
 
-```
 I've just run an Angular suffix removal tool that renamed files like `user.component.ts` → `user.ts` and `user.service.ts` → `user.ts`, removing suffixes from both filenames and class names. This has created namespace collisions where multiple classes now share the same name (e.g., `User` could refer to both a component and a service).
 
 Please help me identify and fix all namespace collisions in this repository:
 
 1. **Identify collisions:**
+
    - Use `git diff` to see what files were renamed and what classes were changed
    - Look for TypeScript compilation errors indicating ambiguous imports
    - Search for patterns like `inject(User)` or `new User()` where `User` could be ambiguous
    - Find files that import multiple classes with the same name from different paths
 
 2. **For each collision:**
+
    - Determine which class should keep the base name (typically components keep the base name)
    - Analyze the conflicting class definitions to understand their purpose and choose semantic suffixes
    - Rename the other class(es) to include a purpose-based suffix (e.g., `UserState`, `UserDataAccess`, `UserModel`, `UserHelper` instead of generic `UserService`)
@@ -85,11 +86,13 @@ Please help me identify and fix all namespace collisions in this repository:
    - Rename the file to match the new class name using kebab-case (e.g., `UserDataAccess` → `user-data-access.ts`)
 
 3. **Verify fixes:**
+
    - Run TypeScript compiler to check for remaining errors
    - Search for any remaining ambiguous references
    - Test that the application builds and runs correctly
 
 4. **Output summary:**
+
    - After completing all fixes, provide a comprehensive summary listing every class that was renamed
    - For each renamed class, include:
      - Original definition name (before suffix removal, e.g., `UserService`)
@@ -99,9 +102,8 @@ Please help me identify and fix all namespace collisions in this repository:
    - Format the summary as a clear table or list for easy review
 
    **Example output format:**
-```
 
-## Namespace Collision Fixes Summary
+### Namespace Collision Fixes Summary
 
 | Original Name | Type      | New Name       | File Path                        |
 | ------------- | --------- | -------------- | -------------------------------- |

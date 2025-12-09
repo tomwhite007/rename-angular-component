@@ -93,28 +93,44 @@ Please help me identify and fix all namespace collisions in this repository:
 
 4. **Output summary:**
 
-   - After completing all fixes, provide a comprehensive summary listing every class that was renamed
-   - For each renamed class, include:
-     - Original definition name (before suffix removal, e.g., `UserService`)
-     - Type (component, service, directive, interface, guard, interceptor, etc.)
-     - New name generated (e.g., `UserDataAccess`)
-     - File path where the class is defined
-   - Format the summary as a clear table or list for easy review
+   - After completing all fixes, provide a single comprehensive table listing ALL changes made (excluding individual import updates)
+   - The table must be in a format that can be easily exported to a spreadsheet (CSV-compatible)
+   - Include the following columns for each change:
+     - **Original Name**: The class/interface name before suffix removal (e.g., `UserService`, `UserInterface`)
+     - **Type**: The Angular type (component, service, directive, interface, guard, interceptor, etc.)
+     - **New Name**: The new name assigned (e.g., `UserDataAccess`, `UserModel`). For unchanged items, use the actual name (e.g., `User`, `Profile`)
+     - **Original File Path**: The file path before renaming (e.g., `src/app/user.service.ts`)
+     - **New File Path**: The file path after renaming (e.g., `src/app/user-data-access.ts`). If the file wasn't renamed, use the same path as Original File Path
+     - **Change Type**: One of: "Class Renamed", "File Renamed", "Type Alias Added", "Both Class and File Renamed", "unchanged"
+     - **Files Updated Count**: Number of files that had imports/references updated (just the count, not the list)
+   - Do NOT include narrative text, explanations, or lists of individual files with updated imports
+   - Keep the summary concise and tabular only
+   - If type aliases were used (e.g., `import { Profile as ProfileModel }`), include them as separate rows with Change Type "Type Alias Added"
 
-   **Example output format:**
+   **Required output format (CSV-compatible markdown table):**
 
-### Namespace Collision Fixes Summary
+   ```
+   ## Namespace Collision Fixes Summary
 
-| Original Name | Type      | New Name       | File Path                        |
-| ------------- | --------- | -------------- | -------------------------------- |
-| UserService   | service   | UserDataAccess | src/services/data-access/user.ts |
-| UserDirective | directive | UserHighlight  | src/directives/user-highlight.ts |
-| UserInterface | interface | UserModel      | src/models/user.ts               |
+   | Original Name | Type      | New Name            | Original File Path                              | New File Path                               | Change Type              | Files Updated Count |
+   | ------------- | --------- | ------------------- | ----------------------------------------------- | ------------------------------------------- | ------------------------ | ------------------- |
+   | UserService   | service   | UserAuth            | src/app/core/auth/services/user.ts              | src/app/core/auth/services/user-auth.ts     | Both Class and File Renamed | 13                  |
+   | UserInterface | interface | User                | src/app/core/auth/user.model.ts                 | src/app/core/auth/user.model.ts             | unchanged                | 0                   |
+   | ProfileService | service   | ProfileDataAccess   | src/app/features/profile/services/profile.ts   | src/app/features/profile/services/profile-data-access.ts | Both Class and File Renamed | 5                   |
+   | ProfileComponent | component | Profile             | src/app/features/profile/pages/profile/profile.ts | src/app/features/profile/pages/profile/profile.ts | unchanged | 0                   |
+   | ProfileInterface | interface | ProfileModel        | src/app/features/profile/models/profile.model.ts | src/app/features/profile/models/profile.model.ts | Type Alias Added | 2                   |
+   ```
 
-```
+   **Notes:**
+
+   - For unchanged items, use the actual name (e.g., "User", "Profile") not "unchanged" in the New Name column
+   - Include all classes/interfaces involved in collisions, even if they weren't renamed
+   - Use "unchanged" only in the Change Type column when no changes were made
+   - Count all files that had any imports or references updated, including test files
+
+   **Important:** The summary must be ONLY the table above. Do not include narrative explanations, collision descriptions, file lists, verification details, or summary statistics. The table is the complete output.
 
 Please work systematically through the repository, fixing one collision at a time and verifying each fix before moving to the next.
-```
 
 ### Strategies for Effective Collision Detection
 

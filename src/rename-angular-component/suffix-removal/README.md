@@ -130,6 +130,24 @@ Please help me identify and fix all namespace collisions in this repository:
 
    **Important:** The summary must be ONLY the table above. Do not include narrative explanations, collision descriptions, file lists, verification details, or summary statistics. The table is the complete output.
 
+   **CSV Export:** After providing the markdown table, offer to provide the same data as a downloadable CSV file. Format the CSV with:
+
+   - Header row with column names: Original Name, Type, New Name, Original File Path, New File Path, Change Type, Files Updated Count
+   - One row per change
+   - Proper CSV escaping (quotes around fields containing commas)
+   - Present it in a code block with filename suggestion (e.g., `namespace-collision-fixes.csv`)
+
+   **Example CSV format:**
+
+   ```
+   namespace-collision-fixes.csv
+
+   Original Name,Type,New Name,Original File Path,New File Path,Change Type,Files Updated Count
+   UserService,service,UserAuth,src/app/core/auth/services/user.ts,src/app/core/auth/services/user-auth.ts,Both Class and File Renamed,13
+   UserInterface,interface,User,src/app/core/auth/user.model.ts,src/app/core/auth/user.model.ts,unchanged,0
+   ProfileService,service,ProfileDataAccess,src/app/features/profile/services/profile.ts,src/app/features/profile/services/profile-data-access.ts,Both Class and File Renamed,5
+   ```
+
 Please work systematically through the repository, fixing one collision at a time and verifying each fix before moving to the next.
 
 ### Strategies for Effective Collision Detection

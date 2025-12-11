@@ -148,6 +148,28 @@ Please help me identify and fix all namespace collisions in this repository:
    ProfileService,service,ProfileDataAccess,src/app/features/profile/services/profile.ts,src/app/features/profile/services/profile-data-access.ts,Both Class and File Renamed,5
    ```
 
+5. **Update inject() variable names:**
+
+   After all namespace collisions are fixed, perform a final pass through all `*.ts` files in the repository to update variable names in `inject()` assignments:
+
+   - Search for all `inject()` variable assignments in every `*.ts` file (e.g., `private userService = inject(User)`, `protected profileService = inject(Profile)`)
+   - For each variable assignment:
+     1. **Remove Angular suffix from variable name**: If the variable name contains an Angular suffix (e.g., `userService`, `profileService`), remove the Angular suffix to get the base name (e.g., `user`, `profile`)
+     2. **Match to injected class name**: Update the variable name to match the injected class name in camelCase:
+        - If `private userService = inject(UserDataAccess)`, rename to `private userDataAccess = inject(UserDataAccess)`
+        - If `private profileService = inject(Profile)`, rename to `private profile = inject(Profile)`
+        - If `private userState = inject(UserState)`, keep as `private userState = inject(UserState)` (already matches)
+     3. **Update all usages**: Update the variable name everywhere it's used within the same file (method calls, property access, etc.)
+   - Ensure variable names follow camelCase convention
+   - Skip variables that already match their injected class name in camelCase
+
+   **Example transformations:**
+
+   - `private userService = inject(UserDataAccess)` → `private userDataAccess = inject(UserDataAccess)`
+   - `private profileService = inject(Profile)` → `private profile = inject(Profile)`
+   - `private authService = inject(UserAuth)` → `private userAuth = inject(UserAuth)`
+   - `private userState = inject(UserState)` → (no change, already matches)
+
 Please work systematically through the repository, fixing one collision at a time and verifying each fix before moving to the next.
 
 ### Strategies for Effective Collision Detection
@@ -295,3 +317,23 @@ When fixing collisions, the agent should:
 4. **Rename Files Appropriately**: If a class is renamed, ensure the file name matches the new class name using kebab-case (e.g., `UserDataAccess` class should be in `user-data-access.ts`, `UserState` class should be in `user-state.ts`)
 
 5. **Verify Incrementally**: After each fix, run the TypeScript compiler to ensure no new errors were introduced and existing errors are resolved.
+
+6. **Update inject() Variable Names (Final Step)**: After all namespace collisions are fixed, perform a final pass to update variable names in `inject()` assignments:
+
+   - Search through all `*.ts` files in the repository for `inject()` variable assignments
+   - For each assignment found (e.g., `private userService = inject(UserDataAccess)`):
+     1. **Remove Angular suffix**: If the variable name has an Angular suffix (e.g., `userService`, `profileService`), remove the Angular suffix to get the base name
+     2. **Match class name**: Update the variable name to match the injected class name in camelCase:
+        - Extract the class name from the `inject()` call
+        - Convert to camelCase (e.g., `UserDataAccess` → `userDataAccess`, `UserAuth` → `userAuth`)
+        - Update the variable name to match
+     3. **Update all usages**: Find all references to the old variable name within the same file and update them
+   - Skip variables that already match their injected class name in camelCase
+   - Ensure all variable names follow camelCase convention
+
+   **Examples:**
+
+   - `private userService = inject(UserDataAccess)` → `private userDataAccess = inject(UserDataAccess)`
+   - `private profileService = inject(Profile)` → `private profile = inject(Profile)`
+   - `private authService = inject(UserAuth)` → `private userAuth = inject(UserAuth)`
+   - `private userState = inject(UserState)` → (no change needed, already matches)

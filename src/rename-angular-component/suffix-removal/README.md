@@ -62,7 +62,7 @@ Here are some considerations for next steps after you have successfully removed 
 
 ## 🔧 Repairing Namespace Collisions
 
-If you encounter namespace collisions after running the suffix removal tool, you can use an AI agent to help identify and fix them systematically. Here's a prompt and strategies for effective repair:
+If you encounter namespace collisions after running the suffix removal tool, you can use an AI agent to help identify and fix them systematically. Here's a prompt with strategies for effective repair (Just copy and paste everything below **'AI Agent Prompt'** to the end of this file):
 
 ## AI Agent Prompt
 

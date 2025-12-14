@@ -1007,12 +1007,15 @@ export class ReferenceIndexBuilder {
         // Then add 1 to get the first character of the import path (after the quote)
         const quoteStart = importPathNode.getStart(file);
         const pathStart = quoteStart + 1;
+        // Get the end position before the closing quote to match the start position
+        // which excludes the opening quote
+        const pathEnd = importPathNode.getEnd() - 1;
         const foundItem: FoundItem = {
           itemType: 'importPath',
           itemText: importPathNode.text,
           location: {
             start: pathStart,
-            end: importPathNode.getEnd(),
+            end: pathEnd,
           },
         };
         this.debugLogger.log(

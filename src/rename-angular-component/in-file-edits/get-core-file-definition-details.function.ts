@@ -112,6 +112,16 @@ const definitionProcessors: DefinitionProcessor[] = [
     extractName: (node: ts.Statement) =>
       nameExtractors.getEnumName(node as ts.EnumDeclaration),
   },
+  // This is a fallback for classes that don't match the expected stub
+  {
+    type: 'class',
+    predicate: (node: ts.Statement, stub: string) =>
+      typeGuards.isClassDeclaration(node) && hasDecorator(node),
+    extractName: (node: ts.Statement) =>
+      nameExtractors.getClassName(node as ts.ClassDeclaration),
+    extractDecorator: (node: ts.Statement) =>
+      getDecoratorName(node as ts.ClassDeclaration),
+  },
 ];
 
 export async function getCoreFileDefinitionDetails(

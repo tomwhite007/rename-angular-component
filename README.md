@@ -41,7 +41,7 @@ Based on the same naming convention in the [Angular Style Guide](https://angular
 - Rename the element, attribute or class selectors inside the class decorator metadata, and in all HTML templates in the repository (provided the selector follows the correct naming convention)
 - Fix all import paths and their class names
 - **Angular 20 compatibility**: Automatically handles the transition between old '.component' suffix and new no-suffix format, or vice versa
-- **Angular 20 compatibility - New Command**: "Rename all Angular suffixes to v20 styleguide" - a script to convert all legacy Angular files in your repo
+- **Pre-Angular 20 class name migration**: "Rename all Angular suffixes to v20 styleguide" - a script to convert all legacy Angular files in your repo
 
 _Example - Changes to Component file after rename:_
 
@@ -56,7 +56,7 @@ _Example - Changes to an element selector in a parent template:_
 This extension contributes the following settings:
 
 - `renameAngularComponent.projectUsesStandaloneComponentsOnly`: Uncheck this if your project uses Modules. Then all selectors will be updated in **all** templates, instead of just the components that import the renamed component. Note: unchecking this option means that any duplicate selectors in your repository will get updated as well.
-- `renameAngularComponent.followAngular20FolderAndSelectorNamingConvention`: Since Angular 20.x, CLI-generated folder names include any dot-suffix you type in the folder name, and the selector - which breaks the build. When this option is set to false, the renamer generates the folder name and selector without the dot-suffix (this is the default setting, to allow you to convert new components to the old suffix format if you want to).
+- `renameAngularComponent.followAngular20FolderAndSelectorNamingConvention`: Since Angular 20.x, CLI-generated folder names include any dot-suffix you type in the folder name, and the selector also includes the dot-suffix - which breaks the build. When this option is set to false, the renamer generates the folder name and selector without the dot-suffix (this is the default setting, to allow you to convert new components to the old suffix format if you want to).
 - `renameAngularComponent.useLocalDirectPaths`: Update imports/exports with direct local paths even if wildcard path exists
 - `renameAngularComponent.showWhatsNewPopup`: Show the 'What's New' screen when the extension is updated to a new version
 - `renameAngularComponent.debugLog`: Enable/disable debug logging to file for optional submission with new issue reports
@@ -79,11 +79,15 @@ Thanks to [Aristeidis Bampakos GDE](https://github.com/bampakoa) for raising iss
 
 Thanks to [@hablix](https://github.com/hablix) for raising issue [29](https://github.com/tomwhite007/rename-angular-component/issues/29) (fixed in Version 2.1.3), with thanks also to [@elmehdielhamdi](https://github.com/elmehdielhamdi) and [@MohRaouf](https://github.com/MohRaouf)
 
-Thanks to [wein2011](https://github.com/wein2011) for improvements to the [Angular 20 Suffix Removal Readme guide](src/rename-angular-component/suffix-removal/README.md).
+Thanks to [@wein2011](https://github.com/wein2011) for suggested improvements to the [Angular 20 Suffix Removal Readme guide](src/rename-angular-component/suffix-removal/README.md) (added in version 4.2.0)
+
+Thanks to [@Oppslia](https://github.com/Oppslia) for raising issue [64](https://github.com/tomwhite007/rename-angular-component/issues/64) (fixed in version 4.3.0)
 
 ## Release Notes
 
-## Latest version: 4.2.0 - 2025-12-04
+## Latest version: 4.3.0 - 2026-01-09
 
-- Fix: Renamed router lazy imports sometimes lose first quote causing compile error.
-- Fix: Allow Angular 20 suffix removal script to cope with abstract classes.
+- Feature: add AI Agent Prompt to fix class namespace collisions with use-based naming convention when removing all pre-Angular 20 suffixes
+- Feature: improve 'Rename all Angular suffixes to v20 styleguide' script to include abstract classes
+- Fix: Lazy router imports after rename line-wrap bug
+- Fix: Rename of attribute and css-class component selectors in templates

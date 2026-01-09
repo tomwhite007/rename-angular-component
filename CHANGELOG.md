@@ -1,6 +1,13 @@
 # Change Log
 
-## Latest version: [4.2.0] - 2025-12-04
+## Latest version: [4.3.0] - 2026-01-09
+
+- Feature: add AI Agent Prompt to fix class namespace collisions with use-based naming convention when removing all pre-Angular 20 suffixes
+- Feature: improve 'Rename all Angular suffixes to v20 styleguide' script to include abstract classes
+- Fix: Lazy router imports after rename line-wrap bug
+- Fix: Rename of attribute and css-class component selectors in templates
+
+## [4.2.0] - 2025-12-04
 
 - Fix: Renamed router lazy imports sometimes lose first quote causing compile error.
 - Fix: Allow Angular 20 suffix removal script to cope with abstract classes.
@@ -8,7 +15,7 @@
 ## [4.1.0] - 2025-11-08
 
 - Feature: Script to convert all .component suffixes to the Angular 20 no-suffix format (Experimental)
-- Fix: Rename same file to remove suffix can not update lazy loaded import paths in route config files.
+- Fix: Rename same file to remove suffix cannot update lazy loaded import paths in route config files.
 - Fix: Rename project root, app component can break app.routes
 
 ## [4.0.0] - 2025-09-10

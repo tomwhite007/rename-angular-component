@@ -1,5 +1,6 @@
 import { escapeRegex } from '../../utils/escape-regex';
 import { AngularConstructOrPlainFile } from '../definitions/file.interfaces';
+import { stripSelectorBraces } from './strip-selector-braces.function';
 
 export function renameSelectorInTemplate(
   html: string,
@@ -7,12 +8,17 @@ export function renameSelectorInTemplate(
   newSelector: string,
   construct: AngularConstructOrPlainFile | null
 ) {
+  // For templates, selectors appear without type markers ([], .)
+  // So we need to strip markers from both old and new selectors for matching/replacement
+  const originalSelectorForTemplate = stripSelectorBraces(originalSelector);
+  const newSelectorForTemplate = stripSelectorBraces(newSelector);
+  
   let regExBodyStr = '';
   if (construct === 'pipe') {
-    regExBodyStr = `(?<=\\| )${escapeRegex(originalSelector)}`;
+    regExBodyStr = `(?<=\\| )${escapeRegex(originalSelectorForTemplate)}`;
   } else {
     regExBodyStr = `(?<![\\w\\-_])${escapeRegex(
-      originalSelector
+      originalSelectorForTemplate
     )}(?![\\w\\-_])`;
   }
 
@@ -23,5 +29,5 @@ export function renameSelectorInTemplate(
   }
 
   const findAll = new RegExp(regExBodyStr, 'g');
-  return html.replace(findAll, newSelector);
+  return html.replace(findAll, newSelectorForTemplate);
 }

@@ -98,4 +98,26 @@ describe('renameSelectorInTemplate', () => {
     const result = renameSelectorInTemplate(html, 'oldPipe', 'newPipe', 'pipe');
     expect(result).to.equal('<div>{{ value | newPipe }}</div>');
   });
+
+  it('should replace attribute selector with brackets in template', () => {
+    const html = '<div appOld></div>';
+    const result = renameSelectorInTemplate(
+      html,
+      '[appOld]',
+      '[appNew]',
+      'directive'
+    );
+    expect(result).to.equal('<div appNew></div>');
+  });
+
+  it('should replace class selector with dot in template', () => {
+    const html = '<div class="app-old"></div>';
+    const result = renameSelectorInTemplate(
+      html,
+      '.app-old',
+      '.app-new',
+      'component'
+    );
+    expect(result).to.equal('<div class="app-new"></div>');
+  });
 });

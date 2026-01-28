@@ -1,6 +1,10 @@
 # Change Log
 
-## Latest version: [4.3.0] - 2026-01-09
+## Latest version: [4.4.0] - 2026-01-28
+
+- Feature: Add command to open the Angular 20 suffix removal guide directly (located in `assets/ANGULAR-SUFFIX-REMOVAL.md`)
+
+## [4.3.0] - 2026-01-09
 
 - Feature: add AI Agent Prompt to fix class namespace collisions with use-based naming convention when removing all pre-Angular 20 suffixes
 - Feature: improve 'Rename all Angular suffixes to v20 styleguide' script to include abstract classes

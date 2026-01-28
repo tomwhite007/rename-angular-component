@@ -304,10 +304,8 @@ export class SuffixRemovalHandler {
     try {
       const readmePath = path.join(
         this.context.extensionPath,
-        'src',
-        'rename-angular-component',
-        'suffix-removal',
-        'README.md'
+        'assets',
+        'ANGULAR-SUFFIX-REMOVAL.md'
       );
 
       // Check if the file exists

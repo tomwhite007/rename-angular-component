@@ -294,10 +294,12 @@ export class SuffixRemovalHandler {
 
   /**
    * Show the README.md file in preview mode
+   * @param force - If true, ignores the configuration setting and forces the readme to open
    */
-  private async showReadme(): Promise<void> {
+  public async showReadme(force: boolean = false): Promise<void> {
     // Check if showing the README is disabled via configuration
-    if (!conf('showSuffixRemovalReadme', true)) {
+    // If force is true, we skip this check
+    if (!force && !conf('showSuffixRemovalReadme', true)) {
       return;
     }
 

@@ -81,6 +81,10 @@
       {
         "command": "rename-angular-component.renameAllSuffixes",
         "title": "Rename all Angular suffixes to v20 styleguide"
+      },
+      {
+        "command": "rename-angular-component.openSuffixRemovalReadme",
+        "title": "Rename Angular Component: Open Suffix Removal Guide"
       }
     ],
     "menus": {

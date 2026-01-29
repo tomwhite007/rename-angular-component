@@ -12,7 +12,7 @@ So, I updated my VS Code extension, [Rename Angular Component](https://marketpla
 
 But there's a catch.
 
-## The Namespace Collision Problem
+## 💥 The Namespace Collision Problem
 
 When you strip suffixes, you quickly run into a problem I call "Namespace Collision."
 
@@ -32,7 +32,9 @@ Three classes named `User` in three files named `user.ts`. The compiler screams,
 
 I wanted to find the best way to handle this, so I took the [Angular Realworld Example App](https://github.com/realworld-apps/angular-realworld-example-app) for a spin to test two different approaches using the extension.
 
-## Approach 1: The Deterministic (Manual) Way
+**⚠️ Note:** Whichever path you choose, **do not commit** your changes immediately after running the bulk rename command. You need the file changes to sit in your working tree so that `git diff` is available. This diff is the evidence that either you (in Path 1) or the AI agent (in Path 2) will use to identify what happened and spot the collisions.
+
+## 🛠️ Approach 1: The Deterministic (Manual) Way
 
 This is for those who trust their own hands more than a probabilistic model.
 
@@ -50,7 +52,7 @@ This is for those who trust their own hands more than a probabilistic model.
 
     It’s fast. It’s cleaner. And frankly, for a handful of files, it's quicker than explaining the context to an LLM.
 
-## Approach 2: The "AI Assisted" Way
+## 🤖 Approach 2: The "AI Assisted" Way
 
 If scale is your problem (or you're just tired), the extension now comes with a specifically crafted **AI Agent Prompt**.
 
@@ -70,7 +72,7 @@ If scale is your problem (or you're just tired), the extension now comes with a 
 
 I tried this on the [Angular Realworld Example App](https://github.com/realworld-apps/angular-realworld-example-app). It correctly identified that `UserService` and `UserComponent` were colliding, and renamed the service to `UserDataAccess` (because it saw the HTTP client usage), resolving the conflict without me typing a single character. I've submited the output as a PR on their [GitHub repo](https://github.com/realworld-apps/angular-realworld-example-app/pull/1).
 
-## Why Not Just Use AI for Everything?
+## 🤔 Why Not Just Use AI for Everything?
 
 You might ask, "Why do I need an extension? I'll just ask ChatGPT to rename my project."
 
@@ -80,7 +82,7 @@ Specialized tools like **Rename Angular Component** are deterministic. They foll
 
 Use AI for the hard stuff—deciding _what_ to name a colliding service. Use the extension for the grunt work—renaming the other 498 files correctly.
 
-## Conclusion
+## 🏁 Conclusion
 
 If you're updating your "legacy" Angular project to modern standards:
 

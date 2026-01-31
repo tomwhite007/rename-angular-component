@@ -13,6 +13,14 @@ export async function isAngularProject(): Promise<boolean> {
         // Continue
       }
 
+      // Check for nx.json at root
+      try {
+        await workspace.fs.stat(Uri.joinPath(folder.uri, 'nx.json'));
+        return true;
+      } catch {
+        // Continue
+      }
+
       // Check for package.json at root with @angular/core
       try {
         const packageJsonPath = Uri.joinPath(folder.uri, 'package.json');

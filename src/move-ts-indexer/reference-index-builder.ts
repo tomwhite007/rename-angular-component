@@ -19,6 +19,9 @@ import {
 } from './util/helper-functions';
 import { FoundItem, Reference } from './util/shared-interfaces';
 
+const EXCLUDE_GLOB =
+  '**/{node_modules,dist,out,build,.nx,.git,.angular,coverage,test-results,typings,jspm_packages}/**';
+
 const BATCH_SIZE = 50;
 
 type Replacement = [string, string];
@@ -73,8 +76,8 @@ export class ReferenceIndexBuilder {
 
     const packageFiles = await vscode.workspace.findFiles(
       '**/package.json',
-      '**/node_modules/**',
-      1000
+      EXCLUDE_GLOB,
+      5000
     );
 
     for (const packageFile of packageFiles) {
@@ -100,8 +103,8 @@ export class ReferenceIndexBuilder {
 
     const configFiles = await vscode.workspace.findFiles(
       '**/tsconfig{.json,.build.json}',
-      '**/node_modules/**',
-      1000
+      EXCLUDE_GLOB,
+      5000
     );
 
     this.debugLogger.log('tsConfig files found: ', JSON.stringify(configFiles));
@@ -214,7 +217,7 @@ export class ReferenceIndexBuilder {
 
     const files = await vscode.workspace.findFiles(
       this.filesToScanGlob,
-      '**/node_modules/**',
+      EXCLUDE_GLOB,
       100000
     );
 
@@ -249,7 +252,7 @@ export class ReferenceIndexBuilder {
       batchTimeout = undefined;
 
       vscode.workspace
-        .findFiles(this.filesToScanGlob, '**/node_modules/**', 10000)
+        .findFiles(this.filesToScanGlob, EXCLUDE_GLOB, 10000)
         .then((files) => {
           const b = new Set(batch.splice(0, batch.length));
           if (b.size) {
@@ -681,13 +684,7 @@ export class ReferenceIndexBuilder {
       message: string;
     }>
   ): Promise<any> {
-    files = files.filter((f) => {
-      return (
-        f.fsPath.indexOf('typings') === -1 &&
-        f.fsPath.indexOf('node_modules') === -1 &&
-        f.fsPath.indexOf('jspm_packages') === -1
-      );
-    });
+    files = files.filter((f) => !this.shouldExclude(f.fsPath));
 
     return new Promise((resolve) => {
       let index = 0;
@@ -725,14 +722,25 @@ export class ReferenceIndexBuilder {
     );
   }
 
+  private shouldExclude(fsPath: string): boolean {
+    const pathToCheck = asUnix(fsPath);
+    return (
+      pathToCheck.includes('/node_modules/') ||
+      pathToCheck.includes('/dist/') ||
+      pathToCheck.includes('/out/') ||
+      pathToCheck.includes('/build/') ||
+      pathToCheck.includes('/.nx/') ||
+      pathToCheck.includes('/.git/') ||
+      pathToCheck.includes('/.angular/') ||
+      pathToCheck.includes('/coverage/') ||
+      pathToCheck.includes('/test-results/') ||
+      pathToCheck.includes('/typings/') ||
+      pathToCheck.includes('/jspm_packages/')
+    );
+  }
+
   private processDocuments(documents: vscode.TextDocument[]): Promise<any> {
-    documents = documents.filter((doc) => {
-      return (
-        doc.uri.fsPath.indexOf('typings') === -1 &&
-        doc.uri.fsPath.indexOf('node_modules') === -1 &&
-        doc.uri.fsPath.indexOf('jspm_packages') === -1
-      );
-    });
+    documents = documents.filter((doc) => !this.shouldExclude(doc.uri.fsPath));
 
     return new Promise((resolve) => {
       let index = 0;

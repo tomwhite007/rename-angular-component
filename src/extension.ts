@@ -17,6 +17,15 @@ export function activate(context: vscode.ExtensionContext) {
     debugLogger.logToConsole(
       `Rename Angular Component check: is Angular project? ${isAngular}`
     );
+    
+    // Create output channel to communicate with user about activation status
+    const outputChannel = vscode.window.createOutputChannel('Rename Angular Component');
+    outputChannel.appendLine(`Activation check: Is Angular Project? ${isAngular}`);
+    if (isAngular) {
+      outputChannel.appendLine('Extension activated and indexing...');
+    } else {
+      outputChannel.appendLine('Extension did not detect an Angular project. Commands disabled.');
+    }
 
     // Set context key to enable / disable commands listed in package.json
     vscode.commands.executeCommand(

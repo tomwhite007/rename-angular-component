@@ -5,6 +5,9 @@ node_modules/**
 src/**
 .gitignore
 .yarnrc
+.yarnrc.yml
+.yarn/**
+yarn.lock
 esbuild.js
 vsc-extension-quickstart.md
 **/tsconfig.json

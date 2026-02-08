@@ -79,13 +79,17 @@ Thanks to [Aristeidis Bampakos GDE](https://github.com/bampakoa) for raising iss
 
 Thanks to [@hablix](https://github.com/hablix) for raising issue [29](https://github.com/tomwhite007/rename-angular-component/issues/29) (fixed in Version 2.1.3), with thanks also to [@elmehdielhamdi](https://github.com/elmehdielhamdi) and [@MohRaouf](https://github.com/MohRaouf)
 
-Thanks to [@wein2011](https://github.com/wein2011) for suggested improvements to the [Angular 20 Suffix Removal Readme guide](src/rename-angular-component/suffix-removal/README.md) (added in version 4.2.0)
+Thanks to [@wein2011](https://github.com/wein2011) for suggested improvements to the [Angular 20 Suffix Removal Readme guide](assets/ANGULAR-SUFFIX-REMOVAL.md) (feature improved in version 4.4.0)
 
 Thanks to [@Oppslia](https://github.com/Oppslia) for raising issue [64](https://github.com/tomwhite007/rename-angular-component/issues/64) (fixed in version 4.3.0)
 
 ## Release Notes
 
-## Latest version: 4.3.0 - 2026-01-09
+## Latest version: 4.4.0 - 2026-01-28
+
+- Feature: Add command to open the Angular 20 suffix removal guide directly (located in `assets/ANGULAR-SUFFIX-REMOVAL.md`)
+
+## 4.3.0 - 2026-01-09
 
 - Feature: add AI Agent Prompt to fix class namespace collisions with use-based naming convention when removing all pre-Angular 20 suffixes
 - Feature: improve 'Rename all Angular suffixes to v20 styleguide' script to include abstract classes

@@ -150,6 +150,13 @@ export function activate(context: vscode.ExtensionContext) {
         () => suffixRemovalHandler.execute()
       )
     );
+
+    context.subscriptions.push(
+      vscode.commands.registerCommand(
+        'rename-angular-component.openSuffixRemovalReadme',
+        () => suffixRemovalHandler.showReadme(true)
+      )
+    );
   });
 }
 

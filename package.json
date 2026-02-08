@@ -3,7 +3,7 @@
   "displayName": "Rename Angular Component",
   "description": "Rename Angular Components, Directives, Pipes and Services",
   "publisher": "tomwhite007",
-  "version": "4.3.0",
+  "version": "4.4.1",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -81,6 +81,10 @@
       {
         "command": "rename-angular-component.renameAllSuffixes",
         "title": "Rename all Angular suffixes to v20 styleguide"
+      },
+      {
+        "command": "rename-angular-component.openSuffixRemovalReadme",
+        "title": "Rename Angular Component: Open Angular 20+ Suffix Removal Guide"
       }
     ],
     "menus": {
